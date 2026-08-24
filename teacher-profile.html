@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunshine · Teacher Profiles</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: #f7f3ed;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* header */
+        .page-header {
+            background: white;
+            border-radius: 32px;
+            padding: 1.2rem 2rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            border: 1px solid rgba(245, 138, 46, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #2d1f0c;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .page-header h1 i {
+            color: #f58a2e;
+            background: #fcf3e8;
+            padding: 0.3rem 0.6rem;
+            border-radius: 16px;
+            font-size: 1.2rem;
+        }
+
+        .page-header .header-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .page-header .badge {
+            background: #fcf3e8;
+            color: #7f6a4b;
+            padding: 0.3rem 1.2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            border: 1px solid rgba(245, 138, 46, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .page-header .badge i {
+            color: #f58a2e;
+        }
+
+        .stat-chip {
+            background: linear-gradient(135deg, #fcf3e8, #fef7ef);
+            padding: 0.3rem 1.4rem;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #2d1f0c;
+            border: 1px solid rgba(245, 138, 46, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-chip i {
+            color: #f58a2e;
+        }
+
+        .stat-chip .number {
+            color: #f58a2e;
+            font-size: 1.1rem;
+        }
+
+        /* search bar */
+        .search-section {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.8rem;
+            border: 1px solid rgba(245, 138, 46, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .search-section .search-icon {
+            color: #b09a7e;
+            font-size: 1rem;
+        }
+
+        .search-section input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.6rem 0;
+            border: none;
+            outline: none;
+            font-size: 0.95rem;
+            background: transparent;
+            color: #2d1f0c;
+            font-weight: 500;
+        }
+
+        .search-section input::placeholder {
+            color: #b8a58b;
+            font-weight: 400;
+        }
+
+        .search-section .search-divider {
+            width: 1px;
+            height: 28px;
+            background: #f0e2d2;
+        }
+
+        .search-section .filter-label {
+            font-size: 0.8rem;
+            color: #7f6a4b;
+            font-weight: 600;
+        }
+
+        /* teacher grid */
+        .teacher-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .teacher-card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem 1.8rem;
+            border: 1px solid rgba(245, 138, 46, 0.06);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .teacher-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #f58a2e, #f9b042, #f58a2e);
+            background-size: 200% 100%;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .teacher-card:hover::before {
+            opacity: 1;
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .teacher-card:hover {
+            transform: translateY(-6px) scale(1.005);
+            box-shadow: 0 16px 48px rgba(245, 138, 46, 0.08);
+            border-color: rgba(245, 138, 46, 0.12);
+        }
+
+        .teacher-card .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .teacher-card .avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fcf3e8, #f9dbb8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #f58a2e;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .teacher-card:hover .avatar {
+            transform: scale(1.05);
+        }
+
+        .teacher-card .card-header .name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #2d1f0c;
+        }
+
+        .teacher-card .card-header .teacher-id {
+            font-size: 0.7rem;
+            color: #b09a7e;
+            font-weight: 500;
+        }
+
+        .teacher-card .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.3rem 1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .teacher-card .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.82rem;
+            color: #3d2e1b;
+        }
+
+        .teacher-card .info-item i {
+            color: #f58a2e;
+            width: 1.1rem;
+            font-size: 0.75rem;
+        }
+
+        .teacher-card .info-item .label {
+            color: #b09a7e;
+            font-weight: 500;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+        }
+
+        .teacher-card .card-actions {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid #f0e2d2;
+        }
+
+        .btn-profile {
+            padding: 0.4rem 1.2rem;
+            border: none;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+        }
+
+        .btn-profile-primary {
+            background: #fcf3e8;
+            color: #f58a2e;
+            border: 1px solid rgba(245, 138, 46, 0.15);
+        }
+
+        .btn-profile-primary:hover {
+            background: #f58a2e;
+            color: white;
+            border-color: #f58a2e;
+            transform: scale(1.02);
+        }
+
+        .btn-profile-outline {
+            background: transparent;
+            color: #7f6a4b;
+            border: 1px solid #f0e2d2;
+        }
+
+        .btn-profile-outline:hover {
+            border-color: #f58a2e;
+            color: #f58a2e;
+            transform: scale(1.02);
+        }
+
+        .teacher-card .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.3rem;
+        }
+
+        .status-dot.active {
+            background: #2b7a3a;
+        }
+
+        .status-dot.inactive {
+            background: #b53b2e;
+        }
+
+        .status-dot.on-leave {
+            background: #e67e22;
+        }
+
+        /* empty state */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 40px;
+            border: 1px solid rgba(245, 138, 46, 0.06);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #f0e2d2;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            color: #2d1f0c;
+            font-size: 1.3rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .empty-state p {
+            color: #b09a7e;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .loading-state .spinner {
+            font-size: 2.5rem;
+            color: #f58a2e;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-state p {
+            color: #7f6a4b;
+            margin-top: 0.5rem;
+        }
+
+        /* footer */
+        .footer-note {
+            margin-top: 2.5rem;
+            border-top: 1px solid #f0e2d2;
+            padding-top: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #b09a7e;
+            font-size: 0.75rem;
+        }
+
+        .footer-note i {
+            color: #f58a2e;
+        }
+
+        /* responsive */
+        @media (max-width: 700px) {
+            .teacher-grid {
+                grid-template-columns: 1fr;
+            }
+            .page-header {
+                padding: 1.2rem 1.5rem;
+            }
+            .page-header h1 {
+                font-size: 1.3rem;
+            }
+            .teacher-card .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .search-section {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1rem;
+            }
+            .search-section .search-divider {
+                display: none;
+            }
+            .search-section input {
+                padding: 0.5rem 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .teacher-card {
+                padding: 1.2rem 1.2rem;
+            }
+            .teacher-card .card-header {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* entrance animation */
+        .teacher-card {
+            opacity: 0;
+            animation: cardEntrance 0.5s ease forwards;
+        }
+
+        .teacher-card:nth-child(1) { animation-delay: 0.05s; }
+        .teacher-card:nth-child(2) { animation-delay: 0.10s; }
+        .teacher-card:nth-child(3) { animation-delay: 0.15s; }
+        .teacher-card:nth-child(4) { animation-delay: 0.20s; }
+        .teacher-card:nth-child(5) { animation-delay: 0.25s; }
+        .teacher-card:nth-child(6) { animation-delay: 0.30s; }
+        .teacher-card:nth-child(7) { animation-delay: 0.35s; }
+        .teacher-card:nth-child(8) { animation-delay: 0.40s; }
+        .teacher-card:nth-child(9) { animation-delay: 0.45s; }
+        .teacher-card:nth-child(10) { animation-delay: 0.50s; }
+        .teacher-card:nth-child(11) { animation-delay: 0.55s; }
+        .teacher-card:nth-child(12) { animation-delay: 0.60s; }
+
+        @keyframes cardEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <h1><i class="fas fa-chalkboard-user"></i> Teacher Profiles</h1>
+        <div class="header-info">
+            <span class="badge"><i class="fas fa-school"></i> Sunshine · staff</span>
+            <span class="stat-chip">
+                <i class="fas fa-users"></i>
+                Total: <span class="number" id="teacherCount">0</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search-section">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Search by name, email, or employee ID...">
+        <div class="search-divider"></div>
+        <span class="filter-label"><i class="fas fa-filter"></i> All Teachers</span>
+    </div>
+
+    <!-- TEACHER GRID -->
+    <div id="teacherContainer">
+        <div class="loading-state">
+            <div class="spinner"><i class="fas fa-circle-notch"></i></div>
+            <p>Loading teachers...</p>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer-note">
+        <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
+        <span><i class="fas fa-lock"></i> secure · staff management</span>
+    </div>
+
+</div>
+
+<script>
+    const API_URL = "https://sunshine-swp6.onrender.com";
+    const container = document.getElementById("teacherContainer");
+    const teacherCountEl = document.getElementById("teacherCount");
+    const searchInput = document.getElementById("searchInput");
+
+    let allTeachers = [];
+
+    // ==========================================
+    // FETCH TEACHERS
+    // ==========================================
+
+    async function fetchTeachers() {
+        try {
+            const response = await fetch(`${API_URL}/api/teachers`);
+            const result = await response.json();
+
+            if (!response.ok) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <h3>Error</h3>
+                        <p>${result.message || "Unable to fetch teachers."}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            allTeachers = result.teachers || [];
+
+            if (allTeachers.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user-tie"></i>
+                        <h3>No Teachers Found</h3>
+                        <p>No teacher records available.</p>
+                    </div>
+                `;
+                teacherCountEl.textContent = "0";
+                return;
+            }
+
+            teacherCountEl.textContent = allTeachers.length;
+            renderTeachers(allTeachers);
+
+        } catch (error) {
+            console.error(error);
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-wifi"></i>
+                    <h3>Connection Error</h3>
+                    <p>Unable to connect with server. Please try again.</p>
+                </div>
+            `;
+        }
+    }
+
+    // ==========================================
+    // RENDER TEACHERS
+    // ==========================================
+
+    function renderTeachers(teachers) {
+        if (teachers.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <h3>No Results</h3>
+                    <p>No teachers match your search criteria.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `<div class="teacher-grid" id="teacherGrid"></div>`;
+        const grid = document.getElementById("teacherGrid");
+
+        teachers.forEach((teacher, index) => {
+            const card = document.createElement("div");
+            card.className = "teacher-card";
+            card.style.animationDelay = `${(index % 12) * 0.04 + 0.05}s`;
+
+            const initials = (teacher.name || 'T').charAt(0).toUpperCase();
+            const status = teacher.status || 'active';
+            const statusClass = status.toLowerCase();
+
+            // Build assigned classes summary
+            let classesSummary = '-';
+            if (teacher.assignedClasses && teacher.assignedClasses.length > 0) {
+                const classNames = teacher.assignedClasses.map(c => c.class).filter(Boolean);
+                classesSummary = classNames.join(', ');
+            }
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="avatar">${initials}</div>
+                    <div>
+                        <div class="name">${teacher.name || '-'}</div>
+                        <div class="teacher-id">
+                            <i class="fas fa-id-badge"></i> ${teacher.teacherId || 'N/A'}
+                            <span style="margin-left:0.6rem;">
+                                <span class="status-dot ${statusClass}"></span>
+                                ${status.charAt(0).toUpperCase() + status.slice(1)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item"><i class="fas fa-id-card"></i> <span class="label">Emp ID:</span> ${teacher.employeeId || '-'}</div>
+                    <div class="info-item"><i class="fas fa-envelope"></i> <span class="label">Email:</span> ${teacher.email || '-'}</div>
+                    <div class="info-item"><i class="fas fa-phone"></i> <span class="label">Phone:</span> ${teacher.phone || '-'}</div>
+                    <div class="info-item"><i class="fas fa-graduation-cap"></i> <span class="label">Qualification:</span> ${teacher.qualification || '-'}</div>
+                    <div class="info-item" style="grid-column: 1 / -1;">
+                        <i class="fas fa-chalkboard"></i> <span class="label">Classes:</span> ${classesSummary}
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-profile btn-profile-primary" onclick="viewTeacher('${teacher._id}')">
+                        <i class="fas fa-eye"></i> View Profile
+                    </button>
+                    <button class="btn-profile btn-profile-outline" onclick="viewTeacher('${teacher._id}')">
+                        <i class="fas fa-external-link-alt"></i> Details
+                    </button>
+                </div>
+            `;
+
+            grid.appendChild(card);
+        });
+    }
+
+    // ==========================================
+    // SEARCH FUNCTIONALITY
+    // ==========================================
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+
+        if (!query) {
+            renderTeachers(allTeachers);
+            return;
+        }
+
+        const filtered = allTeachers.filter(teacher => {
+            const searchable = [
+                teacher.name,
+                teacher.email,
+                teacher.employeeId,
+                teacher.teacherId,
+                teacher.phone,
+                teacher.qualification
+            ].join(' ').toLowerCase();
+
+            return searchable.includes(query);
+        });
+
+        renderTeachers(filtered);
+    });
+
+    // ==========================================
+    // VIEW TEACHER
+    // ==========================================
+
+    function viewTeacher(id) {
+        window.location.href = "teacher-profile-view.html?id=" + id;
+    }
+
+    // ==========================================
+    // START
+    // ==========================================
+
+    fetchTeachers();
+</script>
+
+</body>
+
+</html>

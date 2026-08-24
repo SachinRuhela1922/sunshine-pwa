@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sunshine · Edit Teacher</title>
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: #f7f3ed;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        /* HEADER */
+
+        .page-header {
+            background: white;
+            border-radius: 28px;
+            padding: 1.2rem 1.8rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,.04);
+            border: 1px solid rgba(245,138,46,.08);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 1rem;
+            flex-wrap: wrap;
+
+            margin-bottom: 1.5rem;
+        }
+
+        .page-header h1 {
+            color: #2d1f0c;
+            font-size: 1.5rem;
+
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .page-header h1 i {
+            color: #f58a2e;
+            background: #fcf3e8;
+
+            padding: .45rem;
+            border-radius: 12px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: .6rem;
+        }
+
+        /* BUTTONS */
+
+        .btn {
+            border: none;
+            border-radius: 50px;
+
+            padding: .65rem 1.2rem;
+
+            font-weight: 600;
+            cursor: pointer;
+
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+
+            transition: .2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #f0e2d2;
+            color: #4d3e2b;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg,#f58a2e,#f9b042);
+            color: white;
+
+            box-shadow: 0 5px 15px rgba(245,138,46,.25);
+        }
+
+        .btn-danger {
+            background: #fce4e0;
+            color: #b53b2e;
+        }
+
+        /* CARD */
+
+        .card {
+            background: white;
+            border-radius: 28px;
+
+            padding: 2rem;
+
+            box-shadow: 0 8px 30px rgba(0,0,0,.04);
+
+            border: 1px solid rgba(245,138,46,.06);
+
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+
+            color: #2d1f0c;
+
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+
+            padding-bottom: .6rem;
+            margin-bottom: 1.2rem;
+
+            border-bottom: 2px solid #fcf3e8;
+        }
+
+        .section-title i {
+            color: #f58a2e;
+        }
+
+        /* FORM */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+
+            gap: 1rem 1.3rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: .4rem;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: .78rem;
+            font-weight: 600;
+
+            color: #7f6a4b;
+
+            text-transform: uppercase;
+            letter-spacing: .3px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+
+            border: 1px solid #eadfd1;
+
+            background: #fffdf9;
+
+            border-radius: 12px;
+
+            padding: .75rem .9rem;
+
+            outline: none;
+
+            font-size: .9rem;
+
+            color: #2d1f0c;
+
+            transition: .2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #f58a2e;
+
+            box-shadow: 0 0 0 3px rgba(245,138,46,.1);
+
+            background: white;
+        }
+
+        input:disabled {
+            background: #f5f1eb;
+            color: #8c7b66;
+            cursor: not-allowed;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* CLASSES */
+
+        .classes-box {
+            background: #fcf9f4;
+
+            border: 1px solid #f0e2d2;
+
+            border-radius: 14px;
+
+            padding: 1rem;
+        }
+
+        .class-input-row {
+            display: flex;
+            gap: .6rem;
+            margin-bottom: .8rem;
+        }
+
+        .class-input-row input {
+            flex: 1;
+        }
+
+        .add-class-btn {
+            border: none;
+
+            background: #f58a2e;
+            color: white;
+
+            border-radius: 10px;
+
+            padding: 0 1rem;
+
+            cursor: pointer;
+        }
+
+        .class-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+
+        .class-tag {
+            background: #fff;
+            border: 1px solid #f0d7ba;
+
+            color: #4d3e2b;
+
+            padding: .45rem .7rem;
+
+            border-radius: 30px;
+
+            font-size: .8rem;
+            font-weight: 600;
+
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .class-tag button {
+            border: none;
+            background: none;
+
+            color: #b53b2e;
+
+            cursor: pointer;
+        }
+
+        /* PERMISSIONS */
+
+        .permissions-grid {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: .6rem 1rem;
+        }
+
+        .permission-item {
+            background: #fcf9f4;
+
+            border: 1px solid #f0e2d2;
+
+            padding: .7rem;
+
+            border-radius: 12px;
+
+            display: flex;
+            align-items: center;
+
+            gap: .6rem;
+
+            cursor: pointer;
+        }
+
+        .permission-item input {
+            width: auto;
+        }
+
+        .permission-item span {
+            font-size: .85rem;
+            color: #4d3e2b;
+        }
+
+        /* ACTIONS */
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+
+            gap: .7rem;
+
+            margin-top: 1.5rem;
+            padding-top: 1.2rem;
+
+            border-top: 1px solid #f0e2d2;
+        }
+
+        /* LOADING */
+
+        .loading {
+            background: white;
+            border-radius: 25px;
+
+            padding: 4rem;
+
+            text-align: center;
+
+            color: #7f6a4b;
+        }
+
+        .loading i {
+            font-size: 2.5rem;
+            color: #f58a2e;
+
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width:750px) {
+
+            body {
+                padding: 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+            .permissions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 1.2rem;
+            }
+
+            .page-header {
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .header-actions .btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="page-header">
+
+        <h1>
+            <i class="fas fa-user-pen"></i>
+            Edit Teacher
+        </h1>
+
+        <div class="header-actions">
+
+            <button class="btn btn-secondary" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+                Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- LOADING -->
+
+    <div id="loadingBox" class="loading">
+
+        <i class="fas fa-circle-notch"></i>
+
+        <p style="margin-top:10px;">
+            Loading teacher information...
+        </p>
+
+    </div>
+
+
+    <!-- FORM -->
+
+    <form id="teacherForm" style="display:none;">
+
+        <!-- BASIC INFORMATION -->
+
+        <div class="card">
+
+            <div class="section-title">
+                <i class="fas fa-id-card"></i>
+                Basic Information
+            </div>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>Teacher ID</label>
+
+                    <input
+                        type="text"
+                        id="teacherId"
+                        disabled
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Employee ID</label>
+
+                    <input
+                        type="text"
+                        id="employeeId"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Teacher Name</label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Email</label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Phone</label>
+
+                    <input
+                        type="text"
+                        id="phone"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Gender</label>
+
+                    <select id="gender">
+
+                        <option value="">Select Gender</option>
+
+                        <option value="Male">
+                            Male
+                        </option>
+
+                        <option value="Female">
+                            Female
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Qualification</label>
+
+                    <input
+                        type="text"
+                        id="qualification"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Joining Date</label>
+
+                    <input
+                        type="date"
+                        id="joiningDate"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Role</label>
+
+                    <select id="role">
+
+                        <option value="teacher">
+                            Teacher
+                        </option>
+
+                        <option value="admin">
+                            Admin
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Status</label>
+
+                    <select id="status">
+
+                        <option value="active">
+                            Active
+                        </option>
+
+                        <option value="inactive">
+                            Inactive
+                        </option>
+
+                        <option value="on-leave">
+                            On Leave
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ASSIGNED CLASSES -->
+
+        <div class="card">
+
+            <div class="section-title">
+
+                <i class="fas fa-chalkboard"></i>
+
+                Assigned Classes
+
+            </div>
+
+
+            <div class="classes-box">
+
+                <div class="class-input-row">
+
+                    <input
+                        type="text"
+                        id="classInput"
+                        placeholder="Example: Class 8"
+                    >
+
+                    <button
+                        type="button"
+                        class="add-class-btn"
+                        onclick="addClass()"
+                    >
+
+                        <i class="fas fa-plus"></i>
+                        Add
+
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="classTags"
+                    class="class-tags"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PERMISSIONS -->
+
+        <div class="card">
+
+            <div class="section-title">
+
+                <i class="fas fa-lock"></i>
+
+                Permissions
+
+            </div>
+
+
+            <div
+                id="permissionsGrid"
+                class="permissions-grid"
+            ></div>
+
+        </div>
+
+
+        <!-- PROFILE -->
+
+        <div class="card">
+
+            <div class="section-title">
+
+                <i class="fas fa-address-card"></i>
+
+                Additional Profile
+
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-group full">
+
+                    <label>Address</label>
+
+                    <textarea
+                        id="profileAddress"
+                        placeholder="Teacher address"
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>City</label>
+
+                    <input
+                        type="text"
+                        id="profileCity"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>State</label>
+
+                    <input
+                        type="text"
+                        id="profileState"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Date of Birth</label>
+
+                    <input
+                        type="date"
+                        id="profileDob"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Emergency Contact</label>
+
+                    <input
+                        type="text"
+                        id="profileEmergency"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SAVE -->
+
+        <div class="card">
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    onclick="goBack()"
+                >
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    id="saveBtn"
+                >
+
+                    <i class="fas fa-save"></i>
+
+                    Save Changes
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<script>
+
+const API_URL =
+    "https://sunshine-swp6.onrender.com";
+
+const params =
+    new URLSearchParams(window.location.search);
+
+const teacherMongoId =
+    params.get("id");
+
+
+let assignedClasses = [];
+
+let teacherData = null;
+
+
+/* ==========================================
+   PERMISSIONS
+========================================== */
+
+const permissionDefinitions = {
+
+    viewStudents: "View Students",
+
+    markAttendance: "Mark Attendance",
+
+    viewAttendance: "View Attendance",
+
+    enterMarks: "Enter Marks",
+
+    editMarks: "Edit Marks",
+
+    viewResults: "View Results",
+
+    viewFees: "View Fees",
+
+    manageFees: "Manage Fees",
+
+    generateAdmitCard: "Generate Admit Card"
+
+};
+
+
+/* ==========================================
+   START
+========================================== */
+
+if (!teacherMongoId) {
+
+    alert("Teacher ID not found.");
+
+} else {
+
+    loadTeacher();
+
+}
+
+
+/* ==========================================
+   LOAD TEACHER
+========================================== */
+
+async function loadTeacher() {
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/api/teachers/${teacherMongoId}`
+            );
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.message ||
+                "Unable to load teacher."
+            );
+
+        }
+
+
+        teacherData =
+            result.teacher;
+
+
+        populateForm(
+            teacherData
+        );
+
+
+        document.getElementById(
+            "loadingBox"
+        ).style.display = "none";
+
+
+        document.getElementById(
+            "teacherForm"
+        ).style.display = "block";
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById(
+            "loadingBox"
+        ).innerHTML = `
+
+            <i class="fas fa-triangle-exclamation"
+               style="color:#b53b2e; animation:none;">
+            </i>
+
+            <p>
+                ${error.message}
+            </p>
+
+        `;
+
+    }
+
+}
+
+
+/* ==========================================
+   POPULATE FORM
+========================================== */
+
+function populateForm(teacher) {
+
+    document.getElementById("teacherId").value =
+        teacher.teacherId || "";
+
+    document.getElementById("employeeId").value =
+        teacher.employeeId || "";
+
+    document.getElementById("name").value =
+        teacher.name || "";
+
+    document.getElementById("email").value =
+        teacher.email || "";
+
+    document.getElementById("phone").value =
+        teacher.phone || "";
+
+    document.getElementById("gender").value =
+        teacher.gender || "";
+
+    document.getElementById("qualification").value =
+        teacher.qualification || "";
+
+    document.getElementById("joiningDate").value =
+        formatDateForInput(
+            teacher.joiningDate
+        );
+
+    document.getElementById("role").value =
+        teacher.role || "teacher";
+
+    document.getElementById("status").value =
+        teacher.status || "active";
+
+
+    /* CLASSES */
+
+    if (
+        Array.isArray(
+            teacher.assignedClasses
+        )
+    ) {
+
+        assignedClasses =
+            teacher.assignedClasses.map(
+                cls => {
+
+                    if (
+                        typeof cls === "string"
+                    ) {
+
+                        return cls;
+
+                    }
+
+                    if (
+                        typeof cls === "object"
+                        &&
+                        cls !== null
+                    ) {
+
+                        return cls;
+
+                    }
+
+                    return String(cls);
+
+                }
+            );
+
+    } else {
+
+        assignedClasses = [];
+
+    }
+
+
+    renderClasses();
+
+
+    /* PERMISSIONS */
+
+    renderPermissions(
+        teacher.permissions || {}
+    );
+
+
+    /* PROFILE */
+
+    const profile =
+        teacher.profile || {};
+
+
+    document.getElementById(
+        "profileAddress"
+    ).value =
+        profile.address || "";
+
+
+    document.getElementById(
+        "profileCity"
+    ).value =
+        profile.city || "";
+
+
+    document.getElementById(
+        "profileState"
+    ).value =
+        profile.state || "";
+
+
+    document.getElementById(
+        "profileDob"
+    ).value =
+        formatDateForInput(
+            profile.dob
+        );
+
+
+    document.getElementById(
+        "profileEmergency"
+    ).value =
+        profile.emergencyContact || "";
+
+}
+
+
+/* ==========================================
+   CLASSES
+========================================== */
+
+function renderClasses() {
+
+    const container =
+        document.getElementById(
+            "classTags"
+        );
+
+
+    if (!assignedClasses.length) {
+
+        container.innerHTML = `
+            <span style="color:#b09a7e;">
+                No classes assigned
+            </span>
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        assignedClasses.map(
+            (cls, index) => {
+
+                let text = "";
+
+                if (
+                    typeof cls === "string"
+                ) {
+
+                    text = cls;
+
+                } else {
+
+                    text =
+                        cls.class ||
+                        cls.name ||
+                        "Class";
+
+                    if (
+                        Array.isArray(
+                            cls.sections
+                        )
+                    ) {
+
+                        text +=
+                            " (" +
+                            cls.sections.join(", ") +
+                            ")";
+
+                    }
+
+                }
+
+
+                return `
+
+                    <span class="class-tag">
+
+                        <i class="fas fa-chalkboard"></i>
+
+                        ${escapeHTML(text)}
+
+                        <button
+                            type="button"
+                            onclick="removeClass(${index})"
+                        >
+
+                            <i class="fas fa-times"></i>
+
+                        </button>
+
+                    </span>
+
+                `;
+
+            }
+        ).join("");
+
+}
+
+
+function addClass() {
+
+    const input =
+        document.getElementById(
+            "classInput"
+        );
+
+    const value =
+        input.value.trim();
+
+
+    if (!value) {
+
+        return;
+
+    }
+
+
+    assignedClasses.push(value);
+
+    input.value = "";
+
+    renderClasses();
+
+}
+
+
+function removeClass(index) {
+
+    assignedClasses.splice(
+        index,
+        1
+    );
+
+    renderClasses();
+
+}
+
+
+/* ==========================================
+   PERMISSIONS
+========================================== */
+
+function renderPermissions(
+    currentPermissions
+) {
+
+    const container =
+        document.getElementById(
+            "permissionsGrid"
+        );
+
+
+    container.innerHTML =
+        Object.entries(
+            permissionDefinitions
+        ).map(
+            ([key, label]) => {
+
+                const checked =
+                    currentPermissions[key]
+                    === true
+                    ? "checked"
+                    : "";
+
+
+                return `
+
+                    <label class="permission-item">
+
+                        <input
+                            type="checkbox"
+                            data-permission="${key}"
+                            ${checked}
+                        >
+
+                        <span>
+                            ${label}
+                        </span>
+
+                    </label>
+
+                `;
+
+            }
+        ).join("");
+
+}
+
+
+/* ==========================================
+   SAVE TEACHER
+========================================== */
+
+document.getElementById(
+    "teacherForm"
+).addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const saveBtn =
+            document.getElementById(
+                "saveBtn"
+            );
+
+
+        saveBtn.disabled = true;
+
+        saveBtn.innerHTML = `
+            <i class="fas fa-spinner fa-spin"></i>
+            Saving...
+        `;
+
+
+        try {
+
+            /* PERMISSIONS */
+
+            const permissions = {};
+
+
+            document
+                .querySelectorAll(
+                    "[data-permission]"
+                )
+                .forEach(
+                    checkbox => {
+
+                        permissions[
+                            checkbox.dataset.permission
+                        ] =
+                            checkbox.checked;
+
+                    }
+                );
+
+
+            /* PROFILE */
+
+            const profile = {
+
+                address:
+                    document.getElementById(
+                        "profileAddress"
+                    ).value.trim(),
+
+                city:
+                    document.getElementById(
+                        "profileCity"
+                    ).value.trim(),
+
+                state:
+                    document.getElementById(
+                        "profileState"
+                    ).value.trim(),
+
+                dob:
+                    document.getElementById(
+                        "profileDob"
+                    ).value || null,
+
+                emergencyContact:
+                    document.getElementById(
+                        "profileEmergency"
+                    ).value.trim()
+
+            };
+
+
+            /* DATA */
+
+            const updateData = {
+
+                employeeId:
+                    document.getElementById(
+                        "employeeId"
+                    ).value.trim(),
+
+                name:
+                    document.getElementById(
+                        "name"
+                    ).value.trim(),
+
+                email:
+                    document.getElementById(
+                        "email"
+                    ).value.trim(),
+
+                phone:
+                    document.getElementById(
+                        "phone"
+                    ).value.trim(),
+
+                gender:
+                    document.getElementById(
+                        "gender"
+                    ).value,
+
+                qualification:
+                    document.getElementById(
+                        "qualification"
+                    ).value.trim(),
+
+                joiningDate:
+                    document.getElementById(
+                        "joiningDate"
+                    ).value || null,
+
+                role:
+                    document.getElementById(
+                        "role"
+                    ).value,
+
+                status:
+                    document.getElementById(
+                        "status"
+                    ).value,
+
+                assignedClasses:
+                    assignedClasses,
+
+                permissions:
+                    permissions,
+
+                profile:
+                    profile
+
+            };
+
+
+            /* API */
+
+            const response =
+                await fetch(
+                    `${API_URL}/api/teachers/${teacherMongoId}`,
+                    {
+                        method: "PUT",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify(
+                                updateData
+                            )
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    result.message ||
+                    "Unable to update teacher."
+                );
+
+            }
+
+
+            alert(
+                "✅ Teacher details updated successfully."
+            );
+
+
+            window.location.href =
+                `teacher-profile-view.html?id=${encodeURIComponent(teacherMongoId)}`;
+
+
+        } catch (error) {
+
+            console.error(
+                "Update teacher error:",
+                error
+            );
+
+            alert(
+                "❌ " +
+                error.message
+            );
+
+        } finally {
+
+            saveBtn.disabled = false;
+
+            saveBtn.innerHTML = `
+                <i class="fas fa-save"></i>
+                Save Changes
+            `;
+
+        }
+
+    }
+);
+
+
+/* ==========================================
+   HELPERS
+========================================== */
+
+function formatDateForInput(date) {
+
+    if (!date) return "";
+
+    const d =
+        new Date(date);
+
+    if (
+        isNaN(
+            d.getTime()
+        )
+    ) {
+
+        return "";
+
+    }
+
+    return d
+        .toISOString()
+        .split("T")[0];
+
+}
+
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+function goBack() {
+
+    window.location.href =
+        `teacher-profile-view.html?id=${encodeURIComponent(teacherMongoId)}`;
+
+}
+
+
+/* ENTER TO ADD CLASS */
+
+document.getElementById(
+    "classInput"
+).addEventListener(
+    "keydown",
+    function(e) {
+
+        if (
+            e.key === "Enter"
+        ) {
+
+            e.preventDefault();
+
+            addClass();
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>

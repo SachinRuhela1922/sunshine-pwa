@@ -1,0 +1,572 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sunshine School · Login</title>
+
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(145deg, #f9f3e8, #fff4e6);
+      padding: 20px;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(255,255,255,.9);
+      padding: 40px;
+      border-radius: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.08);
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .brand-logo {
+      width: 80px;
+      height: 80px;
+      margin: auto;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg,#f9b042,#f58a2e);
+      color: white;
+      font-size: 42px;
+    }
+
+    .brand h1 {
+      margin-top: 10px;
+      color: #2d1f0c;
+    }
+
+    .brand h1 span {
+      color: #f58a2e;
+    }
+
+    .brand-sub {
+      display: inline-block;
+      margin-top: 5px;
+      color: #7f6a4b;
+    }
+
+    .welcome {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #6d5a40;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #3d2e1b;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 14px 18px;
+      border: 1px solid #eadbc9;
+      border-radius: 50px;
+      outline: none;
+      background: white;
+      font-size: 15px;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #f58a2e;
+      box-shadow: 0 0 0 4px rgba(245,138,46,.1);
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-wrapper input {
+      padding-right: 50px;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: #a89070;
+      font-size: 16px;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(135deg,#f58a2e,#f9b042);
+      color: white;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .login-btn:hover {
+      opacity: .9;
+    }
+
+    .error {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 30px;
+      text-align: center;
+      color: #d93a2b;
+      background: #fff0ee;
+      font-size: 14px;
+    }
+
+    .login-footer {
+      margin-top: 25px;
+      text-align: center;
+      color: #a89070;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+  <div class="brand">
+    <div class="brand-logo">
+      <i class="fas fa-sun"></i>
+    </div>
+
+    <h1>Sunshine <span>School</span></h1>
+
+    <span class="brand-sub">
+      <i class="fas fa-graduation-cap"></i>
+      Management
+    </span>
+  </div>
+
+  <div class="welcome">
+    <i class="fas fa-hand-peace"></i>
+    Welcome back · Login to your portal
+  </div>
+
+  <form id="loginForm">
+
+    <!-- ROLE -->
+    <div class="form-group">
+
+      <label for="role">
+        <i class="fas fa-user-tag"></i>
+        Login As
+      </label>
+
+      <select id="role" required>
+
+        <option value="">
+          Select role
+        </option>
+
+        <option value="admin">
+          Admin
+        </option>
+
+        <option value="teacher">
+          Teacher
+        </option>
+
+        <option value="student">
+          Student
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- PASSWORD / DOB -->
+    <div class="form-group">
+
+      <label for="password" id="passwordLabel">
+        <i class="fas fa-lock"></i>
+        Password
+      </label>
+
+      <div class="password-wrapper">
+
+        <input
+          type="password"
+          id="password"
+          placeholder="Enter your password"
+          required
+        >
+
+        <button
+          type="button"
+          class="password-toggle"
+          id="togglePassword"
+        >
+          <i class="fas fa-eye"></i>
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <button
+      type="submit"
+      class="login-btn"
+    >
+      <i class="fas fa-arrow-right-to-bracket"></i>
+      Login
+    </button>
+
+
+    <div
+      class="error"
+      id="errorMessage"
+    ></div>
+
+  </form>
+
+
+  <div class="login-footer">
+    <i class="fas fa-school"></i>
+    Sunshine School · est. 2006
+  </div>
+
+</div>
+
+
+<script>
+
+const API = "https://sunshine-swp6.onrender.com";
+
+const loginForm =
+  document.getElementById("loginForm");
+
+const role =
+  document.getElementById("role");
+
+const password =
+  document.getElementById("password");
+
+const passwordLabel =
+  document.getElementById("passwordLabel");
+
+const errorMessage =
+  document.getElementById("errorMessage");
+
+const togglePassword =
+  document.getElementById("togglePassword");
+
+
+/* =========================
+   PASSWORD TOGGLE
+========================= */
+
+togglePassword.addEventListener(
+  "click",
+  function () {
+
+    if (password.type === "password") {
+
+      password.type = "text";
+
+      this.innerHTML =
+        '<i class="fas fa-eye-slash"></i>';
+
+    } else {
+
+      password.type = "password";
+
+      this.innerHTML =
+        '<i class="fas fa-eye"></i>';
+
+    }
+
+  }
+);
+
+
+/* =========================
+   ROLE CHANGE
+========================= */
+
+role.addEventListener(
+  "change",
+  function () {
+
+    errorMessage.style.display = "none";
+
+    password.value = "";
+
+    if (this.value === "student") {
+
+      passwordLabel.innerHTML =
+        '<i class="fas fa-calendar"></i> Date of Birth';
+
+      password.placeholder =
+        "Enter DOB e.g. 15/08/2010";
+
+    } else {
+
+      passwordLabel.innerHTML =
+        '<i class="fas fa-lock"></i> Password';
+
+      password.placeholder =
+        "Enter your password";
+
+    }
+
+  }
+);
+
+
+/* =========================
+   LOGIN
+========================= */
+
+loginForm.addEventListener(
+  "submit",
+  async function (e) {
+
+    e.preventDefault();
+
+    const selectedRole =
+      role.value;
+
+    const enteredPassword =
+      password.value.trim();
+
+    errorMessage.style.display =
+      "none";
+
+
+    /* =========================
+       ADMIN
+    ========================= */
+
+    if (
+      selectedRole === "admin" &&
+      enteredPassword === "admin@000"
+    ) {
+
+      window.location.href =
+        "admin.html";
+
+      return;
+    }
+
+
+    /* =========================
+       TEACHER
+    ========================= */
+
+    if (selectedRole === "teacher") {
+
+      try {
+
+        const response =
+          await fetch(
+            `${API}/api/teachers/login`,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+                password:
+                  enteredPassword
+              })
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            result.message ||
+            "Invalid teacher password."
+          );
+
+        }
+
+
+        localStorage.setItem(
+          "loggedInTeacher",
+          JSON.stringify(
+            result.teacher
+          )
+        );
+
+
+        window.location.href =
+          "teacher.html";
+
+
+      } catch (error) {
+
+        showError(
+          error.message ||
+          "Unable to connect with server."
+        );
+
+      }
+
+      return;
+    }
+
+
+    /* =========================
+       STUDENT
+    ========================= */
+
+    if (selectedRole === "student") {
+
+      if (!enteredPassword) {
+
+        showError(
+          "Please enter your date of birth."
+        );
+
+        return;
+      }
+
+
+      try {
+
+        const response =
+          await fetch(
+            `${API}/api/students/login`,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+
+                dob:
+                  enteredPassword
+
+              })
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            result.message ||
+            "Student not found."
+          );
+
+        }
+
+
+        /*
+          Student data save
+          in localStorage
+        */
+
+        localStorage.setItem(
+          "loggedInStudent",
+          JSON.stringify(
+            result.student
+          )
+        );
+
+
+        /*
+          Student profile
+        */
+
+        window.location.href =
+          "student-profile.html";
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        showError(
+          error.message ||
+          "Unable to login student."
+        );
+
+      }
+
+      return;
+    }
+
+
+    showError(
+      "Please select a valid role."
+    );
+
+  }
+);
+
+
+/* =========================
+   ERROR
+========================= */
+
+function showError(message) {
+
+  errorMessage.innerHTML =
+    `<i class="fas fa-circle-exclamation"></i> ${message}`;
+
+  errorMessage.style.display =
+    "block";
+
+}
+
+</script>
+
+</body>
+</html>

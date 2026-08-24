@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sunshine · Add Teacher</title>
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
+
+    body {
+      background: #f7f3ed;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .container {
+      max-width: 960px;
+      width: 100%;
+      background: white;
+      border-radius: 40px;
+      padding: 2.5rem 2.8rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.04), 0 8px 24px rgba(245, 138, 46, 0.06);
+      border: 1px solid rgba(245, 138, 46, 0.06);
+      transition: transform 0.2s ease;
+    }
+
+    .container:hover {
+      transform: translateY(-2px);
+    }
+
+    /* header */
+    .form-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .form-header h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #2d1f0c;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .form-header h1 i {
+      color: #f58a2e;
+      background: #fcf3e8;
+      padding: 0.4rem 0.6rem;
+      border-radius: 20px;
+      font-size: 1.4rem;
+    }
+
+    .form-header .badge {
+      background: #fcf3e8;
+      color: #7f6a4b;
+      padding: 0.3rem 1.2rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      border: 1px solid rgba(245, 138, 46, 0.1);
+    }
+
+    .form-header .badge i {
+      color: #f58a2e;
+      margin-right: 0.3rem;
+    }
+
+    /* form grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem 1.8rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #3d2e1b;
+      letter-spacing: 0.2px;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .form-group label i {
+      color: #f58a2e;
+      width: 1.2rem;
+      font-size: 0.85rem;
+    }
+
+    .form-group input,
+    .form-group select {
+      padding: 0.8rem 1rem;
+      border: 1.5px solid #f0e2d2;
+      border-radius: 16px;
+      font-size: 0.95rem;
+      background: #fcfaf7;
+      transition: all 0.2s;
+      outline: none;
+      color: #1f160c;
+      font-weight: 500;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #f58a2e;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(245, 138, 46, 0.08);
+    }
+
+    .form-group input::placeholder {
+      color: #b8a58b;
+      font-weight: 400;
+    }
+
+    /* classes section */
+    .class-section {
+      margin-top: 0.5rem;
+      grid-column: 1 / -1;
+    }
+
+    .class-section .section-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #3d2e1b;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .class-section .section-label i {
+      color: #f58a2e;
+    }
+
+    #classesContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .class-box {
+      background: #fcf9f4;
+      border-radius: 24px;
+      padding: 1.2rem 1.5rem;
+      border: 1px solid rgba(245, 138, 46, 0.08);
+      transition: all 0.2s;
+    }
+
+    .class-box:hover {
+      border-color: #f9dbb8;
+      background: #fefcf9;
+    }
+
+    .class-box .class-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+
+    .class-box .class-header h3 {
+      font-size: 0.95rem;
+      color: #2d1f0c;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .class-box .class-header h3 i {
+      color: #f58a2e;
+      font-size: 0.9rem;
+    }
+
+    .class-box .class-header .remove-class {
+      background: none;
+      border: none;
+      color: #b8a58b;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+      transition: all 0.2s;
+    }
+
+    .class-box .class-header .remove-class:hover {
+      background: #fce4e0;
+      color: #c0392b;
+    }
+
+    .class-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    .class-row select,
+    .class-row input {
+      padding: 0.6rem 0.9rem;
+      border: 1.5px solid #f0e2d2;
+      border-radius: 14px;
+      background: white;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .class-row select:focus,
+    .class-row input:focus {
+      border-color: #f58a2e;
+      box-shadow: 0 0 0 3px rgba(245, 138, 46, 0.06);
+    }
+
+    .add-class-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.4rem;
+      border: 1.5px dashed #f0e2d2;
+      border-radius: 60px;
+      background: transparent;
+      color: #7f6a4b;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .add-class-btn:hover {
+      border-color: #f58a2e;
+      color: #f58a2e;
+      background: #fcf3e8;
+    }
+
+    .add-class-btn i {
+      font-size: 0.9rem;
+    }
+
+    /* submit */
+    .submit-btn {
+      width: 100%;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 60px;
+      background: linear-gradient(135deg, #f58a2e, #f9b042);
+      color: white;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 1.8rem;
+      box-shadow: 0 8px 24px -6px rgba(245, 138, 46, 0.3);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      letter-spacing: 0.3px;
+    }
+
+    .submit-btn:hover {
+      transform: scale(1.01);
+      box-shadow: 0 12px 32px -8px rgba(245, 138, 46, 0.4);
+      background: linear-gradient(135deg, #e07c20, #f58a2e);
+    }
+
+    .submit-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* message */
+    .message {
+      margin-top: 1.2rem;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.6rem;
+      border-radius: 60px;
+      display: none;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.success {
+      background: #e8f5e9;
+      color: #2b7a3a;
+      border: 1px solid #a5d6a7;
+    }
+
+    .message.error {
+      background: #fce4e0;
+      color: #b53b2e;
+      border: 1px solid #f5b7b1;
+    }
+
+    /* footer */
+    .form-footer {
+      margin-top: 2rem;
+      border-top: 1px solid #f0e2d2;
+      padding-top: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      color: #b09a7e;
+      font-size: 0.8rem;
+    }
+
+    .form-footer i {
+      color: #f58a2e;
+    }
+
+    /* responsive */
+    @media (max-width: 700px) {
+      .container { padding: 1.5rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: 1; }
+      .class-row { grid-template-columns: 1fr; }
+      .form-header h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="form-header">
+    <h1><i class="fas fa-chalkboard-user"></i> Add Teacher</h1>
+    <span class="badge"><i class="fas fa-school"></i> Sunshine · staff</span>
+  </div>
+
+  <!-- FORM -->
+  <form id="teacherForm">
+
+    <div class="form-grid">
+
+      <!-- name -->
+      <div class="form-group">
+        <label for="name"><i class="fas fa-user"></i> Full Name</label>
+        <input type="text" id="name" placeholder="e.g. Rahul Sharma" required>
+      </div>
+
+      <!-- employee id -->
+      <div class="form-group">
+        <label for="employeeId"><i class="fas fa-id-badge"></i> Employee ID</label>
+        <input type="text" id="employeeId" placeholder="EMP-2024-001" required>
+      </div>
+
+      <!-- email -->
+      <div class="form-group">
+        <label for="email"><i class="fas fa-envelope"></i> Email</label>
+        <input type="email" id="email" placeholder="teacher@school.com" required>
+      </div>
+
+      <!-- phone -->
+      <div class="form-group">
+        <label for="phone"><i class="fas fa-phone"></i> Phone</label>
+        <input type="tel" id="phone" placeholder="+91 98765 43210" required>
+      </div>
+
+      <!-- password -->
+      <div class="form-group">
+        <label for="password"><i class="fas fa-lock"></i> Password</label>
+        <input type="password" id="password" placeholder="teach@006" required>
+      </div>
+
+      <!-- gender -->
+      <div class="form-group">
+        <label for="gender"><i class="fas fa-venus-mars"></i> Gender</label>
+        <select id="gender">
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <!-- qualification -->
+      <div class="form-group">
+        <label for="qualification"><i class="fas fa-graduation-cap"></i> Qualification</label>
+        <input type="text" id="qualification" placeholder="M.Sc, B.Ed">
+      </div>
+
+      <!-- joining date -->
+      <div class="form-group">
+        <label for="joiningDate"><i class="fas fa-calendar-plus"></i> Joining Date</label>
+        <input type="date" id="joiningDate">
+      </div>
+
+      <!-- address (full) -->
+      <div class="form-group full">
+        <label for="address"><i class="fas fa-home"></i> Address</label>
+        <input type="text" id="address" placeholder="Street, City, State">
+      </div>
+
+      <!-- ASSIGNED CLASSES (full) -->
+      <div class="class-section full">
+        <div class="section-label"><i class="fas fa-chalkboard"></i> Assigned Classes</div>
+
+        <div id="classesContainer">
+          <!-- initial class box -->
+          <div class="class-box">
+            <div class="class-header">
+              <h3><i class="fas fa-layer-group"></i> Class Assignment</h3>
+              <button type="button" class="remove-class" onclick="removeClass(this)" title="Remove this class"><i class="fas fa-trash-alt"></i></button>
+            </div>
+            <div class="class-row">
+              <select class="class">
+                <option value="">Select Class</option>
+                <option value="Nursery">Nursery</option><option value="LKG">LKG</option><option value="UKG">UKG</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+                <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+                <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+              </select>
+              <input type="text" class="sections" placeholder="Sections e.g. A, B">
+              <input type="text" class="subjects" placeholder="Subjects e.g. Maths, Science">
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="add-class-btn" onclick="addClass()">
+          <i class="fas fa-plus-circle"></i> Add Another Class
+        </button>
+      </div>
+
+    </div>
+
+    <button type="submit" class="submit-btn">
+      <i class="fas fa-user-plus"></i> Add Teacher
+    </button>
+
+    <div class="message" id="message"></div>
+
+  </form>
+
+  <div class="form-footer">
+    <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
+    <span><i class="fas fa-lock"></i> secure · staff management</span>
+  </div>
+
+</div>
+
+<!-- ========== SCRIPT (logic untouched, only UI helpers) ========== -->
+<script>
+  // ---- ADD CLASS (enhanced with remove) ----
+  function addClass() {
+    const container = document.getElementById("classesContainer");
+    const div = document.createElement("div");
+    div.className = "class-box";
+    div.innerHTML = `
+      <div class="class-header">
+        <h3><i class="fas fa-layer-group"></i> Class Assignment</h3>
+        <button type="button" class="remove-class" onclick="removeClass(this)" title="Remove this class"><i class="fas fa-trash-alt"></i></button>
+      </div>
+      <div class="class-row">
+        <select class="class">
+          <option value="">Select Class</option>
+          <option value="Nursery">Nursery</option><option value="LKG">LKG</option><option value="UKG">UKG</option>
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+          <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+          <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+        </select>
+        <input type="text" class="sections" placeholder="Sections e.g. A, B">
+        <input type="text" class="subjects" placeholder="Subjects e.g. Maths, Science">
+      </div>
+    `;
+    container.appendChild(div);
+  }
+
+  function removeClass(btn) {
+    const box = btn.closest('.class-box');
+    if (box) {
+      const container = document.getElementById("classesContainer");
+      if (container.children.length > 1) {
+        box.remove();
+      } else {
+        // if only one left, just clear fields instead of removing
+        const selects = box.querySelectorAll('select, input');
+        selects.forEach(el => el.value = '');
+        // show a small hint
+        const msg = document.getElementById('message');
+        msg.textContent = 'At least one class assignment is required.';
+        msg.className = 'message show error';
+        setTimeout(() => { msg.className = 'message'; }, 2500);
+      }
+    }
+  }
+
+  // ---- ORIGINAL LOGIC (100% preserved) ----
+  const form = document.getElementById("teacherForm");
+  const message = document.getElementById("message");
+
+  form.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const assignments = [];
+    document.querySelectorAll(".class-box").forEach(box => {
+      const className = box.querySelector(".class").value;
+      const sections = box.querySelector(".sections").value
+        .split(",")
+        .map(item => item.trim())
+        .filter(Boolean);
+      const subjects = box.querySelector(".subjects").value
+        .split(",")
+        .map(item => item.trim())
+        .filter(Boolean);
+      if (className) {
+        assignments.push({
+          class: className,
+          sections: sections,
+          subjects: subjects
+        });
+      }
+    });
+
+    const teacherData = {
+      name: document.getElementById("name").value,
+      employeeId: document.getElementById("employeeId").value,
+      email: document.getElementById("email").value,
+      phone: document.getElementById("phone").value,
+      password: document.getElementById("password").value,
+      gender: document.getElementById("gender").value,
+      qualification: document.getElementById("qualification").value,
+      joiningDate: document.getElementById("joiningDate").value,
+      assignedClasses: assignments,
+      profile: {
+        address: document.getElementById("address").value
+      }
+    };
+
+    try {
+      const response = await fetch("https://sunshine-swp6.onrender.com/api/teachers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(teacherData)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        message.textContent = "✅ Teacher added successfully!";
+        message.className = "message show success";
+        form.reset();
+        // reset class boxes to initial state
+        document.querySelectorAll(".class-box").forEach((box, idx) => {
+          if (idx === 0) {
+            box.querySelectorAll('select, input').forEach(el => el.value = '');
+          } else {
+            box.remove();
+          }
+        });
+        // ensure at least one class box remains
+        if (document.querySelectorAll(".class-box").length === 0) {
+          addClass();
+        }
+      } else {
+        message.textContent = result.message || "❌ Something went wrong.";
+        message.className = "message show error";
+      }
+    } catch (error) {
+      console.error(error);
+      message.textContent = "⚠️ Server connection failed.";
+      message.className = "message show error";
+    }
+  });
+
+  // initial message hide
+  message.className = "message";
+</script>
+
+</body>
+</html>

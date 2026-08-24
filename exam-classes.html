@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sunshine · Select Class</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+}
+
+body {
+    background: #f7f3ed;
+    min-height: 100vh;
+    padding: 1.5rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ===== HEADER ===== */
+.page-header {
+    background: white;
+    border-radius: 32px;
+    padding: 1.2rem 2rem;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+    border: 1px solid rgba(245, 138, 46, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.8rem;
+}
+
+.page-header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #2d1f0c;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.page-header h1 i {
+    color: #f58a2e;
+    background: #fcf3e8;
+    padding: 0.3rem 0.6rem;
+    border-radius: 16px;
+    font-size: 1.2rem;
+}
+
+.page-header .header-sub {
+    font-size: 0.85rem;
+    color: #b09a7e;
+    font-weight: 500;
+}
+
+.page-header .header-sub i {
+    color: #f58a2e;
+    margin-right: 0.3rem;
+}
+
+.page-header .actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    padding: 0.5rem 1.2rem;
+    border: none;
+    border-radius: 60px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: #f0e2d2;
+    color: #4d3e2b;
+}
+
+.btn-secondary:hover {
+    background: #e6d5c0;
+}
+
+/* ===== EXAM BANNER ===== */
+.exam-banner {
+    background: linear-gradient(135deg, #fcf3e8, #f9dbb8);
+    border-radius: 28px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border: 1px solid rgba(245, 138, 46, 0.15);
+}
+
+.exam-banner .exam-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.exam-banner .exam-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f58a2e;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 12px rgba(245, 138, 46, 0.1);
+}
+
+.exam-banner .exam-details h2 {
+    font-size: 1.2rem;
+    color: #2d1f0c;
+    font-weight: 700;
+}
+
+.exam-banner .exam-details p {
+    color: #8a765e;
+    font-size: 0.85rem;
+    margin-top: 0.1rem;
+}
+
+.exam-banner .exam-badge {
+    background: white;
+    padding: 0.4rem 1.2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #f58a2e;
+    box-shadow: 0 2px 8px rgba(245, 138, 46, 0.08);
+}
+
+.exam-banner .exam-badge i {
+    margin-right: 0.4rem;
+}
+
+/* ===== SECTION HEADER ===== */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+}
+
+.section-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d1f0c;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.section-header h3 i {
+    color: #f58a2e;
+}
+
+.section-header .count-badge {
+    background: #fcf3e8;
+    color: #f58a2e;
+    padding: 0.2rem 0.8rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    border: 1px solid rgba(245, 138, 46, 0.1);
+}
+
+/* ===== CLASS GRID ===== */
+.class-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+}
+
+.class-card {
+    background: white;
+    border-radius: 24px;
+    padding: 1.8rem 1.2rem;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+    border: 1px solid rgba(245, 138, 46, 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.class-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #f58a2e, #f9b042);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.class-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(245, 138, 46, 0.08);
+    border-color: rgba(245, 138, 46, 0.2);
+}
+
+.class-card:hover::before {
+    opacity: 1;
+}
+
+.class-card:active {
+    transform: scale(0.97);
+}
+
+.class-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 0.8rem;
+    border-radius: 18px;
+    background: #fcf3e8;
+    color: #f58a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    transition: all 0.3s;
+}
+
+.class-card:hover .class-icon {
+    background: #f58a2e;
+    color: white;
+    transform: rotate(-5deg) scale(1.05);
+}
+
+.class-card h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d1f0c;
+    margin-bottom: 0.3rem;
+}
+
+.class-card .class-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.4rem;
+    font-size: 0.78rem;
+    color: #b09a7e;
+}
+
+.class-card .class-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.class-card .class-meta i {
+    color: #f58a2e;
+    font-size: 0.7rem;
+}
+
+.class-card .arrow-hint {
+    margin-top: 0.8rem;
+    color: #f0e2d2;
+    font-size: 0.8rem;
+    transition: all 0.3s;
+}
+
+.class-card:hover .arrow-hint {
+    color: #f58a2e;
+    transform: translateX(4px);
+}
+
+/* ===== LOADING ===== */
+.loading-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    grid-column: 1 / -1;
+}
+
+.loading-state .spinner {
+    font-size: 3rem;
+    color: #f58a2e;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-state p {
+    color: #b09a7e;
+    margin-top: 0.8rem;
+    font-weight: 500;
+}
+
+.loading-state .sub-text {
+    font-size: 0.8rem;
+    color: #d5c8b8;
+    margin-top: 0.2rem;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    grid-column: 1 / -1;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #f0e2d2;
+    margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+    color: #2d1f0c;
+    font-size: 1.2rem;
+    margin-bottom: 0.3rem;
+}
+
+.empty-state p {
+    color: #b09a7e;
+}
+
+/* ===== FOOTER ===== */
+.footer-note {
+    margin-top: 2.5rem;
+    border-top: 1px solid #f0e2d2;
+    padding-top: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    color: #b09a7e;
+    font-size: 0.75rem;
+}
+
+.footer-note i {
+    color: #f58a2e;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+    .class-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .class-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .page-header {
+        padding: 1rem 1.2rem;
+    }
+    .page-header h1 {
+        font-size: 1.2rem;
+    }
+    .exam-banner {
+        padding: 1.2rem 1.2rem;
+        flex-direction: column;
+        text-align: center;
+    }
+    .exam-banner .exam-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    .exam-banner .exam-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.4rem;
+    }
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .class-grid {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+    .class-card {
+        padding: 1.2rem;
+    }
+    .page-header .actions .btn-action {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.8rem;
+    }
+    .exam-banner .exam-details h2 {
+        font-size: 1rem;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- ===== HEADER ===== -->
+    <div class="page-header">
+        <div>
+            <h1>
+                <i class="fas fa-school"></i>
+                Select Class
+            </h1>
+            <div class="header-sub">
+                <i class="fas fa-ticket"></i>
+                <span id="examTitle">Choose a class to manage admit cards</span>
+            </div>
+        </div>
+        <div class="actions">
+            <button class="btn-action btn-secondary" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== EXAM BANNER ===== -->
+    <div class="exam-banner">
+        <div class="exam-info">
+            <div class="exam-icon">
+                <i class="fas fa-file-pen"></i>
+            </div>
+            <div class="exam-details">
+                <h2 id="examNameDisplay">Loading Exam...</h2>
+                <p><i class="fas fa-calendar-alt"></i> Select a class to view or create admit cards</p>
+            </div>
+        </div>
+        <div class="exam-badge">
+            <i class="fas fa-clock"></i> Upcoming Exam
+        </div>
+    </div>
+
+    <!-- ===== SECTION HEADER ===== -->
+    <div class="section-header">
+        <h3>
+            <i class="fas fa-users"></i> Available Classes
+            <span class="count-badge" id="classCount">0</span>
+        </h3>
+        <span style="font-size:0.8rem;color:#b09a7e;">
+            <i class="fas fa-hand-pointer"></i> Click a class to continue
+        </span>
+    </div>
+
+    <!-- ===== CLASS GRID ===== -->
+    <div id="classGrid" class="class-grid">
+
+        <div class="loading-state">
+            <div class="spinner"><i class="fas fa-circle-notch"></i></div>
+            <p>Loading classes...</p>
+            <div class="sub-text"><i class="fas fa-spinner fa-pulse"></i> Please wait</div>
+        </div>
+
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="footer-note">
+        <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
+        <span><i class="fas fa-lock"></i> secure · exam management</span>
+    </div>
+
+</div>
+
+<script>
+
+const API_URL = "https://sunshine-swp6.onrender.com";
+
+const params = new URLSearchParams(location.search);
+
+const exam = params.get("exam");
+
+// Update header with exam name
+document.getElementById("examTitle").innerHTML =
+    `${exam || "Exam"} · Choose a class to manage admit cards`;
+
+document.getElementById("examNameDisplay").textContent =
+    exam || "Exam Not Specified";
+
+async function loadClasses() {
+
+    try {
+
+        const response =
+            await fetch(`${API_URL}/api/extra-classes`);
+
+        const data =
+            await response.json();
+
+        if (!data.success) {
+            throw new Error(data.message);
+        }
+
+        const classes =
+            data.classes || [];
+
+        const grid =
+            document.getElementById("classGrid");
+
+        // Update count
+        document.getElementById("classCount").textContent = classes.length;
+
+        if (!classes.length) {
+
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-users-slash"></i>
+                    <h4>No Classes Found</h4>
+                    <p>There are no classes available for this exam.</p>
+                    <p style="font-size:0.8rem;margin-top:0.3rem;color:#d5c8b8;">
+                        <i class="fas fa-info-circle"></i> Please create a class first
+                    </p>
+                </div>
+            `;
+
+            return;
+        }
+
+        grid.innerHTML = classes.map((cls, index) => `
+
+            <div class="class-card"
+                onclick="openClass('${cls._id}')"
+                style="animation: fadeUp 0.4s ease ${index * 0.05}s both;">
+
+                <div class="class-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+
+                <h4>${escapeHtml(cls.className)}</h4>
+
+                <div class="class-meta">
+                    <span>
+                        <i class="fas fa-user-graduate"></i>
+                        ${cls.students?.length || 0} Students
+                    </span>
+                    <span>
+                        <i class="fas fa-file-alt"></i>
+                        ${cls.subjects?.length || 0} Subjects
+                    </span>
+                </div>
+
+                <div class="arrow-hint">
+                    <i class="fas fa-arrow-right"></i> Select
+                </div>
+
+            </div>
+
+        `).join("");
+
+    } catch(error) {
+
+        console.error(error);
+
+        document.getElementById("classGrid").innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-wifi"></i>
+                <h4>Connection Error</h4>
+                <p>Unable to load classes. Please check your connection.</p>
+                <p style="font-size:0.8rem;margin-top:0.3rem;color:#d5c8b8;">
+                    <i class="fas fa-info-circle"></i> ${error.message || 'Try again later'}
+                </p>
+            </div>
+        `;
+    }
+}
+
+function openClass(classId) {
+
+    window.location.href =
+        `exam-student.html?exam=${encodeURIComponent(exam)}&classId=${classId}`;
+
+}
+
+function escapeHtml(value) {
+
+    return String(value || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+// Add animation keyframes
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+`;
+document.head.appendChild(style);
+
+loadClasses();
+
+</script>
+
+</body>
+</html>

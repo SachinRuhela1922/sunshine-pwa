@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sunshine · Notice Board</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: #f7f3ed;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        .page-header {
+            background: white;
+            border-radius: 32px;
+            padding: 1.2rem 2rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            border: 1px solid rgba(245, 138, 46, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #2d1f0c;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .page-header h1 i {
+            color: #f58a2e;
+            background: #fcf3e8;
+            padding: 0.3rem 0.6rem;
+            border-radius: 16px;
+            font-size: 1.2rem;
+        }
+
+        .page-header .header-sub {
+            font-size: 0.85rem;
+            color: #b09a7e;
+            font-weight: 500;
+            margin-top: 0.2rem;
+        }
+
+        .page-header .header-sub i {
+            color: #f58a2e;
+            margin-right: 0.3rem;
+        }
+
+        .page-header .actions {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            padding: 0.5rem 1.2rem;
+            border: none;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: #f0e2d2;
+            color: #4d3e2b;
+        }
+
+        .btn-secondary:hover {
+            background: #e6d5c0;
+        }
+
+        /* ===== BANNER ===== */
+        .banner {
+            background: linear-gradient(135deg, #fcf3e8, #f9dbb8);
+            border-radius: 28px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border: 1px solid rgba(245, 138, 46, 0.15);
+        }
+
+        .banner .banner-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .banner .banner-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f58a2e;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 12px rgba(245, 138, 46, 0.1);
+        }
+
+        .banner .banner-details h2 {
+            font-size: 1.2rem;
+            color: #2d1f0c;
+            font-weight: 700;
+        }
+
+        .banner .banner-details p {
+            color: #8a765e;
+            font-size: 0.85rem;
+            margin-top: 0.1rem;
+        }
+
+        .banner .banner-badge {
+            background: white;
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #f58a2e;
+            box-shadow: 0 2px 8px rgba(245, 138, 46, 0.08);
+        }
+
+        .banner .banner-badge i {
+            margin-right: 0.4rem;
+        }
+
+        /* ===== MAIN BOX ===== */
+        .main-box {
+            background: white;
+            border-radius: 28px;
+            padding: 2rem 2.2rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            border: 1px solid rgba(245, 138, 46, 0.06);
+        }
+
+        /* ===== SECTION HEADER ===== */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .section-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2d1f0c;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .section-header h3 i {
+            color: #f58a2e;
+        }
+
+        .section-header .count-badge {
+            background: #fcf3e8;
+            color: #f58a2e;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            border: 1px solid rgba(245, 138, 46, 0.1);
+        }
+
+        /* ===== NOTICE INPUT ===== */
+        .notice-input-area {
+            margin-bottom: 2rem;
+        }
+
+        .notice-input-area .input-wrapper {
+            position: relative;
+        }
+
+        .notice-input-area .input-wrapper i {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            color: #b09a7e;
+            font-size: 1rem;
+        }
+
+        .notice-input-area textarea {
+            width: 100%;
+            height: 120px;
+            padding: 0.8rem 1rem 0.8rem 3rem;
+            border: 1.5px solid #f0e2d2;
+            border-radius: 16px;
+            background: #fcfaf7;
+            resize: vertical;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s;
+            color: #1f160c;
+            font-weight: 500;
+        }
+
+        .notice-input-area textarea:focus {
+            border-color: #f58a2e;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(245, 138, 46, 0.06);
+        }
+
+        .notice-input-area textarea::placeholder {
+            color: #b8a58b;
+            font-weight: 400;
+        }
+
+        .notice-input-area .input-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .notice-input-area .input-actions .char-count {
+            font-size: 0.75rem;
+            color: #b09a7e;
+        }
+
+        .notice-input-area .input-actions .char-count span {
+            font-weight: 700;
+            color: #2d1f0c;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #f58a2e, #f9b042);
+            color: white;
+            border: none;
+            padding: 0.6rem 2rem;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: 0 4px 12px rgba(245, 138, 46, 0.2);
+        }
+
+        .btn-add:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(245, 138, 46, 0.3);
+        }
+
+        .btn-add:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.7;
+            box-shadow: none;
+        }
+
+        .btn-add:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-add i {
+            font-size: 1rem;
+        }
+
+        /* ===== NOTICE LIST ===== */
+        .notice-list-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid #fcf3e8;
+        }
+
+        .notice-list-header h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #2d1f0c;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .notice-list-header h4 i {
+            color: #f58a2e;
+        }
+
+        .notice-list-header .notice-count {
+            font-size: 0.78rem;
+            color: #b09a7e;
+            font-weight: 500;
+        }
+
+        .notice-list-header .notice-count i {
+            color: #f58a2e;
+            margin-right: 0.3rem;
+        }
+
+        /* ===== NOTICE ITEM ===== */
+        .notice-item {
+            background: #fcfaf7;
+            border: 1px solid #f0e2d2;
+            border-radius: 16px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: flex-start;
+            transition: all 0.2s;
+        }
+
+        .notice-item:hover {
+            border-color: rgba(245, 138, 46, 0.2);
+            background: #fcf9f4;
+        }
+
+        .notice-item .notice-content {
+            flex: 1;
+            display: flex;
+            gap: 0.8rem;
+            align-items: flex-start;
+        }
+
+        .notice-item .notice-content .notice-icon {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: 50%;
+            background: #fcf3e8;
+            color: #f58a2e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            margin-top: 0.1rem;
+        }
+
+        .notice-item .notice-content .notice-text {
+            white-space: pre-wrap;
+            font-size: 0.92rem;
+            color: #2d1f0c;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .notice-item .notice-content .notice-text .notice-time {
+            display: block;
+            font-size: 0.7rem;
+            color: #b09a7e;
+            margin-top: 0.3rem;
+            font-weight: 500;
+        }
+
+        .notice-item .notice-content .notice-text .notice-time i {
+            margin-right: 0.3rem;
+        }
+
+        .btn-delete-notice {
+            background: #fce4e0;
+            color: #b53b2e;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.72rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            white-space: nowrap;
+        }
+
+        .btn-delete-notice:hover {
+            background: #b53b2e;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn-delete-notice i {
+            font-size: 0.65rem;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #b09a7e;
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            color: #f0e2d2;
+            display: block;
+            margin-bottom: 0.8rem;
+        }
+
+        .empty-state h4 {
+            color: #2d1f0c;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .empty-state p {
+            color: #b09a7e;
+            font-size: 0.9rem;
+        }
+
+        /* ===== LOADING ===== */
+        .loading-state {
+            text-align: center;
+            padding: 2rem;
+            color: #b09a7e;
+        }
+
+        .loading-state i {
+            font-size: 1.5rem;
+            color: #f58a2e;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== MESSAGE ===== */
+        .message {
+            margin-top: 0.8rem;
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #e8f5e9;
+            color: #2b7a3a;
+            border: 1px solid #a5d6a7;
+        }
+
+        .message.error {
+            background: #fce4e0;
+            color: #b53b2e;
+            border: 1px solid #f5b7b1;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer-note {
+            margin-top: 2.5rem;
+            border-top: 1px solid #f0e2d2;
+            padding-top: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #b09a7e;
+            font-size: 0.75rem;
+        }
+
+        .footer-note i {
+            color: #f58a2e;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .page-header {
+                padding: 1rem 1.2rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .page-header h1 {
+                font-size: 1.2rem;
+            }
+            .banner {
+                padding: 1rem 1.2rem;
+                flex-direction: column;
+                text-align: center;
+            }
+            .banner .banner-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            .banner .banner-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 1.3rem;
+            }
+            .banner .banner-details h2 {
+                font-size: 1rem;
+            }
+            .main-box {
+                padding: 1.2rem 1.2rem;
+            }
+            .notice-item {
+                flex-direction: column;
+            }
+            .notice-item .notice-content {
+                width: 100%;
+            }
+            .btn-delete-notice {
+                align-self: flex-end;
+            }
+            .notice-input-area .input-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .notice-input-area .input-actions .char-count {
+                text-align: center;
+            }
+            .btn-add {
+                justify-content: center;
+            }
+            .notice-list-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-header .actions .btn-action {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.7rem;
+            }
+            .notice-input-area textarea {
+                padding: 0.6rem 0.8rem 0.6rem 2.5rem;
+                font-size: 0.85rem;
+                height: 100px;
+            }
+            .notice-input-area .input-wrapper i {
+                left: 0.7rem;
+                top: 0.7rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- ===== HEADER ===== -->
+    <div class="page-header">
+        <div>
+            <h1>
+                <i class="fas fa-bullhorn"></i>
+                Notice Board
+            </h1>
+            <div class="header-sub">
+                <i class="fas fa-edit"></i>
+                Create and manage important announcements
+            </div>
+        </div>
+        <div class="actions">
+            <button class="btn-action btn-secondary" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== BANNER ===== -->
+    <div class="banner">
+        <div class="banner-info">
+            <div class="banner-icon">
+                <i class="fas fa-bullhorn"></i>
+            </div>
+            <div class="banner-details">
+                <h2>School Notice Board</h2>
+                <p><i class="fas fa-info-circle"></i> Post important notices for students and staff</p>
+            </div>
+        </div>
+        <div class="banner-badge">
+            <i class="fas fa-clock"></i> Live Updates
+        </div>
+    </div>
+
+    <!-- ===== MAIN BOX ===== -->
+    <div class="main-box">
+
+        <!-- ===== NOTICE INPUT ===== -->
+        <div class="notice-input-area">
+            <div class="input-wrapper">
+                <i class="fas fa-pen"></i>
+                <textarea
+                    id="noticeInput"
+                    placeholder="Write your notice here..."
+                    oninput="updateCharCount()"
+                ></textarea>
+            </div>
+            <div class="input-actions">
+                <div class="char-count">
+                    <i class="fas fa-text-width"></i>
+                    <span id="charCount">0</span> characters
+                </div>
+                <button class="btn-add" id="addBtn" onclick="addNotice()">
+                    <i class="fas fa-plus-circle"></i> Add Notice
+                </button>
+            </div>
+            <div id="message" class="message"></div>
+        </div>
+
+        <!-- ===== NOTICE LIST ===== -->
+        <div class="notice-list-header">
+            <h4>
+                <i class="fas fa-list"></i> All Notices
+            </h4>
+            <span class="notice-count">
+                <i class="fas fa-file-alt"></i>
+                <span id="noticeCount">0</span> notice<span id="noticeCountPlural">s</span>
+            </span>
+        </div>
+
+        <div id="noticeList">
+            <div class="loading-state">
+                <i class="fas fa-circle-notch"></i> Loading notices...
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="footer-note">
+        <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
+        <span><i class="fas fa-lock"></i> secure · notice board</span>
+    </div>
+
+</div>
+
+
+<script>
+
+// ==========================================
+// ALL LOGIC REMAINS EXACTLY THE SAME
+// ==========================================
+
+const API = "https://sunshine-swp6.onrender.com";
+
+
+// ==============================
+// CHARACTER COUNT
+// ==============================
+
+function updateCharCount() {
+    const input = document.getElementById("noticeInput");
+    const count = document.getElementById("charCount");
+    count.textContent = input.value.length;
+}
+
+
+// ==============================
+// FETCH NOTICES
+// ==============================
+
+async function loadNotices() {
+    const noticeList = document.getElementById("noticeList");
+
+    try {
+        const response = await fetch(`${API}/api/notices`);
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Failed to load notices");
+        }
+
+        const notices = data.notices || [];
+
+        // Update count
+        document.getElementById("noticeCount").textContent = notices.length;
+        document.getElementById("noticeCountPlural").textContent = notices.length !== 1 ? 's' : '';
+
+        if (!notices.length) {
+            noticeList.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-bullhorn"></i>
+                    <h4>No Notices Available</h4>
+                    <p>Be the first to post a notice!</p>
+                </div>
+            `;
+            return;
+        }
+
+        noticeList.innerHTML = notices.map((notice, index) => `
+            <div class="notice-item" style="animation: fadeUp 0.3s ease ${index * 0.05}s both;">
+                <div class="notice-content">
+                    <div class="notice-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <div class="notice-text">
+                        ${escapeHtml(notice.notice)}
+                        ${notice.createdAt ? `
+                            <span class="notice-time">
+                                <i class="fas fa-clock"></i>
+                                ${new Date(notice.createdAt).toLocaleString('en-IN', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })}
+                            </span>
+                        ` : ''}
+                    </div>
+                </div>
+                <button class="btn-delete-notice" onclick="deleteNotice('${notice._id}')">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        `).join("");
+
+        // Add animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeUp {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+
+    } catch (error) {
+        console.error(error);
+        noticeList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h4>Unable to Load Notices</h4>
+                <p>${escapeHtml(error.message)}</p>
+            </div>
+        `;
+    }
+}
+
+
+// ==============================
+// ADD NOTICE
+// ==============================
+
+async function addNotice() {
+    const input = document.getElementById("noticeInput");
+    const notice = input.value.trim();
+    const btn = document.getElementById("addBtn");
+    const messageEl = document.getElementById("message");
+
+    if (!notice) {
+        messageEl.className = "message show error";
+        messageEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please enter a notice.';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+    try {
+        const response = await fetch(`${API}/api/notices`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ notice })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Failed to add notice");
+        }
+
+        input.value = "";
+        updateCharCount();
+
+        messageEl.className = "message show success";
+        messageEl.innerHTML = '<i class="fas fa-check-circle"></i> Notice added successfully!';
+
+        setTimeout(() => {
+            messageEl.className = "message";
+        }, 3000);
+
+        loadNotices();
+
+    } catch (error) {
+        console.error(error);
+        messageEl.className = "message show error";
+        messageEl.innerHTML = `<i class="fas fa-exclamation-circle"></i> Error: ${escapeHtml(error.message)}`;
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Notice';
+    }
+}
+
+
+// ==============================
+// DELETE NOTICE
+// ==============================
+
+async function deleteNotice(id) {
+    if (!confirm("Delete this notice?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API}/api/notices/${id}`, {
+            method: "DELETE"
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Failed to delete notice");
+        }
+
+        loadNotices();
+
+    } catch (error) {
+        console.error(error);
+        alert("Error: " + error.message);
+    }
+}
+
+
+// ==============================
+// ESCAPE HTML
+// ==============================
+
+function escapeHtml(value) {
+    return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+// ==============================
+// KEYBOARD SHORTCUT - CTRL+ENTER
+// ==============================
+
+document.getElementById("noticeInput").addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        addNotice();
+    }
+});
+
+
+// ==============================
+// LOAD ON PAGE OPEN
+// ==============================
+
+loadNotices();
+
+</script>
+
+</body>
+</html>

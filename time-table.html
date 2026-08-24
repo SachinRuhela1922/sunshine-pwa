@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sunshine · Timetable</title>
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- jsPDF + AutoTable for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: #f7f3ed;
+            min-height: 100vh;
+            padding: 1.5rem;
+            color: #2d1f0c;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        /* HEADER */
+
+        .page-header {
+            background: white;
+            border-radius: 30px;
+            padding: 1.2rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(245, 138, 46, .08);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .03);
+        }
+
+        .page-header h1 {
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .page-header h1 i {
+            color: #f58a2e;
+            background: #fcf3e8;
+            padding: .55rem .7rem;
+            border-radius: 15px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: .6rem;
+            flex-wrap: wrap;
+        }
+
+        button,
+        select,
+        input {
+            font-family: inherit;
+        }
+
+        .btn {
+            border: none;
+            padding: .6rem 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            transition: .2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f58a2e, #f9b042);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2b7a3a, #3a9e4a);
+            color: white;
+        }
+
+        .btn-danger {
+            background: #fff0ee;
+            color: #d84b3e;
+        }
+
+        .btn-secondary {
+            background: #fcf3e8;
+            color: #f58a2e;
+        }
+
+        .btn-back {
+            background: #fcf3e8;
+            color: #f58a2e;
+            text-decoration: none;
+        }
+
+        /* SEASON */
+
+        .season-section {
+            background: white;
+            border-radius: 25px;
+            padding: 1rem 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .season-tabs {
+            display: flex;
+            gap: .5rem;
+        }
+
+        .season-btn {
+            border: none;
+            padding: .65rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            background: #f7f3ed;
+            color: #7f6a4b;
+        }
+
+        .season-btn.active {
+            background: #f58a2e;
+            color: white;
+        }
+
+        .current-season {
+            color: #7f6a4b;
+            font-size: .85rem;
+        }
+
+        .current-season strong {
+            color: #f58a2e;
+        }
+
+        /* BASIC TIMING */
+
+        .timing-card {
+            background: white;
+            border-radius: 25px;
+            padding: 1.3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .section-title i {
+            color: #f58a2e;
+        }
+
+        .timing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: .35rem;
+        }
+
+        .field label {
+            font-size: .75rem;
+            font-weight: 700;
+            color: #7f6a4b;
+        }
+
+        .field input {
+            width: 100%;
+            padding: .75rem 1rem;
+            border: 1px solid #e4d9ca;
+            border-radius: 14px;
+            outline: none;
+            color: #2d1f0c;
+            background: #fffdf9;
+        }
+
+        .field input:focus {
+            border-color: #f58a2e;
+        }
+
+        /* LECTURES */
+
+        .lectures-section {
+            background: white;
+            border-radius: 25px;
+            padding: 1.3rem;
+        }
+
+        .lectures-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .lecture-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .lecture-card {
+            border: 1px solid #eadfd1;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #fffdf9;
+        }
+
+        .lecture-top {
+            background: #fcf3e8;
+            padding: .9rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .lecture-title {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            font-weight: 800;
+            color: #3d2e1b;
+        }
+
+        .lecture-title i {
+            color: #f58a2e;
+        }
+
+        .lecture-time {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .lecture-time input {
+            padding: .45rem .6rem;
+            border: 1px solid #dfd1c0;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .lecture-body {
+            padding: 1rem;
+        }
+
+        /* CLASS GRID */
+
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: .8rem;
+        }
+
+        .class-box {
+            background: white;
+            border: 1px solid #eadfd1;
+            border-radius: 14px;
+            padding: .7rem;
+        }
+
+        .class-box label {
+            display: block;
+            font-size: .72rem;
+            font-weight: 800;
+            color: #7f6a4b;
+            margin-bottom: .4rem;
+        }
+
+        .class-box select {
+            width: 100%;
+            padding: .55rem .5rem;
+            border: 1px solid #e2d5c5;
+            border-radius: 9px;
+            background: #fffdf9;
+            outline: none;
+            color: #3d2e1b;
+        }
+
+        .class-box select:focus {
+            border-color: #f58a2e;
+        }
+
+        /* LUNCH */
+
+        .lunch-card {
+            border: 1px dashed #e6b46e;
+            border-radius: 18px;
+            background: #fff9ef;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .lunch-info {
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+            font-weight: 700;
+        }
+
+        .lunch-info i {
+            color: #f58a2e;
+        }
+
+        /* EMPTY */
+
+        .empty {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #b09a7e;
+        }
+
+        .empty i {
+            font-size: 3rem;
+            margin-bottom: .7rem;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-top: 1px solid #eadfd1;
+            display: flex;
+            justify-content: space-between;
+            color: #b09a7e;
+            font-size: .75rem;
+        }
+
+        .footer i {
+            color: #f58a2e;
+        }
+
+        /* TOAST */
+
+        .toast {
+            position: fixed;
+            right: 25px;
+            bottom: 25px;
+            background: #2d1f0c;
+            color: white;
+            padding: .9rem 1.2rem;
+            border-radius: 14px;
+            display: none;
+            z-index: 9999;
+            box-shadow: 0 8px 30px rgba(0,0,0,.15);
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .toast.success {
+            background: #2b7a3a;
+        }
+
+        .toast.error {
+            background: #c94437;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width:1000px) {
+            .class-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .timing-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width:650px) {
+            body {
+                padding: .7rem;
+            }
+
+            .page-header {
+                padding: 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.2rem;
+            }
+
+            .season-section {
+                align-items: flex-start;
+            }
+
+            .season-tabs {
+                width: 100%;
+            }
+
+            .season-btn {
+                flex: 1;
+            }
+
+            .class-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .lecture-time {
+                width: 100%;
+            }
+
+            .lecture-time input {
+                flex: 1;
+            }
+
+            .footer {
+                flex-direction: column;
+                gap: .5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="page-header">
+
+        <h1>
+            <i class="fas fa-calendar-days"></i>
+            School Timetable
+        </h1>
+
+        <div class="header-actions">
+
+            <a href="admin.html" class="btn btn-back">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </a>
+
+            <button class="btn btn-secondary" onclick="loadTimetable()">
+                <i class="fas fa-sync"></i>
+                Refresh
+            </button>
+
+            <button class="btn btn-secondary" onclick="downloadPDF()">
+                <i class="fas fa-file-pdf"></i>
+                Download PDF
+            </button>
+
+            <button class="btn btn-success" onclick="saveTimetable()">
+                <i class="fas fa-save"></i>
+                Save Timetable
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- SEASON -->
+
+    <div class="season-section">
+
+        <div class="season-tabs">
+
+            <button
+                class="season-btn active"
+                data-season="Summer"
+                onclick="changeSeason('Summer')">
+                <i class="fas fa-sun"></i>
+                Summer
+            </button>
+
+            <button
+                class="season-btn"
+                data-season="Winter"
+                onclick="changeSeason('Winter')">
+                <i class="fas fa-snowflake"></i>
+                Winter
+            </button>
+
+        </div>
+
+        <div class="current-season">
+            Editing:
+            <strong id="currentSeason">Summer</strong>
+        </div>
+
+    </div>
+
+
+    <!-- BASIC TIMING -->
+
+    <div class="timing-card">
+
+        <div class="section-title">
+            <i class="fas fa-clock"></i>
+            School Timing
+        </div>
+
+        <div class="timing-grid">
+
+            <div class="field">
+
+                <label>
+                    Teacher Timing
+                </label>
+
+                <input
+                    type="text"
+                    id="teacherTiming"
+                    placeholder="8:00 AM - 2:00 PM">
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Student Timing
+                </label>
+
+                <input
+                    type="text"
+                    id="studentTiming"
+                    placeholder="8:30 AM - 1:30 PM">
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Prayer Bell
+                </label>
+
+                <input
+                    type="text"
+                    id="prayerBell"
+                    placeholder="8:25 AM">
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- LECTURES -->
+
+    <div class="lectures-section">
+
+        <div class="lectures-header">
+
+            <div class="section-title" style="margin:0;">
+                <i class="fas fa-chalkboard-teacher"></i>
+                Lectures & Class Teachers
+            </div>
+
+            <button
+                class="btn btn-primary"
+                onclick="addLecture()">
+
+                <i class="fas fa-plus"></i>
+                Add Lecture
+
+            </button>
+
+        </div>
+
+
+        <div id="lectureList" class="lecture-list">
+
+            <div class="empty">
+
+                <i class="fas fa-calendar-xmark"></i>
+
+                <p>
+                    No lectures added yet.
+                </p>
+
+                <small>
+                    Click "Add Lecture" to create the first lecture.
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <div class="footer">
+
+        <span>
+            <i class="fas fa-school"></i>
+            Sunshine School · Timetable
+        </span>
+
+        <span>
+            <i class="fas fa-database"></i>
+            MongoDB connected timetable
+        </span>
+
+    </div>
+
+</div>
+
+
+<div id="toast" class="toast"></div>
+
+
+<script>
+
+const API_URL = "https://sunshine-swp6.onrender.com";
+
+
+/* ================= STATE ================= */
+
+let currentSeason = "Summer";
+
+let lectures = [];
+
+let timetableId = null;
+
+
+/*
+    Yahan apne actual teachers ke names
+    add kar sakte ho.
+*/
+
+let teachers = [];
+
+/* ================= SEASON ================= */
+
+/* ================= FORMAT TIME (HH:mm) ================= */
+
+function formatTimeValue(value) {
+
+    if (!value) {
+        return "";
+    }
+
+    const parts = String(value).split(":");
+
+    if (parts.length < 2) {
+        return "";
+    }
+
+    let [h, m] = parts;
+
+    h = h.padStart(2, "0");
+    m = m.padStart(2, "0");
+
+    // sirf HH:mm chahiye, seconds hata do agar hai
+    return `${h}:${m}`;
+}
+
+/* ================= LOAD TEACHERS ================= */
+
+async function loadTeachers() {
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/teachers`
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.message || "Unable to fetch teachers."
+            );
+        }
+
+        teachers = result.teachers || [];
+
+        console.log("Teachers loaded:", teachers);
+
+        renderLectures();
+
+    } catch (error) {
+
+        console.error(
+            "Load teachers error:",
+            error
+        );
+
+        showToast(
+            "Unable to load teachers.",
+            "error"
+        );
+
+    }
+}
+
+function changeSeason(season) {
+
+    currentSeason = season;
+
+    document
+        .getElementById("currentSeason")
+        .textContent = season;
+
+    document
+        .querySelectorAll(".season-btn")
+        .forEach(btn => {
+
+            btn.classList.toggle(
+                "active",
+                btn.dataset.season === season
+            );
+
+        });
+
+    loadTimetable();
+}
+
+
+/* ================= ADD LECTURE ================= */
+
+function addLecture() {
+
+    const lectureNumbers = lectures
+        .filter(l => l.type === "lecture")
+        .map(l => Number(l.lectureNumber) || 0);
+
+    const nextNumber =
+        lectureNumbers.length
+            ? Math.max(...lectureNumbers) + 1
+            : 1;
+
+
+    const classTeachers = {};
+
+    for (let i = 1; i <= 10; i++) {
+
+        classTeachers[`Class ${i}`] = "";
+
+    }
+
+
+    lectures.push({
+
+        type: "lecture",
+
+        lectureNumber: nextNumber,
+
+        from: "",
+
+        to: "",
+
+        classes: classTeachers
+
+    });
+
+
+    renderLectures();
+}
+
+
+/* ================= ADD LUNCH ================= */
+
+function addLunch() {
+
+    lectures.push({
+
+        type: "lunch",
+
+        from: "",
+
+        to: "",
+
+        classes: {}
+
+    });
+
+    renderLectures();
+}
+
+
+/* ================= REMOVE ================= */
+
+function removeLecture(index) {
+
+    if (!confirm("Delete this lecture?")) {
+        return;
+    }
+
+    lectures.splice(index, 1);
+
+    renumberLectures();
+
+    renderLectures();
+}
+
+
+function renumberLectures() {
+
+    let number = 1;
+
+    lectures.forEach(lecture => {
+
+        if (lecture.type === "lecture") {
+
+            lecture.lectureNumber = number++;
+
+        }
+
+    });
+
+}
+
+
+/* ================= RENDER ================= */
+
+function renderLectures() {
+
+    const list =
+        document.getElementById("lectureList");
+
+
+    if (!lectures.length) {
+
+        list.innerHTML = `
+
+            <div class="empty">
+
+                <i class="fas fa-calendar-xmark"></i>
+
+                <p>No lectures added yet.</p>
+
+                <small>
+                    Click "Add Lecture" to create the first lecture.
+                </small>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    list.innerHTML = lectures
+        .map((lecture, index) => {
+
+            if (lecture.type === "lunch") {
+
+                return renderLunch(
+                    lecture,
+                    index
+                );
+
+            }
+
+            return renderLecture(
+                lecture,
+                index
+            );
+
+        })
+        .join("");
+
+}
+
+
+/* ================= RENDER LECTURE ================= */
+
+function renderLecture(lecture, index) {
+
+    let classHtml = "";
+
+    for (let i = 1; i <= 10; i++) {
+
+        const className = `Class ${i}`;
+
+        const selected =
+            lecture.classes?.[className] || "";
+
+
+        classHtml += `
+
+            <div class="class-box">
+
+                <label>
+                    ${className}
+                </label>
+
+                <select
+                    onchange="updateTeacher(
+                        ${index},
+                        '${className}',
+                        this.value
+                    )">
+
+                    <option value="">
+    Select Teacher
+</option>
+
+${teachers.map(teacher => {
+
+    const teacherName =
+        typeof teacher === "string"
+            ? teacher
+            : (
+                teacher.name ||
+                teacher.teacherName ||
+                teacher.fullName ||
+                ""
+            );
+
+    return `
+
+        <option
+            value="${escapeHtml(teacherName)}"
+            ${selected === teacherName ? "selected" : ""}>
+
+            ${escapeHtml(teacherName)}
+
+        </option>
+
+    `;
+
+}).join("")}
+
+                </select>
+
+            </div>
+
+        `;
+
+    }
+
+
+    return `
+
+        <div class="lecture-card">
+
+            <div class="lecture-top">
+
+                <div class="lecture-title">
+
+                    <i class="fas fa-book-open"></i>
+
+                    Lecture ${lecture.lectureNumber}
+
+                </div>
+
+
+                <div class="lecture-time">
+
+                    <input
+                        type="time"
+                        value="${escapeHtml(formatTimeValue(lecture.from))}"
+                        onchange="updateTime(
+                            ${index},
+                            'from',
+                            this.value
+                        )">
+
+                    <span>to</span>
+
+                    <input
+                        type="time"
+                        value="${escapeHtml(formatTimeValue(lecture.to))}"
+                        onchange="updateTime(
+                            ${index},
+                            'to',
+                            this.value
+                        )">
+
+                    <button
+                        class="btn btn-danger"
+                        onclick="removeLecture(${index})">
+
+                        <i class="fas fa-trash"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="lecture-body">
+
+                <div class="section-title">
+
+                    <i class="fas fa-users"></i>
+
+                    Teacher for each class
+
+                </div>
+
+
+                <div class="class-grid">
+
+                    ${classHtml}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* ================= RENDER LUNCH ================= */
+
+function renderLunch(lecture, index) {
+
+    return `
+
+        <div class="lunch-card">
+
+            <div class="lunch-info">
+
+                <i class="fas fa-utensils"></i>
+
+                Lunch Break
+
+            </div>
+
+
+            <div class="lecture-time">
+
+                <input
+                    type="time"
+                    value="${escapeHtml(formatTimeValue(lecture.from))}"
+                    onchange="updateTime(
+                        ${index},
+                        'from',
+                        this.value
+                    )">
+
+                <span>to</span>
+
+                <input
+                    type="time"
+                    value="${escapeHtml(formatTimeValue(lecture.to))}"
+                    onchange="updateTime(
+                        ${index},
+                        'to',
+                        this.value
+                    )">
+
+                <button
+                    class="btn btn-danger"
+                    onclick="removeLecture(${index})">
+
+                    <i class="fas fa-trash"></i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* ================= UPDATE TEACHER ================= */
+
+function updateTeacher(
+    lectureIndex,
+    className,
+    teacher
+) {
+
+    if (!lectures[lectureIndex].classes) {
+
+        lectures[lectureIndex].classes = {};
+
+    }
+
+    lectures[lectureIndex]
+        .classes[className] = teacher;
+
+}
+
+
+/* ================= UPDATE TIME ================= */
+
+function updateTime(
+    index,
+    field,
+    value
+) {
+
+    lectures[index][field] = value;
+
+}
+
+
+/* ================= LOAD ================= */
+
+async function loadTimetable() {
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/api/timetable/${currentSeason}`
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.message ||
+                "Unable to load timetable."
+            );
+
+        }
+
+
+        const timetable =
+            result.timetable;
+
+
+        if (!timetable) {
+
+            timetableId = null;
+
+            document
+                .getElementById("teacherTiming")
+                .value = "";
+
+            document
+                .getElementById("studentTiming")
+                .value = "";
+
+            document
+                .getElementById("prayerBell")
+                .value = "";
+
+            lectures = [];
+
+            renderLectures();
+
+            return;
+
+        }
+
+
+        timetableId =
+            timetable._id;
+
+
+        document
+            .getElementById("teacherTiming")
+            .value =
+            timetable.teacherTiming || "";
+
+
+        document
+            .getElementById("studentTiming")
+            .value =
+            timetable.studentTiming || "";
+
+
+        document
+            .getElementById("prayerBell")
+            .value =
+            timetable.prayerBell || "";
+
+
+        lectures =
+            (timetable.lectures || [])
+                .map(lecture => {
+
+                    return {
+
+                        type:
+                            lecture.type ||
+                            "lecture",
+
+                        lectureNumber:
+                            lecture.lectureNumber,
+
+                        from:
+                            formatTimeValue(lecture.from),
+
+                        to:
+                            formatTimeValue(lecture.to),
+
+                        classes:
+                            mapToObject(
+                                lecture.classes
+                            )
+
+                    };
+
+                });
+
+
+        renderLectures();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            error.message ||
+            "Unable to load timetable.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* ================= MAP CONVERSION ================= */
+
+function mapToObject(value) {
+
+    if (!value) {
+        return {};
+    }
+
+    if (Array.isArray(value)) {
+
+        return Object.fromEntries(value);
+
+    }
+
+    return {
+        ...value
+    };
+
+}
+
+
+/* ================= SAVE ================= */
+
+async function saveTimetable() {
+
+    try {
+
+        const teacherTiming =
+            document
+                .getElementById("teacherTiming")
+                .value
+                .trim();
+
+
+        const studentTiming =
+            document
+                .getElementById("studentTiming")
+                .value
+                .trim();
+
+
+        const prayerBell =
+            document
+                .getElementById("prayerBell")
+                .value
+                .trim();
+
+
+        if (!lectures.length) {
+
+            if (!confirm(
+                "No lectures have been added. Save timetable anyway?"
+            )) {
+
+                return;
+
+            }
+
+        }
+
+
+        const cleanLectures =
+            lectures.map(lecture => {
+
+                if (lecture.type === "lunch") {
+
+                    return {
+
+                        type: "lunch",
+
+                        from: formatTimeValue(lecture.from),
+
+                        to: formatTimeValue(lecture.to),
+
+                        classes: {}
+
+                    };
+
+                }
+
+
+                const classes = {};
+
+                for (let i = 1; i <= 10; i++) {
+
+                    const key = `Class ${i}`;
+
+                    classes[key] =
+                        lecture.classes?.[key] || "";
+
+                }
+
+
+                return {
+
+                    type: "lecture",
+
+                    lectureNumber:
+                        Number(
+                            lecture.lectureNumber
+                        ),
+
+                    from:
+                        formatTimeValue(lecture.from),
+
+                    to:
+                        formatTimeValue(lecture.to),
+
+                    classes
+
+                };
+
+            });
+
+
+        const payload = {
+
+            season: currentSeason,
+
+            teacherTiming,
+
+            studentTiming,
+
+            prayerBell,
+
+            lectures: cleanLectures
+
+        };
+
+
+        const response =
+            await fetch(
+                `${API_URL}/api/timetable`,
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(payload)
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.message ||
+                "Unable to save timetable."
+            );
+
+        }
+
+
+        timetableId =
+            result.timetable?._id ||
+            timetableId;
+
+
+        showToast(
+            `${currentSeason} timetable saved successfully.`,
+            "success"
+        );
+
+
+        await loadTimetable();
+
+
+    } catch (error) {
+
+        console.error(
+            "Save timetable error:",
+            error
+        );
+
+        showToast(
+            error.message ||
+            "Unable to save timetable.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* ================= DOWNLOAD PDF ================= */
+
+function downloadPDF() {
+
+    if (!window.jspdf) {
+
+        showToast(
+            "PDF library failed to load. Check your internet connection.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (!lectures.length) {
+
+        if (!confirm(
+            "No lectures have been added. Download PDF anyway?"
+        )) {
+
+            return;
+
+        }
+
+    }
+
+
+    const teacherTiming =
+        document.getElementById("teacherTiming").value.trim() || "-";
+
+    const studentTiming =
+        document.getElementById("studentTiming").value.trim() || "-";
+
+    const prayerBell =
+        document.getElementById("prayerBell").value.trim() || "-";
+
+
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4"
+    });
+
+
+    // ---- Header text ----
+
+    doc.setFontSize(16);
+    doc.setTextColor(45, 31, 12);
+    doc.text(
+        `Sunshine School - ${currentSeason} Timetable`,
+        14,
+        15
+    );
+
+    doc.setFontSize(10);
+    doc.setTextColor(90, 75, 55);
+    doc.text(
+        `Teacher Timing: ${teacherTiming}    |    Student Timing: ${studentTiming}    |    Prayer Bell: ${prayerBell}`,
+        14,
+        22
+    );
+
+
+    // ---- Table header: Lecture No. / From / To / Class 1 ... Class 10 ----
+
+    const classHeaders =
+        Array.from({ length: 10 }, (_, i) => `Class ${i + 1}`);
+
+    const tableHead =
+        [["Lecture No.", "From", "To", ...classHeaders]];
+
+
+    // ---- Build table rows ----
+
+    const body = lectures.map((lecture, index) => {
+
+        const from =
+            formatTimeValue(lecture.from) || lecture.from || "-";
+
+        const to =
+            formatTimeValue(lecture.to) || lecture.to || "-";
+
+
+        if (lecture.type === "lunch") {
+
+            return [
+                "Lunch",
+                from,
+                to,
+                { content: "—", colSpan: 10, styles: { halign: "center" } }
+            ];
+
+        }
+
+
+        const classesObj = mapToObject(lecture.classes);
+
+        const classCells = Array.from({ length: 10 }, (_, i) => {
+
+            const key = `Class ${i + 1}`;
+
+            return classesObj[key] && classesObj[key].trim() !== ""
+                ? classesObj[key]
+                : "-";
+
+        });
+
+
+        return [
+            lecture.lectureNumber ?? index + 1,
+            from,
+            to,
+            ...classCells
+        ];
+
+    });
+
+
+    // ---- Draw the table ----
+
+    doc.autoTable({
+
+        startY: 28,
+
+        head: tableHead,
+
+        body: body.length
+            ? body
+            : [["-", "-", "-", ...Array(10).fill("-")]],
+
+        theme: "grid",
+
+        styles: {
+            fontSize: 7.5,
+            cellPadding: 2,
+            valign: "middle",
+            overflow: "linebreak",
+            halign: "center"
+        },
+
+        headStyles: {
+            fillColor: [245, 138, 46],
+            textColor: 255,
+            fontStyle: "bold",
+            halign: "center",
+            fontSize: 8
+        },
+
+        alternateRowStyles: {
+            fillColor: [252, 250, 247]
+        },
+
+        columnStyles: {
+            0: { cellWidth: 16 },
+            1: { cellWidth: 16 },
+            2: { cellWidth: 16 }
+        },
+
+        margin: { left: 10, right: 10 },
+
+        didParseCell: function (data) {
+
+            if (data.row.raw && data.row.raw[0] === "Lunch") {
+
+                data.cell.styles.fillColor = [255, 243, 205];
+                data.cell.styles.textColor = [133, 100, 4];
+                data.cell.styles.fontStyle = "bold";
+
+            }
+
+        }
+
+    });
+
+
+    // ---- Footer ----
+
+    const pageCount = doc.internal.getNumberOfPages();
+
+    for (let i = 1; i <= pageCount; i++) {
+
+        doc.setPage(i);
+
+        doc.setFontSize(8);
+        doc.setTextColor(176, 154, 126);
+
+        doc.text(
+            `Sunshine School · est. 2006  —  Generated on ${new Date().toLocaleDateString()}`,
+            14,
+            doc.internal.pageSize.getHeight() - 8
+        );
+
+    }
+
+
+    doc.save(`Sunshine_${currentSeason}_Timetable.pdf`);
+
+}
+
+
+/* ================= TOAST ================= */
+
+function showToast(
+    message,
+    type = ""
+) {
+
+    const toast =
+        document.getElementById("toast");
+
+
+    toast.textContent =
+        message;
+
+
+    toast.className =
+        `toast show ${type}`;
+
+
+    setTimeout(() => {
+
+        toast.className =
+            "toast";
+
+    }, 3000);
+
+}
+
+
+/* ================= ESCAPE ================= */
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* ================= START ================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
+
+        await loadTeachers();
+
+        await loadTimetable();
+
+    }
+);
+
+</script>
+</body>
+</html>

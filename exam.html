@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sunshine · Examinations</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+}
+
+body {
+    background: #f7f3ed;
+    min-height: 100vh;
+    padding: 1.5rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ===== HEADER ===== */
+.page-header {
+    background: white;
+    border-radius: 32px;
+    padding: 1.2rem 2rem;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+    border: 1px solid rgba(245, 138, 46, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.8rem;
+}
+
+.page-header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #2d1f0c;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.page-header h1 i {
+    color: #f58a2e;
+    background: #fcf3e8;
+    padding: 0.3rem 0.6rem;
+    border-radius: 16px;
+    font-size: 1.2rem;
+}
+
+.page-header .header-sub {
+    font-size: 0.85rem;
+    color: #b09a7e;
+    font-weight: 500;
+    margin-top: 0.2rem;
+}
+
+.page-header .header-sub i {
+    color: #f58a2e;
+    margin-right: 0.3rem;
+}
+
+.page-header .actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    padding: 0.5rem 1.2rem;
+    border: none;
+    border-radius: 60px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: #f0e2d2;
+    color: #4d3e2b;
+}
+
+.btn-secondary:hover {
+    background: #e6d5c0;
+}
+
+/* ===== SECTION ===== */
+.section {
+    display: block;
+}
+
+.section.hidden {
+    display: none;
+}
+
+/* ===== EXAM BANNER ===== */
+.exam-banner {
+    background: linear-gradient(135deg, #fcf3e8, #f9dbb8);
+    border-radius: 28px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border: 1px solid rgba(245, 138, 46, 0.15);
+}
+
+.exam-banner .exam-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.exam-banner .exam-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f58a2e;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 12px rgba(245, 138, 46, 0.1);
+}
+
+.exam-banner .exam-details h2 {
+    font-size: 1.2rem;
+    color: #2d1f0c;
+    font-weight: 700;
+}
+
+.exam-banner .exam-details p {
+    color: #8a765e;
+    font-size: 0.85rem;
+    margin-top: 0.1rem;
+}
+
+.exam-banner .exam-badge {
+    background: white;
+    padding: 0.4rem 1.2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #f58a2e;
+    box-shadow: 0 2px 8px rgba(245, 138, 46, 0.08);
+}
+
+.exam-banner .exam-badge i {
+    margin-right: 0.4rem;
+}
+
+/* ===== SECTION HEADER ===== */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+}
+
+.section-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d1f0c;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.section-header h3 i {
+    color: #f58a2e;
+}
+
+.section-header .count-badge {
+    background: #fcf3e8;
+    color: #f58a2e;
+    padding: 0.2rem 0.8rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    border: 1px solid rgba(245, 138, 46, 0.1);
+}
+
+.section-header .hint {
+    font-size: 0.8rem;
+    color: #b09a7e;
+}
+
+.section-header .hint i {
+    color: #f58a2e;
+}
+
+/* ===== EXAM GRID ===== */
+.exam-grid,
+.class-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.2rem;
+}
+
+/* ===== CARDS ===== */
+.card {
+    background: white;
+    border-radius: 24px;
+    padding: 1.8rem 1.2rem;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+    border: 1px solid rgba(245, 138, 46, 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #f58a2e, #f9b042);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(245, 138, 46, 0.08);
+    border-color: rgba(245, 138, 46, 0.2);
+}
+
+.card:hover::before {
+    opacity: 1;
+}
+
+.card:active {
+    transform: scale(0.97);
+}
+
+/* ===== EXAM CARD ===== */
+.exam-card .card-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 0.8rem;
+    border-radius: 18px;
+    background: #fcf3e8;
+    color: #f58a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    transition: all 0.3s;
+}
+
+.exam-card:hover .card-icon {
+    background: #f58a2e;
+    color: white;
+    transform: rotate(-5deg) scale(1.05);
+}
+
+.exam-card h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d1f0c;
+    margin-bottom: 0.3rem;
+}
+
+.exam-card .exam-sub {
+    font-size: 0.75rem;
+    color: #b09a7e;
+}
+
+.exam-card .arrow-hint {
+    margin-top: 0.8rem;
+    color: #f0e2d2;
+    font-size: 0.8rem;
+    transition: all 0.3s;
+}
+
+.exam-card:hover .arrow-hint {
+    color: #f58a2e;
+    transform: translateX(4px);
+}
+
+/* ===== CLASS CARD ===== */
+.class-card .card-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 0.8rem;
+    border-radius: 16px;
+    background: #e8f5e9;
+    color: #2b7a3a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    transition: all 0.3s;
+}
+
+.class-card:hover .card-icon {
+    background: #2b7a3a;
+    color: white;
+    transform: rotate(-5deg) scale(1.05);
+}
+
+.class-card h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #2d1f0c;
+    margin-bottom: 0.2rem;
+}
+
+.class-card .class-sub {
+    font-size: 0.78rem;
+    color: #b09a7e;
+}
+
+.class-card .class-sub i {
+    color: #f58a2e;
+    margin-right: 0.3rem;
+}
+
+.class-card .arrow-hint {
+    margin-top: 0.6rem;
+    color: #f0e2d2;
+    font-size: 0.75rem;
+    transition: all 0.3s;
+}
+
+.class-card:hover .arrow-hint {
+    color: #f58a2e;
+    transform: translateX(4px);
+}
+
+/* ===== BACK BUTTON ===== */
+.btn-back {
+    background: #f0e2d2;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 60px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #4d3e2b;
+    margin-bottom: 1.2rem;
+}
+
+.btn-back:hover {
+    background: #e6d5c0;
+    transform: scale(1.02);
+}
+
+.btn-back i {
+    color: #f58a2e;
+}
+
+/* ===== LOADING ===== */
+.loading {
+    text-align: center;
+    padding: 3rem 2rem;
+    grid-column: 1 / -1;
+}
+
+.loading i {
+    font-size: 2.5rem;
+    color: #f58a2e;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading p {
+    color: #b09a7e;
+    margin-top: 0.8rem;
+    font-weight: 500;
+}
+
+/* ===== ERROR ===== */
+.error {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #b53b2e;
+    grid-column: 1 / -1;
+}
+
+.error i {
+    font-size: 2.5rem;
+    color: #fce4e0;
+    display: block;
+    margin-bottom: 0.8rem;
+}
+
+/* ===== FOOTER ===== */
+.footer-note {
+    margin-top: 2.5rem;
+    border-top: 1px solid #f0e2d2;
+    padding-top: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    color: #b09a7e;
+    font-size: 0.75rem;
+}
+
+.footer-note i {
+    color: #f58a2e;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 1rem 1.2rem;
+    }
+    .page-header h1 {
+        font-size: 1.2rem;
+    }
+    .exam-banner {
+        padding: 1rem 1.2rem;
+        flex-direction: column;
+        text-align: center;
+    }
+    .exam-banner .exam-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    .exam-banner .exam-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 1.3rem;
+    }
+    .exam-grid,
+    .class-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0.8rem;
+    }
+    .card {
+        padding: 1.2rem 0.8rem;
+    }
+    .exam-card .card-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.4rem;
+    }
+    .class-card .card-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+    }
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .exam-grid,
+    .class-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.6rem;
+    }
+    .card {
+        padding: 1rem 0.6rem;
+    }
+    .exam-card h4 {
+        font-size: 0.95rem;
+    }
+    .class-card h4 {
+        font-size: 0.9rem;
+    }
+    .page-header .actions .btn-action {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.8rem;
+    }
+    .exam-banner .exam-details h2 {
+        font-size: 1rem;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- ===== HEADER ===== -->
+    <div class="page-header">
+        <div>
+            <h1>
+                <i class="fas fa-pen-to-square"></i>
+                Examinations
+            </h1>
+            <div class="header-sub">
+                <i class="fas fa-graduation-cap"></i>
+                Select an exam to manage marks
+            </div>
+        </div>
+        <div class="actions">
+            <button class="btn-action btn-secondary" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== EXAM BANNER ===== -->
+    <div class="exam-banner">
+        <div class="exam-info">
+            <div class="exam-icon">
+                <i class="fas fa-file-pen"></i>
+            </div>
+            <div class="exam-details">
+                <h2>Exam Management</h2>
+                <p><i class="fas fa-calendar-alt"></i> Select an examination to begin</p>
+            </div>
+        </div>
+        <div class="exam-badge">
+            <i class="fas fa-clock"></i> Academic Year 2026-27
+        </div>
+    </div>
+
+    <!-- ===== EXAM SECTION ===== -->
+    <div class="section" id="examSection">
+
+        <div class="section-header">
+            <h3>
+                <i class="fas fa-list"></i> Available Examinations
+                <span class="count-badge">6</span>
+            </h3>
+            <span class="hint">
+                <i class="fas fa-hand-pointer"></i> Click an exam to continue
+            </span>
+        </div>
+
+        <div class="exam-grid">
+
+            <div class="card exam-card" onclick="selectExam('Unit 1')">
+                <div class="card-icon"><i class="fas fa-1"></i></div>
+                <h4>Unit 1</h4>
+                <div class="exam-sub">First Assessment</div>
+                <div class="arrow-hint"><i class="fas fa-arrow-right"></i> Select</div>
+            </div>
+
+            <div class="card exam-card" onclick="selectExam('Unit 2')">
+                <div class="card-icon"><i class="fas fa-2"></i></div>
+                <h4>Unit 2</h4>
+                <div class="exam-sub">Second Assessment</div>
+                <div class="arrow-hint"><i class="fas fa-arrow-right"></i> Select</div>
+            </div>
+
+            <div class="card exam-card" onclick="selectExam('Half Yearly')">
+                <div class="card-icon"><i class="fas fa-flag"></i></div>
+                <h4>Half Yearly</h4>
+                <div class="exam-sub">Mid-Term Examination</div>
+                <div class="arrow-hint"><i class="fas fa-arrow-right"></i> Select</div>
+            </div>
+
+            <div class="card exam-card" onclick="selectExam('Unit 3')">
+                <div class="card-icon"><i class="fas fa-3"></i></div>
+                <h4>Unit 3</h4>
+                <div class="exam-sub">Third Assessment</div>
+                <div class="arrow-hint"><i class="fas fa-arrow-right"></i> Select</div>
+            </div>
+
+            <div class="card exam-card" onclick="selectExam('Unit 4')">
+                <div class="card-icon"><i class="fas fa-4"></i></div>
+                <h4>Unit 4</h4>
+                <div class="exam-sub">Fourth Assessment</div>
+                <div class="arrow-hint"><i class="fas fa-arrow-right"></i> Select</div>
+            </div>
+
+            <div class="card exam-card" onclick="selectExam('Annual')">
+                <div class="card-icon"><i class="fas fa-trophy"></i></div>
+                <h4>Annual</h4>
+                <div class="exam-sub">Final Examination</div>
+                <div class="arrow-hint"><i class="fas fa-arrow-right"></i> Select</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ===== CLASS SECTION ===== -->
+    <div class="section hidden" id="classSection">
+
+        <button class="btn-back" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Back to Exams
+        </button>
+
+        <div class="exam-banner" style="margin-bottom: 1.5rem;">
+            <div class="exam-info">
+                <div class="exam-icon" style="background:#f58a2e; color:white;">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="exam-details">
+                    <h2 id="examTitle">Select Class</h2>
+                    <p><i class="fas fa-info-circle"></i> Choose a class to enter marks</p>
+                </div>
+            </div>
+            <div class="exam-badge">
+                <i class="fas fa-edit"></i> Marks Entry
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h3>
+                <i class="fas fa-users"></i> Available Classes
+                <span class="count-badge" id="classCount">0</span>
+            </h3>
+            <span class="hint">
+                <i class="fas fa-hand-pointer"></i> Click a class to enter marks
+            </span>
+        </div>
+
+        <div id="classGrid" class="class-grid">
+            <div class="loading">
+                <i class="fas fa-circle-notch"></i>
+                <p>Loading classes...</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="footer-note">
+        <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
+        <span><i class="fas fa-lock"></i> secure · exam management</span>
+    </div>
+
+</div>
+
+
+<script>
+
+// ==========================================
+// ALL LOGIC REMAINS EXACTLY THE SAME
+// ==========================================
+
+const API = "https://sunshine-swp6.onrender.com";
+
+let selectedExam = "";
+
+async function selectExam(exam) {
+    selectedExam = exam;
+
+    document.getElementById("examSection").classList.add("hidden");
+    document.getElementById("classSection").classList.remove("hidden");
+
+    document.getElementById("examTitle").textContent = `${exam} - Select Class`;
+
+    await loadClasses();
+}
+
+async function loadClasses() {
+    const classGrid = document.getElementById("classGrid");
+
+    classGrid.innerHTML = `
+        <div class="loading">
+            <i class="fas fa-circle-notch"></i>
+            <p>Loading classes...</p>
+        </div>
+    `;
+
+    try {
+        const response = await fetch(`${API}/api/exam/classes`);
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Unable to load classes.");
+        }
+
+        if (!data.classes || data.classes.length === 0) {
+            classGrid.innerHTML = `
+                <div class="error">
+                    <i class="fas fa-users-slash"></i>
+                    No classes found in Student collection.
+                </div>
+            `;
+            return;
+        }
+
+        // Update class count
+        document.getElementById("classCount").textContent = data.classes.length;
+
+        classGrid.innerHTML = data.classes
+            .map(className => `
+                <div class="card class-card" onclick='openClass(${JSON.stringify(className)})'>
+                    <div class="card-icon"><i class="fas fa-school"></i></div>
+                    <h4>${escapeHtml(className)}</h4>
+                    <div class="class-sub"><i class="fas fa-user-graduate"></i> Click to enter marks</div>
+                    <div class="arrow-hint"><i class="fas fa-arrow-right"></i> Open</div>
+                </div>
+            `)
+            .join("");
+
+    } catch (error) {
+        console.error(error);
+        classGrid.innerHTML = `
+            <div class="error">
+                <i class="fas fa-exclamation-triangle"></i>
+                ${escapeHtml(error.message)}
+            </div>
+        `;
+    }
+}
+
+function openClass(className) {
+    window.location.href = 
+        `exam-student.html?exam=${encodeURIComponent(selectedExam)}&class=${encodeURIComponent(className)}`;
+}
+
+function goBack() {
+    document.getElementById("classSection").classList.add("hidden");
+    document.getElementById("examSection").classList.remove("hidden");
+}
+
+function escapeHtml(value) {
+    return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+</script>
+
+</body>
+</html>

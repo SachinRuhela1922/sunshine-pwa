@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunshine · All Students</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- jsPDF & jsPDF-AutoTable for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: #f7f3ed;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* header */
+        .page-header {
+            background: white;
+            border-radius: 32px;
+            padding: 1.2rem 2rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            border: 1px solid rgba(245, 138, 46, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #2d1f0c;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .page-header h1 i {
+            color: #f58a2e;
+            background: #fcf3e8;
+            padding: 0.3rem 0.6rem;
+            border-radius: 16px;
+            font-size: 1.2rem;
+        }
+
+        .page-header .header-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .page-header .badge {
+            background: #fcf3e8;
+            color: #7f6a4b;
+            padding: 0.3rem 1.2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            border: 1px solid rgba(245, 138, 46, 0.1);
+        }
+
+        .page-header .badge i {
+            color: #f58a2e;
+            margin-right: 0.3rem;
+        }
+
+        .btn-action {
+            padding: 0.5rem 1.2rem;
+            border: none;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f58a2e, #f9b042);
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 138, 46, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(245, 138, 46, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2b7a3a, #3a9e4a);
+            color: white;
+            box-shadow: 0 4px 12px rgba(43, 122, 58, 0.2);
+        }
+
+        .btn-success:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(43, 122, 58, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0e2d2;
+            color: #4d3e2b;
+        }
+
+        .btn-secondary:hover {
+            background: #e6d5c0;
+        }
+
+        /* search & filters */
+        .search-section {
+            background: white;
+            border-radius: 20px;
+            padding: 0.8rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(245, 138, 46, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .search-section .search-icon {
+            color: #b09a7e;
+            font-size: 1rem;
+        }
+
+        .search-section input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.6rem 0;
+            border: none;
+            outline: none;
+            font-size: 0.95rem;
+            background: transparent;
+            color: #2d1f0c;
+            font-weight: 500;
+        }
+
+        .search-section input::placeholder {
+            color: #b8a58b;
+            font-weight: 400;
+        }
+
+        .search-section .search-divider {
+            width: 1px;
+            height: 28px;
+            background: #f0e2d2;
+        }
+
+        .search-section .result-count {
+            font-size: 0.8rem;
+            color: #7f6a4b;
+            font-weight: 500;
+        }
+
+        /* stats bar */
+        .stats-bar {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-bar.visible {
+            display: grid;
+        }
+
+        .stat-item {
+            background: white;
+            border-radius: 20px;
+            padding: 0.8rem 1rem;
+            border: 1px solid rgba(245, 138, 46, 0.06);
+            text-align: center;
+        }
+
+        .stat-item .number {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #2d1f0c;
+        }
+
+        .stat-item .label {
+            font-size: 0.7rem;
+            color: #7f6a4b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .stat-item .icon {
+            color: #f58a2e;
+            font-size: 1rem;
+            margin-right: 0.3rem;
+        }
+
+        /* students table */
+        .table-wrapper {
+            background: white;
+            border-radius: 24px;
+            padding: 1rem 1.2rem;
+            border: 1px solid #dcd0c0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+            overflow-x: auto;
+        }
+
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            min-width: 1000px;
+            border: 1px solid #dcd0c0; /* Table Outer Border */
+        }
+
+        .students-table thead {
+            background: #fcf9f4;
+        }
+
+        .students-table th {
+            padding: 0.6rem 0.6rem;
+            text-align: left;
+            font-weight: 700;
+            color: #3d2e1b;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #dcd0c0;
+            border-right: 1px solid #dcd0c0; /* Vertical Line */
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            background: #fcf9f4;
+            z-index: 10;
+        }
+
+        .students-table td {
+            padding: 0.5rem 0.6rem;
+            border-bottom: 1px solid #e5d8c8; /* Horizontal Line */
+            border-right: 1px solid #e5d8c8; /* Vertical Line */
+            color: #3d2e1b;
+            vertical-align: middle;
+            font-size: 0.78rem;
+        }
+
+        .students-table th:last-child,
+        .students-table td:last-child {
+            border-right: none;
+        }
+
+        .students-table td .wrap-text {
+            white-space: normal;
+            word-break: break-word;
+            display: inline-block;
+            max-width: 150px;
+            line-height: 1.3;
+        }
+
+        .students-table td .wrap-address {
+            white-space: normal;
+            word-break: break-word;
+            display: inline-block;
+            max-width: 180px;
+            line-height: 1.3;
+        }
+
+        .students-table tr {
+            transition: background 0.2s;
+        }
+
+        .students-table tr:hover td {
+            background: #fcf9f4;
+        }
+
+        .students-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: #2d1f0c;
+        }
+
+        .student-id {
+            font-size: 0.65rem;
+            color: #b09a7e;
+            display: block;
+        }
+
+        .view-btn {
+            padding: 0.2rem 0.8rem;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fcf3e8;
+            color: #f58a2e;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            text-decoration: none;
+        }
+
+        .view-btn:hover {
+            background: #f58a2e;
+            color: white;
+        }
+
+        /* empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: white;
+            border-radius: 32px;
+            border: 1px solid rgba(245, 138, 46, 0.06);
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            color: #f0e2d2;
+            margin-bottom: 0.8rem;
+        }
+
+        .empty-state h3 {
+            color: #2d1f0c;
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .empty-state p {
+            color: #b09a7e;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 2.5rem 2rem;
+        }
+
+        .loading-state .spinner {
+            font-size: 2.5rem;
+            color: #f58a2e;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-state p {
+            color: #7f6a4b;
+            margin-top: 0.5rem;
+        }
+
+        /* footer */
+        .footer-note {
+            margin-top: 2rem;
+            border-top: 1px solid #f0e2d2;
+            padding-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #b09a7e;
+            font-size: 0.75rem;
+        }
+
+        .footer-note i {
+            color: #f58a2e;
+        }
+
+        /* responsive */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1rem 1.2rem;
+            }
+            .page-header h1 {
+                font-size: 1.2rem;
+            }
+            .search-section {
+                padding: 0.6rem 1rem;
+                flex-wrap: wrap;
+            }
+            .search-section input {
+                min-width: 150px;
+                font-size: 0.85rem;
+            }
+            .students-table {
+                font-size: 0.7rem;
+                min-width: 800px;
+            }
+            .students-table th,
+            .students-table td {
+                padding: 0.3rem 0.4rem;
+            }
+            .students-table td .wrap-text {
+                max-width: 100px;
+            }
+            .students-table td .wrap-address {
+                max-width: 120px;
+            }
+            .stats-bar {
+                grid-template-columns: 1fr 1fr;
+            }
+            .table-wrapper {
+                padding: 0.6rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 0.8rem;
+            }
+            .page-header .header-info .badge {
+                display: none;
+            }
+            .btn-action {
+                padding: 0.3rem 0.8rem;
+                font-size: 0.7rem;
+            }
+            .students-table {
+                min-width: 700px;
+                font-size: 0.65rem;
+            }
+            .students-table th,
+            .students-table td {
+                padding: 0.2rem 0.3rem;
+            }
+            .students-table td .wrap-text {
+                max-width: 70px;
+            }
+            .students-table td .wrap-address {
+                max-width: 90px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <h1><i class="fas fa-users"></i> All Students</h1>
+        <div class="header-info">
+            <span class="badge"><i class="fas fa-school"></i> Sunshine · records</span>
+            <button class="btn-action btn-success" id="exportBtn">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </button>
+            <button class="btn-action btn-primary" id="fetchStudents">
+                <i class="fas fa-sync-alt"></i> Fetch
+            </button>
+        </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search-section">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Search by name, father, mother, admission no, email...">
+        <div class="search-divider"></div>
+        <span class="result-count" id="resultCount">0 students</span>
+    </div>
+
+    <!-- STATS BAR (FEE REMOVED) -->
+    <div class="stats-bar" id="statsBar">
+        <div class="stat-item">
+            <div class="number" id="totalStudents">0</div>
+            <div class="label"><i class="fas fa-users icon"></i> Total Students</div>
+        </div>
+        <div class="stat-item">
+            <div class="number" id="activeStudents">0</div>
+            <div class="label"><i class="fas fa-user-check icon"></i> Active Records</div>
+        </div>
+        <div class="stat-item">
+            <div class="number" id="aadhaarCount">0</div>
+            <div class="label"><i class="fas fa-id-card icon"></i> With Aadhaar</div>
+        </div>
+        <div class="stat-item">
+            <div class="number" id="phoneCount">0</div>
+            <div class="label"><i class="fas fa-phone icon"></i> With Mobile</div>
+        </div>
+    </div>
+
+    <!-- STUDENTS CONTAINER -->
+    <div id="studentsContainer"></div>
+
+    <!-- FOOTER -->
+    <div class="footer-note">
+        <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
+        <span><i class="fas fa-lock"></i> secure · student records</span>
+    </div>
+
+</div>
+
+<script>
+    const fetchButton = document.getElementById("fetchStudents");
+    const exportBtn = document.getElementById("exportBtn");
+    const studentsContainer = document.getElementById("studentsContainer");
+    const statsBar = document.getElementById("statsBar");
+    const totalStudentsEl = document.getElementById("totalStudents");
+    const activeStudentsEl = document.getElementById("activeStudents");
+    const aadhaarCountEl = document.getElementById("aadhaarCount");
+    const phoneCountEl = document.getElementById("phoneCount");
+    const searchInput = document.getElementById("searchInput");
+    const resultCount = document.getElementById("resultCount");
+
+    let allStudentsData = [];
+    let filteredData = [];
+
+    // ==========================================
+    // FETCH STUDENTS
+    // ==========================================
+
+    fetchButton.addEventListener("click", async function () {
+        fetchButton.disabled = true;
+        fetchButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+
+        try {
+            studentsContainer.innerHTML = `
+                <div class="loading-state">
+                    <div class="spinner"><i class="fas fa-circle-notch"></i></div>
+                    <p>Loading student records...</p>
+                </div>
+            `;
+
+            const response = await fetch("https://sunshine-swp6.onrender.com/api/students");
+            const result = await response.json();
+
+            if (!response.ok) {
+                studentsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <h3>Error</h3>
+                        <p>${result.message || "Unable to fetch students."}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            allStudentsData = result.students || [];
+            filteredData = [...allStudentsData];
+            renderTable(filteredData);
+
+            // Update stats
+            updateStats(allStudentsData);
+
+        } catch (error) {
+            console.error(error);
+            studentsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-wifi"></i>
+                    <h3>Connection Error</h3>
+                    <p>Unable to connect with server. Please try again.</p>
+                </div>
+            `;
+        } finally {
+            fetchButton.disabled = false;
+            fetchButton.innerHTML = '<i class="fas fa-sync-alt"></i> Fetch';
+        }
+    });
+
+    // ==========================================
+    // SEARCH FUNCTIONALITY
+    // ==========================================
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+
+        if (!query) {
+            filteredData = [...allStudentsData];
+        } else {
+            filteredData = allStudentsData.filter(student => {
+                const searchable = [
+                    student.studentName,
+                    student.father?.name,
+                    student.fatherName,
+                    student.mother?.name,
+                    student.motherName,
+                    student.admissionNumber,
+                    student.email,
+                    student.contact?.email,
+                    student.studentId,
+                    student.phone,
+                    student.contact?.phone,
+                    student.category,
+                    student.father?.occupation
+                ].join(' ').toLowerCase();
+                return searchable.includes(query);
+            });
+        }
+
+        renderTable(filteredData);
+        updateStats(filteredData);
+        resultCount.textContent = `${filteredData.length} students`;
+    });
+
+    // ==========================================
+    // RENDER TABLE
+    // ==========================================
+
+    function renderTable(students) {
+        if (!students || students.length === 0) {
+            studentsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <h3>No Results Found</h3>
+                    <p>${allStudentsData.length === 0 ? 'Start by adding your first student.' : 'Try adjusting your search criteria.'}</p>
+                </div>
+            `;
+            return;
+        }
+
+        let tableHtml = `
+            <div class="table-wrapper">
+                <table class="students-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student Name</th>
+                            <th>Father Name</th>
+                            <th>Mother Name</th>
+                            <th>DOB</th>
+                            <th>Mobile</th>
+                            <th>Aadhaar</th>
+                            <th>Category</th>
+                            <th>Father Occ.</th>
+                            <th>Admission No</th>
+                            <th>Address</th>
+                            <th>Email</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        students.forEach((student, index) => {
+            const dob = formatDOB(student.dob);
+            const admissionNo = student.admissionNumber || '-';
+            const name = student.studentName || '-';
+            const fatherName = student.father?.name || student.fatherName || '-';
+            const motherName = student.mother?.name || student.motherName || '-';
+            const mobile = student.phone || student.father?.phone || student.contact?.phone || '-';
+            const aadhaar = student.documents?.aadhaarNumber || student.aadhaarNumber || '-';
+            const category = student.category || '-';
+            const fatherOcc = student.father?.occupation || '-';
+            const address = student.contact?.address || student.address || '-';
+            const email = student.email || student.contact?.email || '-';
+
+            tableHtml += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>
+                        <span class="student-name">${name}</span>
+                        <span class="student-id">${student.studentId || 'N/A'}</span>
+                    </td>
+                    <td>${fatherName}</td>
+                    <td>${motherName}</td>
+                    <td>${dob}</td>
+                    <td>${mobile}</td>
+                    <td>${aadhaar}</td>
+                    <td>${category}</td>
+                    <td>${fatherOcc}</td>
+                    <td>${admissionNo}</td>
+                    <td><span class="wrap-address">${address}</span></td>
+                    <td><span class="wrap-text">${email}</span></td>
+                    <td>
+                        <button class="view-btn" onclick="viewStudent('${student._id}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tableHtml += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        studentsContainer.innerHTML = tableHtml;
+        resultCount.textContent = `${students.length} students`;
+    }
+
+    // ==========================================
+    // UPDATE STATS (NON-FEE METRICS)
+    // ==========================================
+
+    function updateStats(students) {
+        if (!students || students.length === 0) {
+            statsBar.classList.remove('visible');
+            return;
+        }
+
+        let withAadhaar = 0;
+        let withPhone = 0;
+
+        students.forEach(student => {
+            const aadhaar = student.documents?.aadhaarNumber || student.aadhaarNumber;
+            const phone = student.phone || student.father?.phone || student.contact?.phone;
+            
+            if (aadhaar && aadhaar !== '-') withAadhaar++;
+            if (phone && phone !== '-') withPhone++;
+        });
+
+        statsBar.classList.add('visible');
+        totalStudentsEl.textContent = students.length;
+        activeStudentsEl.textContent = students.length; // Or filter by student status if backend supports it
+        aadhaarCountEl.textContent = withAadhaar;
+        phoneCountEl.textContent = withPhone;
+    }
+
+
+
+    function formatDOB(dateValue) {
+    if (!dateValue) return '-';
+
+    const dateString = String(dateValue).split('T')[0];
+    const parts = dateString.split('-');
+
+    if (parts.length === 3) {
+        const [year, month, day] = parts;
+        return `${day}/${month}/${year}`;
+    }
+
+    return '-';
+}
+
+    // ==========================================
+    // VIEW STUDENT
+    // ==========================================
+
+    function viewStudent(studentId) {
+        window.location.href = "profile-view.html?id=" + studentId;
+    }
+
+    // ==========================================
+    // EXPORT DATA TO PDF (NON-FEE)
+    // ==========================================
+
+    exportBtn.addEventListener('click', function() {
+        const dataToExport = filteredData.length > 0 ? filteredData : allStudentsData;
+
+        if (dataToExport.length === 0) {
+            alert("No data to export.");
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('l', 'mm', 'a4');
+
+        // Title
+        doc.setFontSize(16);
+        doc.setTextColor(45, 31, 12);
+        doc.text("Sunshine School - Student Directory", 14, 15);
+        
+        doc.setFontSize(9);
+        doc.setTextColor(127, 106, 75);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()} | Total Records: ${dataToExport.length}`, 14, 21);
+
+        // Header Structure
+        const headers = [
+            ['#', 'ID', 'Student Name', 'Father Name', 'Mother Name', 'DOB', 'Mobile', 'Aadhaar', 'Cat.', 'Adm. No', 'Address', 'Email']
+        ];
+
+        // Row Mapping
+        const rows = dataToExport.map((student, index) => [
+            index + 1,
+            student.studentId || '-',
+            student.studentName || '-',
+            student.father?.name || student.fatherName || '-',
+            student.mother?.name || student.motherName || '-',
+            formatDOB(student.dob),
+            student.phone || student.father?.phone || student.contact?.phone || '-',
+            student.documents?.aadhaarNumber || student.aadhaarNumber || '-',
+            student.category || '-',
+            student.admissionNumber || '-',
+            student.contact?.address || student.address || '-',
+            student.email || student.contact?.email || '-'
+        ]);
+
+        // Draw Table
+        doc.autoTable({
+            head: headers,
+            body: rows,
+            startY: 26,
+            theme: 'grid',
+            styles: {
+                fontSize: 7,
+                cellPadding: 2,
+                textColor: [45, 31, 12],
+                lineColor: [200, 200, 200],
+                lineWidth: 0.1
+            },
+            headStyles: {
+                fillColor: [245, 138, 46],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                halign: 'center'
+            },
+            alternateRowStyles: {
+                fillColor: [252, 249, 244]
+            }
+        });
+
+        doc.save(`students_directory_${new Date().toISOString().split('T')[0]}.pdf`);
+
+        const originalText = exportBtn.innerHTML;
+        exportBtn.innerHTML = '<i class="fas fa-check"></i> PDF Downloaded!';
+        setTimeout(() => {
+            exportBtn.innerHTML = originalText;
+        }, 2000);
+    });
+
+    // ==========================================
+    // AUTO-FETCH ON LOAD
+    // ==========================================
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchButton.click();
+    });
+</script>
+
+</body>
+
+</html>

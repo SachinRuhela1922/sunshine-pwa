@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sunshine · View Time Table</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- jsPDF + AutoTable for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: #f7f3ed;
+            padding: 1.5rem;
+            color: #2d1f0c;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        .page-header {
+            background: linear-gradient(135deg, #f58a2e, #f9b042);
+            border-radius: 32px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 8px 30px rgba(245, 138, 46, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .page-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            z-index: 1;
+        }
+
+        .page-header h1 i {
+            background: rgba(255,255,255,0.15);
+            padding: 0.3rem 0.6rem;
+            border-radius: 16px;
+            font-size: 1.2rem;
+        }
+
+        .page-header .header-sub {
+            color: rgba(255,255,255,0.85);
+            font-size: 0.85rem;
+            z-index: 1;
+        }
+
+        .page-header .header-sub i {
+            margin-right: 0.3rem;
+        }
+
+        .page-header .actions {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            z-index: 1;
+        }
+
+        .btn-action {
+            padding: 0.5rem 1.2rem;
+            border: none;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.02);
+        }
+
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ===== BANNER ===== */
+        .banner {
+            background: linear-gradient(135deg, #fcf3e8, #f9dbb8);
+            border-radius: 28px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border: 1px solid rgba(245, 138, 46, 0.15);
+        }
+
+        .banner .banner-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .banner .banner-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f58a2e;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 12px rgba(245, 138, 46, 0.1);
+        }
+
+        .banner .banner-details h2 {
+            font-size: 1.2rem;
+            color: #2d1f0c;
+            font-weight: 700;
+        }
+
+        .banner .banner-details p {
+            color: #8a765e;
+            font-size: 0.85rem;
+            margin-top: 0.1rem;
+        }
+
+        .banner .banner-badge {
+            background: white;
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #f58a2e;
+            box-shadow: 0 2px 8px rgba(245, 138, 46, 0.08);
+        }
+
+        .banner .banner-badge i {
+            margin-right: 0.4rem;
+        }
+
+        /* ===== SEASON BUTTONS ===== */
+        .season-buttons {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .season-btn {
+            padding: 0.6rem 1.8rem;
+            border: none;
+            border-radius: 60px;
+            background: white;
+            color: #4d3e2b;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid rgba(245, 138, 46, 0.06);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .season-btn i {
+            color: #b09a7e;
+            transition: color 0.2s;
+        }
+
+        .season-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+        }
+
+        .season-btn.active {
+            background: linear-gradient(135deg, #f58a2e, #f9b042);
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 138, 46, 0.25);
+            border-color: transparent;
+        }
+
+        .season-btn.active i {
+            color: white;
+        }
+
+        /* ===== TIMING BOX ===== */
+        .timing-box {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem 1.8rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(245, 138, 46, 0.06);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            transition: all 0.3s;
+        }
+
+        .timing-box:hover {
+            border-color: rgba(245, 138, 46, 0.12);
+        }
+
+        .timing-box .box-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2d1f0c;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 2px solid #fcf3e8;
+        }
+
+        .timing-box .box-title i {
+            color: #f58a2e;
+        }
+
+        .timing-box .box-title .title-badge {
+            background: #fcf3e8;
+            color: #f58a2e;
+            padding: 0.1rem 0.6rem;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        /* ===== TIMING INFO ===== */
+        .timing-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .info-item {
+            background: #fcfaf7;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            border: 1px solid #f0e2d2;
+            transition: all 0.2s;
+        }
+
+        .info-item:hover {
+            border-color: #f9b042;
+            background: #fcf9f4;
+        }
+
+        .info-item strong {
+            display: block;
+            font-size: 0.65rem;
+            color: #b09a7e;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+        }
+
+        .info-item strong i {
+            color: #f58a2e;
+            margin-right: 0.3rem;
+        }
+
+        .info-item span {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #2d1f0c;
+        }
+
+        /* ===== TABLE ===== */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            min-width: 1200px;
+        }
+
+        th {
+            background: #f58a2e;
+            color: white;
+            font-weight: 700;
+            padding: 0.8rem 1rem;
+            text-align: center;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        th i {
+            margin-right: 0.4rem;
+        }
+
+        td {
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid #f0e2d2;
+            text-align: center;
+            color: #2d1f0c;
+            font-size: 0.88rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:nth-child(even) td {
+            background: #fcfaf7;
+        }
+
+        tr:hover td {
+            background: #fcf9f4;
+        }
+
+        .lecture-number {
+            font-weight: 700;
+            color: #f58a2e;
+        }
+
+        /* ===== CLASS BADGES ===== */
+        .class-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            justify-content: center;
+        }
+
+        .class-badge {
+            background: #fcf3e8;
+            color: #8a5a1e;
+            border: 1px solid #f0d8b8;
+            padding: 0.15rem 0.6rem;
+            border-radius: 30px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .class-badge b {
+            color: #f58a2e;
+        }
+
+        .no-teacher {
+            color: #d5c8b8;
+            font-size: 0.8rem;
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: white;
+            border-radius: 24px;
+            border: 1px solid rgba(245, 138, 46, 0.06);
+        }
+
+        .loading i {
+            font-size: 2.5rem;
+            color: #f58a2e;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: #b09a7e;
+            margin-top: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* ===== EMPTY ===== */
+        .empty {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            text-align: center;
+            color: #b09a7e;
+            border: 1px solid rgba(245, 138, 46, 0.06);
+        }
+
+        .empty i {
+            font-size: 3.5rem;
+            color: #f0e2d2;
+            display: block;
+            margin-bottom: 0.8rem;
+        }
+
+        .empty h4 {
+            color: #2d1f0c;
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .empty p {
+            color: #b09a7e;
+            font-size: 0.95rem;
+        }
+
+        .empty .empty-hint {
+            margin-top: 0.8rem;
+            color: #d5c8b8;
+            font-size: 0.85rem;
+        }
+
+        .empty .empty-hint i {
+            font-size: 0.85rem;
+            color: #f58a2e;
+            display: inline;
+        }
+
+        /* ===== ERROR ===== */
+        .error {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #b53b2e;
+            background: #fce4e0;
+            border-radius: 20px;
+        }
+
+        .error i {
+            font-size: 2.5rem;
+            color: #f5b7b1;
+            display: block;
+            margin-bottom: 0.8rem;
+        }
+
+        .error h4 {
+            color: #b53b2e;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .error p {
+            color: #8a3a2e;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer-note {
+            margin-top: 2.5rem;
+            border-top: 1px solid #f0e2d2;
+            padding-top: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #b09a7e;
+            font-size: 0.75rem;
+        }
+
+        .footer-note i {
+            color: #f58a2e;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 820px) {
+            body {
+                padding: 1rem;
+            }
+            .page-header {
+                padding: 1.2rem 1.2rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .page-header h1 {
+                font-size: 1.2rem;
+            }
+            .banner {
+                padding: 1rem 1.2rem;
+                flex-direction: column;
+                text-align: center;
+            }
+            .banner .banner-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            .banner .banner-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 1.3rem;
+            }
+            .banner .banner-details h2 {
+                font-size: 1rem;
+            }
+            .season-buttons {
+                flex-wrap: wrap;
+            }
+            .season-btn {
+                padding: 0.4rem 1.2rem;
+                font-size: 0.8rem;
+            }
+            .timing-info {
+                grid-template-columns: 1fr;
+            }
+            .timing-box {
+                padding: 1.2rem 1.2rem;
+            }
+            table {
+                min-width: 900px;
+                font-size: 0.8rem;
+            }
+            th, td {
+                padding: 0.5rem 0.6rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-header .actions .btn-action {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.7rem;
+            }
+            .season-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            .season-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            table {
+                min-width: 750px;
+                font-size: 0.75rem;
+            }
+            th, td {
+                padding: 0.4rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- ===== HEADER ===== -->
+    <div class="page-header">
+        <div>
+            <h1>
+                <i class="fas fa-clock"></i>
+                Time Table
+            </h1>
+            <div class="header-sub">
+                <i class="fas fa-school"></i>
+                View school schedule
+            </div>
+        </div>
+        <div class="actions">
+            <button class="btn-action btn-secondary" id="downloadPdfBtn" onclick="downloadPDF()" disabled>
+                <i class="fas fa-file-pdf"></i> Download PDF
+            </button>
+            <button class="btn-action btn-secondary" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== BANNER ===== -->
+    <div class="banner">
+        <div class="banner-info">
+            <div class="banner-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="banner-details">
+                <h2>School Time Table</h2>
+                <p><i class="fas fa-info-circle"></i> View summer and winter schedules</p>
+            </div>
+        </div>
+        <div class="banner-badge">
+            <i class="fas fa-clock"></i> Academic Year 2025-26
+        </div>
+    </div>
+
+    <!-- ===== SEASON BUTTONS ===== -->
+    <div class="season-buttons">
+        <button class="season-btn" id="summerBtn" onclick="loadTimetable('Summer')">
+            <i class="fas fa-sun"></i> Summer
+        </button>
+        <button class="season-btn" id="winterBtn" onclick="loadTimetable('Winter')">
+            <i class="fas fa-snowflake"></i> Winter
+        </button>
+    </div>
+
+    <!-- ===== TIMETABLE CONTAINER ===== -->
+    <div id="timetableContainer">
+        <div class="empty">
+            <i class="fas fa-clock"></i>
+            <h4>Select a Season</h4>
+            <p>Choose Summer or Winter timetable to view.</p>
+            <div class="empty-hint">
+                <i class="fas fa-hand-pointer"></i> Click a button above to get started
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="footer-note">
+        <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
+        <span><i class="fas fa-clock"></i> timetable viewer</span>
+    </div>
+
+</div>
+
+
+<script>
+
+// ==========================================
+// ALL LOGIC REMAINS EXACTLY THE SAME
+// ==========================================
+
+const API = "https://sunshine-swp6.onrender.com";
+
+// Holds the currently loaded timetable so the PDF button can use it
+let currentTimetable = null;
+
+// ========================================
+// LOAD TIMETABLE
+// ========================================
+
+async function loadTimetable(season) {
+    const container = document.getElementById("timetableContainer");
+    const pdfBtn = document.getElementById("downloadPdfBtn");
+
+    // Update active button
+    document.getElementById("summerBtn").classList.remove("active");
+    document.getElementById("winterBtn").classList.remove("active");
+
+    if (season === "Summer") {
+        document.getElementById("summerBtn").classList.add("active");
+    } else {
+        document.getElementById("winterBtn").classList.add("active");
+    }
+
+    // Reset PDF state while loading
+    currentTimetable = null;
+    pdfBtn.disabled = true;
+
+    container.innerHTML = `
+        <div class="loading">
+            <i class="fas fa-circle-notch"></i>
+            <p>Loading ${escapeHtml(season)} timetable...</p>
+        </div>
+    `;
+
+    try {
+        const response = await fetch(`${API}/api/timetable/${encodeURIComponent(season)}`);
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Unable to fetch timetable.");
+        }
+
+        const timetable = data.timetable;
+
+        if (!timetable) {
+            container.innerHTML = `
+                <div class="empty">
+                    <i class="fas fa-calendar-times"></i>
+                    <h4>No ${escapeHtml(season)} Timetable Found</h4>
+                    <p>Please create a timetable for ${escapeHtml(season)} season.</p>
+                    <div class="empty-hint">
+                        <i class="fas fa-info-circle"></i> Use the timetable management page to create one
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        currentTimetable = timetable;
+        pdfBtn.disabled = false;
+
+        renderTimetable(timetable);
+
+    } catch (error) {
+        console.error("Timetable fetch error:", error);
+        container.innerHTML = `
+            <div class="error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h4>Unable to Load Timetable</h4>
+                <p>${escapeHtml(error.message)}</p>
+            </div>
+        `;
+    }
+}
+
+// ========================================
+// FORMAT TIME (HH:mm) - matches management page
+// ========================================
+
+function formatTimeValue(value) {
+    if (!value) {
+        return "";
+    }
+
+    const parts = String(value).split(":");
+
+    if (parts.length < 2) {
+        return "";
+    }
+
+    let [h, m] = parts;
+
+    h = h.padStart(2, "0");
+    m = m.padStart(2, "0");
+
+    return `${h}:${m}`;
+}
+
+// ========================================
+// MAP CONVERSION (classes may come as Map/object/array)
+// ========================================
+
+function mapToObject(value) {
+    if (!value) {
+        return {};
+    }
+
+    if (Array.isArray(value)) {
+        return Object.fromEntries(value);
+    }
+
+    return { ...value };
+}
+
+// ========================================
+// CLASS COLUMNS CONFIG (Class 1 ... Class 10)
+// ========================================
+
+const TOTAL_CLASSES = 10;
+
+// Tries several likely key formats so it matches however the classes map was saved
+function getTeacherForClassNumber(classesObj, num) {
+    const candidates = [
+        `Class ${num}`,
+        `class ${num}`,
+        `Class${num}`,
+        `Class-${num}`,
+        `${num}`
+    ];
+
+    for (const key of candidates) {
+        if (classesObj[key] && String(classesObj[key]).trim() !== "") {
+            return classesObj[key];
+        }
+    }
+
+    // Fallback: find any key whose number matches
+    for (const [key, val] of Object.entries(classesObj)) {
+        const match = String(key).match(/(\d+)/);
+        if (match && parseInt(match[1], 10) === num && val && String(val).trim() !== "") {
+            return val;
+        }
+    }
+
+    return "";
+}
+
+// ========================================
+// RENDER TIMETABLE (UPDATED - uses classes map)
+// ========================================
+
+function renderTimetable(timetable) {
+    const container = document.getElementById("timetableContainer");
+
+    const season = timetable.season || "-";
+    const teacherTiming = timetable.teacherTiming || "-";
+    const studentTiming = timetable.studentTiming || "-";
+    const prayerBell = timetable.prayerBell || "-";
+    const lectures = Array.isArray(timetable.lectures) ? timetable.lectures : [];
+
+    let lectureRows = "";
+
+    if (lectures.length) {
+        lectureRows = lectures.map((lecture, index) => {
+
+            const from = formatTimeValue(lecture.from) || lecture.from || "-";
+            const to = formatTimeValue(lecture.to) || lecture.to || "-";
+
+            // Check if it's a lunch break
+            if (lecture.type === "lunch") {
+                return `
+                    <tr style="background: #fff3cd; font-weight: 600;">
+                        <td style="color: #856404;">
+                            <i class="fas fa-utensils" style="color:#d97706;"></i> Lunch
+                        </td>
+                        <td style="color: #856404;">${escapeHtml(from)}</td>
+                        <td style="color: #856404;">${escapeHtml(to)}</td>
+                        <td colspan="${TOTAL_CLASSES}" style="color: #856404;">—</td>
+                    </tr>
+                `;
+            }
+
+            // Build a cell per class (Class 1 ... Class 10)
+            const classesObj = mapToObject(lecture.classes);
+
+            let classCells = "";
+            for (let c = 1; c <= TOTAL_CLASSES; c++) {
+                const teacherName = getTeacherForClassNumber(classesObj, c);
+                classCells += teacherName
+                    ? `<td>${escapeHtml(teacherName)}</td>`
+                    : `<td><span class="no-teacher">-</span></td>`;
+            }
+
+            // Regular lecture
+            return `
+                <tr>
+                    <td class="lecture-number">${lecture.lectureNumber ?? index + 1}</td>
+                    <td>${escapeHtml(from)}</td>
+                    <td>${escapeHtml(to)}</td>
+                    ${classCells}
+                </tr>
+            `;
+        }).join("");
+    } else {
+        lectureRows = `
+            <tr>
+                <td colspan="${3 + TOTAL_CLASSES}" style="text-align:center;color:#b09a7e;padding:1.5rem;">
+                    <i class="fas fa-book" style="color:#f0e2d2;display:block;font-size:1.5rem;margin-bottom:0.3rem;"></i>
+                    No lecture data available.
+                </td>
+            </tr>
+        `;
+    }
+
+    container.innerHTML = `
+        <div class="timing-box">
+            <div class="box-title">
+                <i class="fas fa-clock"></i>
+                ${escapeHtml(season)} Timetable
+                <span class="title-badge">${escapeHtml(season)}</span>
+            </div>
+
+            <div class="timing-info">
+                <div class="info-item">
+                    <strong><i class="fas fa-user-tie"></i> Teacher Timing</strong>
+                    <span>${escapeHtml(teacherTiming)}</span>
+                </div>
+                <div class="info-item">
+                    <strong><i class="fas fa-user-graduate"></i> Student Timing</strong>
+                    <span>${escapeHtml(studentTiming)}</span>
+                </div>
+                <div class="info-item">
+                    <strong><i class="fas fa-bell"></i> Prayer Bell</strong>
+                    <span>${escapeHtml(prayerBell)}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="timing-box">
+            <div class="box-title">
+                <i class="fas fa-list"></i>
+                Lecture Schedule
+                <span class="title-badge">${lectures.length} Lectures</span>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> Lecture No.</th>
+                            <th><i class="fas fa-arrow-right"></i> From</th>
+                            <th><i class="fas fa-arrow-left"></i> To</th>
+                            ${Array.from({ length: TOTAL_CLASSES }, (_, i) => `<th>Class ${i + 1}</th>`).join("")}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${lectureRows}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+}
+
+// ========================================
+// DOWNLOAD PDF (uses jsPDF + AutoTable)
+// ========================================
+
+function downloadPDF() {
+    if (!currentTimetable) {
+        alert("Please load a timetable first, then download.");
+        return;
+    }
+
+    if (!window.jspdf) {
+        alert("PDF library failed to load. Please check your internet connection and try again.");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+
+    const season = currentTimetable.season || "Timetable";
+    const teacherTiming = currentTimetable.teacherTiming || "-";
+    const studentTiming = currentTimetable.studentTiming || "-";
+    const prayerBell = currentTimetable.prayerBell || "-";
+    const lectures = Array.isArray(currentTimetable.lectures) ? currentTimetable.lectures : [];
+
+    // ---- Header text ----
+    doc.setFontSize(16);
+    doc.setTextColor(45, 31, 12);
+    doc.text(`Sunshine School - ${season} Timetable`, 14, 15);
+
+    doc.setFontSize(10);
+    doc.setTextColor(90, 75, 55);
+    doc.text(`Teacher Timing: ${teacherTiming}    |    Student Timing: ${studentTiming}    |    Prayer Bell: ${prayerBell}`, 14, 22);
+
+    // ---- Table header: Lecture No. / From / To / Class 1 ... Class 10 ----
+    const classHeaders = Array.from({ length: TOTAL_CLASSES }, (_, i) => `Class ${i + 1}`);
+    const tableHead = [["Lecture No.", "From", "To", ...classHeaders]];
+
+    // ---- Build table rows ----
+    const body = lectures.map((lecture, index) => {
+        const from = formatTimeValue(lecture.from) || lecture.from || "-";
+        const to = formatTimeValue(lecture.to) || lecture.to || "-";
+
+        if (lecture.type === "lunch") {
+            // Merge all 10 class columns into a single "—" cell
+            return [
+                "Lunch",
+                from,
+                to,
+                { content: "—", colSpan: TOTAL_CLASSES, styles: { halign: "center" } }
+            ];
+        }
+
+        const classesObj = mapToObject(lecture.classes);
+        const classCells = Array.from({ length: TOTAL_CLASSES }, (_, i) => {
+            const teacherName = getTeacherForClassNumber(classesObj, i + 1);
+            return teacherName || "-";
+        });
+
+        return [
+            lecture.lectureNumber ?? index + 1,
+            from,
+            to,
+            ...classCells
+        ];
+    });
+
+    // ---- Draw the table ----
+    doc.autoTable({
+        startY: 28,
+        head: tableHead,
+        body: body.length ? body : [["-", "-", "-", ...Array(TOTAL_CLASSES).fill("-")]],
+        theme: "grid",
+        styles: {
+            fontSize: 7.5,
+            cellPadding: 2,
+            valign: "middle",
+            overflow: "linebreak",
+            halign: "center"
+        },
+        headStyles: {
+            fillColor: [245, 138, 46],
+            textColor: 255,
+            fontStyle: "bold",
+            halign: "center",
+            fontSize: 8
+        },
+        alternateRowStyles: {
+            fillColor: [252, 250, 247]
+        },
+        columnStyles: {
+            0: { cellWidth: 16 },
+            1: { cellWidth: 16 },
+            2: { cellWidth: 16 }
+        },
+        margin: { left: 10, right: 10 },
+        didParseCell: function (data) {
+            // Highlight lunch rows
+            if (data.row.raw && data.row.raw[0] === "Lunch") {
+                data.cell.styles.fillColor = [255, 243, 205];
+                data.cell.styles.textColor = [133, 100, 4];
+                data.cell.styles.fontStyle = "bold";
+            }
+        }
+    });
+
+    // ---- Footer ----
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(176, 154, 126);
+        doc.text(
+            `Sunshine School · est. 2006  —  Generated on ${new Date().toLocaleDateString()}`,
+            14,
+            doc.internal.pageSize.getHeight() - 8
+        );
+    }
+
+    doc.save(`Sunshine_${season}_Timetable.pdf`);
+}
+
+// ========================================
+// ESCAPE HTML
+// ========================================
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+</script>
+
+</body>
+</html>

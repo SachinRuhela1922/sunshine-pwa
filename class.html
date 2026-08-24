@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+  <title>Sunshine · Class Students</title>
+
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+
+  <style>
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
+
+    body {
+      background: #f7f3ed;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: auto;
+    }
+
+    .page-header {
+      background: white;
+      border-radius: 32px;
+      padding: 1.2rem 2rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,.02);
+      border: 1px solid rgba(245,138,46,.06);
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      flex-wrap: wrap;
+      gap: 1rem;
+
+      margin-bottom: 1.5rem;
+    }
+
+    .page-header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #2d1f0c;
+
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .page-header h1 i {
+      color: #f58a2e;
+      background: #fcf3e8;
+      padding: .3rem .6rem;
+      border-radius: 16px;
+      font-size: 1.2rem;
+    }
+
+    .header-info {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: #fcf3e8;
+      color: #7f6a4b;
+      padding: .3rem 1.2rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: .8rem;
+      border: 1px solid rgba(245,138,46,.1);
+    }
+
+    .badge i {
+      color: #f58a2e;
+      margin-right: .3rem;
+    }
+
+    .btn-action {
+      padding: .5rem 1.2rem;
+      border: none;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: .8rem;
+      cursor: pointer;
+      transition: .2s;
+
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .btn-action:hover {
+      transform: scale(1.02);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg,#2b7a3a,#3a9e4a);
+      color: white;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg,#f58a2e,#f9b042);
+      color: white;
+    }
+
+    .btn-back {
+      background: #fcf3e8;
+      color: #f58a2e;
+      text-decoration: none;
+    }
+
+
+    /* SEARCH */
+
+    .search-section {
+      background: white;
+      border-radius: 20px;
+      padding: .8rem 1.5rem;
+      margin-bottom: 1.5rem;
+
+      border: 1px solid rgba(245,138,46,.06);
+
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .search-icon {
+      color: #b09a7e;
+    }
+
+    .search-section input {
+      flex: 1;
+      min-width: 200px;
+      padding: .6rem 0;
+
+      border: none;
+      outline: none;
+
+      font-size: .95rem;
+      background: transparent;
+      color: #2d1f0c;
+    }
+
+    .search-divider {
+      width: 1px;
+      height: 28px;
+      background: #f0e2d2;
+    }
+
+    .result-count {
+      font-size: .8rem;
+      color: #7f6a4b;
+    }
+
+
+    /* STATS */
+
+    .stats-bar {
+      display: none;
+      grid-template-columns:
+        repeat(auto-fit,minmax(140px,1fr));
+
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stats-bar.visible {
+      display: grid;
+    }
+
+    .stat-item {
+      background: white;
+      border-radius: 20px;
+      padding: .8rem 1rem;
+      border: 1px solid rgba(245,138,46,.06);
+      text-align: center;
+    }
+
+    .stat-item .number {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #2d1f0c;
+    }
+
+    .stat-item .label {
+      font-size: .7rem;
+      color: #7f6a4b;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .stat-item .icon {
+      color: #f58a2e;
+      margin-right: .3rem;
+    }
+
+
+    /* TABLE */
+
+    .table-wrapper {
+      background: white;
+      border-radius: 24px;
+      padding: 1rem 1.2rem;
+
+      border: 1px solid rgba(245,138,46,.06);
+
+      box-shadow: 0 4px 16px rgba(0,0,0,.02);
+
+      overflow-x: auto;
+    }
+
+    .students-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .8rem;
+      min-width: 1000px;
+    }
+
+    .students-table th,
+    .students-table td {
+      border: 1px solid #d6cbbc !important;
+
+      padding: .6rem;
+
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .students-table thead {
+      background: #fcf9f4;
+    }
+
+    .students-table th {
+      font-weight: 700;
+      color: #3d2e1b;
+      font-size: .65rem;
+
+      text-transform: uppercase;
+      letter-spacing: .3px;
+
+      background: #fcf9f4;
+
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .students-table td {
+      color: #3d2e1b;
+      font-size: .78rem;
+    }
+
+    .students-table tr:hover td {
+      background: #fcf9f4;
+    }
+
+    .wrap-text {
+      white-space: normal;
+      word-break: break-word;
+
+      display: inline-block;
+      max-width: 150px;
+      line-height: 1.3;
+    }
+
+    .wrap-address {
+      white-space: normal;
+      word-break: break-word;
+
+      display: inline-block;
+      max-width: 180px;
+      line-height: 1.3;
+    }
+
+    .student-name {
+      font-weight: 600;
+      color: #2d1f0c;
+    }
+
+    .student-id {
+      font-size: .65rem;
+      color: #b09a7e;
+      display: block;
+    }
+
+    .view-btn {
+      padding: .2rem .8rem;
+      border: none;
+      border-radius: 30px;
+
+      font-weight: 600;
+      font-size: .65rem;
+
+      cursor: pointer;
+
+      background: #fcf3e8;
+      color: #f58a2e;
+
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+    }
+
+    .view-btn:hover {
+      background: #f58a2e;
+      color: white;
+    }
+
+
+    /* EMPTY / LOADING */
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+
+      background: white;
+      border-radius: 32px;
+
+      border: 1px solid rgba(245,138,46,.06);
+    }
+
+    .empty-state i {
+      font-size: 3.5rem;
+      color: #f0e2d2;
+      margin-bottom: .8rem;
+    }
+
+    .empty-state h3 {
+      color: #2d1f0c;
+      margin-bottom: .3rem;
+    }
+
+    .empty-state p {
+      color: #b09a7e;
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 2.5rem;
+    }
+
+    .loading-state .spinner {
+      font-size: 2.5rem;
+      color: #f58a2e;
+    }
+
+
+    .footer-note {
+      margin-top: 2rem;
+
+      border-top: 1px solid #f0e2d2;
+
+      padding-top: 1rem;
+
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+
+      color: #b09a7e;
+      font-size: .75rem;
+    }
+
+    .footer-note i {
+      color: #f58a2e;
+    }
+
+
+    @media(max-width:768px) {
+
+      body {
+        padding: .8rem;
+      }
+
+      .page-header {
+        padding: 1rem 1.2rem;
+      }
+
+      .page-header h1 {
+        font-size: 1.2rem;
+      }
+
+      .students-table {
+        min-width: 800px;
+      }
+
+      .stats-bar {
+        grid-template-columns: 1fr 1fr;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+  <!-- HEADER -->
+
+  <div class="page-header">
+
+    <h1>
+
+      <i class="fas fa-layer-group"></i>
+        Class
+      <span id="classNameDisplay">
+        Class
+      </span>
+
+
+    </h1>
+
+
+    <div class="header-info">
+
+      <span class="badge">
+
+        <i class="fas fa-school"></i>
+
+        Sunshine · class
+
+      </span>
+
+
+      <a href="admin.html"
+        class="btn-action btn-back">
+
+        <i class="fas fa-arrow-left"></i>
+
+        Back
+
+      </a>
+
+
+      <button
+        class="btn-action btn-success"
+        id="exportPdfBtn">
+
+        <i class="fas fa-file-pdf"></i>
+
+        PDF
+
+      </button>
+
+
+      <button
+        class="btn-action btn-primary"
+        id="refreshBtn">
+
+        <i class="fas fa-sync-alt"></i>
+
+        Refresh
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- SEARCH -->
+
+  <div class="search-section">
+
+    <i class="fas fa-search search-icon"></i>
+
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Search by name, father, mother, admission no, email...">
+
+    <div class="search-divider"></div>
+
+    <span
+      class="result-count"
+      id="resultCount">
+
+      0 students
+
+    </span>
+
+  </div>
+
+
+  <!-- STATS -->
+
+  <div
+    class="stats-bar"
+    id="statsBar">
+
+
+    <div class="stat-item">
+
+      <div
+        class="number"
+        id="totalStudents">
+        0
+      </div>
+
+      <div class="label">
+
+        <i class="fas fa-users icon"></i>
+
+        Total Students
+
+      </div>
+
+    </div>
+
+
+    <div class="stat-item">
+
+      <div
+        class="number"
+        id="totalDue">
+        ₹0
+      </div>
+
+      <div class="label">
+
+        <i class="fas fa-circle-exclamation icon"></i>
+
+        Total Due
+
+      </div>
+
+    </div>
+
+
+    <div class="stat-item">
+
+      <div
+        class="number"
+        id="paidCount">
+        0
+      </div>
+
+      <div class="label">
+
+        <i class="fas fa-check-circle icon"></i>
+
+        Fee Paid
+
+      </div>
+
+    </div>
+
+
+    <div class="stat-item">
+
+      <div
+        class="number"
+        id="dueCount">
+        0
+      </div>
+
+      <div class="label">
+
+        <i class="fas fa-exclamation-triangle icon"></i>
+
+        Fee Due
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+
+  <!-- STUDENTS -->
+
+  <div id="studentsContainer">
+
+    <div class="loading-state">
+
+      <div class="spinner">
+
+        <i class="fas fa-circle-notch fa-spin"></i>
+
+      </div>
+
+      <p>
+        Loading students...
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- FOOTER -->
+
+  <div class="footer-note">
+
+    <span>
+
+      <i class="fas fa-school"></i>
+
+      Sunshine School · est. 2006
+
+    </span>
+
+    <span>
+
+      <i class="fas fa-lock"></i>
+
+      secure · class records
+
+    </span>
+
+  </div>
+
+
+</div>
+
+
+<script>
+
+const API_URL =
+  "https://sunshine-swp6.onrender.com"; // Change this to your actual API URL
+
+
+/* ================= CLASS NAME ================= */
+
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
+
+
+const className =
+  params.get("class");
+
+
+if (!className) {
+
+  document
+    .getElementById("classNameDisplay")
+    .textContent =
+    "Class not selected";
+
+}
+
+
+/* DO NOT ADD "Class " HERE
+   because MongoDB stores exact name */
+
+const displayName =
+  className || "Class";
+
+
+document
+  .getElementById("classNameDisplay")
+  .textContent =
+  displayName;
+
+
+/* ELEMENTS */
+
+const container =
+  document.getElementById(
+    "studentsContainer"
+  );
+
+const studentCount =
+  document.getElementById(
+    "totalStudents"
+  );
+
+const totalDueEl =
+  document.getElementById(
+    "totalDue"
+  );
+
+const paidCountEl =
+  document.getElementById(
+    "paidCount"
+  );
+
+const dueCountEl =
+  document.getElementById(
+    "dueCount"
+  );
+
+const statsBar =
+  document.getElementById(
+    "statsBar"
+  );
+
+const searchInput =
+  document.getElementById(
+    "searchInput"
+  );
+
+const resultCount =
+  document.getElementById(
+    "resultCount"
+  );
+
+const exportPdfBtn =
+  document.getElementById(
+    "exportPdfBtn"
+  );
+
+const refreshBtn =
+  document.getElementById(
+    "refreshBtn"
+  );
+
+
+let allStudentsData = [];
+
+let filteredData = [];
+
+
+/* ================= LOAD STUDENTS ================= */
+
+async function loadClassStudents() {
+
+  if (!className) {
+
+    showError(
+      "No class selected."
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    container.innerHTML = `
+
+      <div class="loading-state">
+
+        <div class="spinner">
+
+          <i class="fas fa-circle-notch fa-spin"></i>
+
+        </div>
+
+        <p>
+          Loading ${escapeHtml(displayName)} students...
+        </p>
+
+      </div>
+
+    `;
+
+
+    const response =
+      await fetch(
+        `${API_URL}/api/students/class/${encodeURIComponent(className)}`
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        result.message ||
+        "Unable to fetch students."
+      );
+
+    }
+
+
+    allStudentsData =
+      result.students || [];
+
+    filteredData =
+      [...allStudentsData];
+
+
+    renderTable(
+      filteredData
+    );
+
+    updateStats(
+      filteredData
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    showError(
+      error.message ||
+      "Unable to connect with server."
+    );
+
+  }
+
+}
+
+
+/* ================= ERROR ================= */
+
+function showError(message) {
+
+  container.innerHTML = `
+
+    <div class="empty-state">
+
+      <i class="fas fa-triangle-exclamation"></i>
+
+      <h3>
+        Error
+      </h3>
+
+      <p>
+        ${escapeHtml(message)}
+      </p>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ================= SEARCH ================= */
+
+searchInput.addEventListener(
+  "input",
+  function() {
+
+    const query =
+      this.value
+        .toLowerCase()
+        .trim();
+
+
+    if (!query) {
+
+      filteredData =
+        [...allStudentsData];
+
+    } else {
+
+      filteredData =
+        allStudentsData.filter(
+          student => {
+
+            const searchable = [
+
+              student.studentName,
+
+              student.father?.name,
+
+              student.fatherName,
+
+              student.mother?.name,
+
+              student.motherName,
+
+              student.admissionNumber,
+
+              student.email,
+
+              student.contact?.email,
+
+              student.studentId,
+
+              student.phone,
+
+              student.contact?.phone,
+
+              student.category,
+
+              student.father?.occupation
+
+            ]
+              .filter(Boolean)
+              .join(" ")
+              .toLowerCase();
+
+
+            return searchable.includes(
+              query
+            );
+
+          }
+        );
+
+    }
+
+
+    renderTable(
+      filteredData
+    );
+
+    updateStats(
+      filteredData
+    );
+
+    resultCount.textContent =
+      `${filteredData.length} students`;
+
+  }
+);
+function formatDOB(dateValue) {
+  if (!dateValue) return "-";
+
+  // MongoDB ISO date: 2006-08-20T00:00:00.000Z
+  // Sirf date portion lenge, timezone conversion nahi karenge.
+  const dateString = String(dateValue).split("T")[0];
+
+  const parts = dateString.split("-");
+
+  if (parts.length === 3) {
+    const [year, month, day] = parts;
+
+    return `${day}/${month}/${year}`;
+  }
+
+  return "-";
+}
+
+/* ================= TABLE ================= */
+
+function renderTable(students) {
+
+  if (
+    !students ||
+    students.length === 0
+  ) {
+
+    container.innerHTML = `
+
+      <div class="empty-state">
+
+        <i class="fas fa-users-slash"></i>
+
+        <h3>
+          No Students Found
+        </h3>
+
+        <p>
+
+          ${
+            allStudentsData.length === 0
+            ? `No students found in ${escapeHtml(displayName)}.`
+            : "Try adjusting your search."
+
+          }
+
+        </p>
+
+      </div>
+
+    `;
+
+    resultCount.textContent =
+      "0 students";
+
+    return;
+
+  }
+
+
+  let tableHtml = `
+
+    <div class="table-wrapper">
+
+      <table class="students-table">
+
+        <thead>
+
+          <tr>
+
+            <th>#</th>
+
+            <th>Student Name</th>
+
+            <th>Father Name</th>
+
+            <th>Mother Name</th>
+
+            <th>DOB</th>
+
+            <th>Mobile</th>
+
+            <th>PEN No</th>
+
+            <th>Aadhaar</th>
+
+            <th>Category</th>
+
+            <th>Father Occ.</th>
+
+            <th>Admission No</th>
+
+            <th>Address</th>
+
+            <th>Email</th>
+
+            <th>Action</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+  `;
+
+
+  students.forEach(
+    (student,index) => {
+
+      const dob = formatDOB(student.dob);
+
+
+      const name =
+        student.studentName || "-";
+
+
+      const fatherName =
+        student.father?.name ||
+        student.fatherName ||
+        "-";
+
+
+      const motherName =
+        student.mother?.name ||
+        student.motherName ||
+        "-";
+
+
+      const mobile =
+        student.phone ||
+        student.father?.phone ||
+        student.contact?.phone ||
+        "-";
+
+
+      const penNo =
+        student.fees?.transactionId ||
+        student.transactionId ||
+        "-";
+
+
+      const aadhaar =
+        student.documents?.aadhaarNumber ||
+        student.aadhaarNumber ||
+        "-";
+
+
+      const category =
+        student.category ||
+        "-";
+
+
+      const fatherOcc =
+        student.father?.occupation ||
+        "-";
+
+
+      const admissionNo =
+        student.admissionNumber ||
+        "-";
+
+
+      const address =
+        student.contact?.address ||
+        student.address ||
+        "-";
+
+
+      const email =
+        student.email ||
+        student.contact?.email ||
+        "-";
+
+
+      tableHtml += `
+
+        <tr>
+
+          <td>
+            ${index + 1}
+          </td>
+
+
+          <td>
+
+            <span class="student-name">
+
+              ${escapeHtml(name)}
+
+            </span>
+
+            <span class="student-id">
+
+              ${escapeHtml(
+                student.studentId || "N/A"
+              )}
+
+            </span>
+
+          </td>
+
+
+          <td>
+            ${escapeHtml(fatherName)}
+          </td>
+
+
+          <td>
+            ${escapeHtml(motherName)}
+          </td>
+
+
+          <td>
+            ${dob}
+          </td>
+
+
+          <td>
+            ${escapeHtml(mobile)}
+          </td>
+
+
+          <td>
+            ${escapeHtml(penNo)}
+          </td>
+
+
+          <td>
+            ${escapeHtml(aadhaar)}
+          </td>
+
+
+          <td>
+            ${escapeHtml(category)}
+          </td>
+
+
+          <td>
+            ${escapeHtml(fatherOcc)}
+          </td>
+
+
+          <td>
+            ${escapeHtml(admissionNo)}
+          </td>
+
+
+          <td>
+
+            <span class="wrap-address">
+
+              ${escapeHtml(address)}
+
+            </span>
+
+          </td>
+
+
+          <td>
+
+            <span class="wrap-text">
+
+              ${escapeHtml(email)}
+
+            </span>
+
+          </td>
+
+
+          <td>
+
+            <button
+              class="view-btn"
+              onclick="viewStudent('${student._id}')">
+
+              <i class="fas fa-eye"></i>
+
+              View
+
+            </button>
+
+          </td>
+
+        </tr>
+
+      `;
+
+    }
+  );
+
+
+  tableHtml += `
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+
+  container.innerHTML =
+    tableHtml;
+
+
+  resultCount.textContent =
+    `${students.length} students`;
+
+}
+
+
+/* ================= STATS ================= */
+
+function updateStats(students) {
+
+  if (
+    !students ||
+    students.length === 0
+  ) {
+
+    statsBar.classList.remove(
+      "visible"
+    );
+
+    return;
+
+  }
+
+
+  let totalDueSum = 0;
+
+  let paidCount = 0;
+
+  let dueCount = 0;
+
+
+  students.forEach(
+    student => {
+
+      if (student.fees) {
+
+        const fee =
+          student.fees;
+
+
+        const monthlyFee =
+          Number(
+            fee.monthlyFee
+          ) || 0;
+
+
+        const paid =
+          Number(
+            fee.paid
+          ) || 0;
+
+
+        const previousDue =
+          Number(
+            fee.previousDue
+          ) || 0;
+
+
+        const totalDue =
+          Math.max(
+            monthlyFee -
+            paid +
+            previousDue,
+            0
+          );
+
+
+        totalDueSum +=
+          totalDue;
+
+
+        if (
+          fee.status ===
+          "Paid"
+        ) {
+
+          paidCount++;
+
+        } else {
+
+          dueCount++;
+
+        }
+
+      } else {
+
+        dueCount++;
+
+      }
+
+    }
+  );
+
+
+  statsBar.classList.add(
+    "visible"
+  );
+
+
+  studentCount.textContent =
+    students.length;
+
+
+  totalDueEl.textContent =
+    `₹${totalDueSum}`;
+
+
+  paidCountEl.textContent =
+    paidCount;
+
+
+  dueCountEl.textContent =
+    dueCount;
+
+}
+
+
+/* ================= VIEW ================= */
+
+function viewStudent(
+  studentId
+) {
+
+  window.location.href =
+    `profile-view.html?id=${encodeURIComponent(studentId)}`;
+
+}
+
+
+/* ================= PDF ================= */
+
+/* ================= PDF ================= */
+
+exportPdfBtn.addEventListener(
+  "click",
+  function() {
+
+    const data =
+      filteredData.length
+      ? filteredData
+      : allStudentsData;
+
+
+    if (!data.length) {
+
+      alert(
+        "No data to export."
+      );
+
+      return;
+
+    }
+
+
+    const {
+      jsPDF
+    } = window.jspdf;
+
+
+    const doc =
+      new jsPDF(
+        "landscape",
+        "pt",
+        "a4"
+      );
+
+
+    doc.setTextColor(0, 0, 0);
+
+    doc.setFontSize(14);
+
+    doc.text(
+      `Class = ${displayName} [Students List - Sunshine School]`,
+      40,
+      40
+    );
+
+
+    const rows =
+      data.map(
+        (student,index) => {
+
+          const dob = formatDOB(student.dob);
+
+
+          return [
+
+            index + 1,
+
+            student.studentName || "-",
+
+            student.father?.name ||
+              student.fatherName ||
+              "-",
+
+            student.mother?.name ||
+              student.motherName ||
+              "-",
+
+            dob,
+
+            student.phone ||
+              student.father?.phone ||
+              student.contact?.phone ||
+              "-",
+
+            student.fees?.transactionId ||
+              student.transactionId ||
+              "-",
+
+            student.documents?.aadhaarNumber ||
+              student.aadhaarNumber ||
+              "-",
+
+            student.category ||
+              "-",
+
+            student.father?.occupation ||
+              "-",
+
+            student.admissionNumber ||
+              "-",
+
+            student.contact?.address ||
+              student.address ||
+              "-",
+
+            student.email ||
+              student.contact?.email ||
+              "-"
+
+          ];
+
+        }
+      );
+
+
+    doc.autoTable({
+
+      head: [[
+        "#",
+        "Student",
+        "Father",
+        "Mother",
+        "DOB",
+        "Mobile",
+        "PEN No",
+        "Aadhaar",
+        "Category",
+        "Father Occ.",
+        "Admission No",
+        "Address",
+        "Email"
+      ]],
+
+      body: rows,
+
+      startY: 55,
+
+      theme: "grid",
+
+      styles: {
+        fontSize: 6,
+        cellPadding: 2,
+        minCellHeight: 12,
+        textColor: [0, 0, 0],
+        lineColor: [0, 0, 0],
+        lineWidth: 0.4,
+        overflow: "linebreak",
+        valign: "middle",
+        halign: "left"
+      },
+
+      headStyles: {
+        fillColor: [255, 255, 255],
+        textColor: [0, 0, 0],
+        fontStyle: "bold",
+        fontSize: 6.5,
+        lineColor: [0, 0, 0],
+        lineWidth: 0.4,
+        halign: "left",
+        minCellHeight: 14
+      },
+
+      alternateRowStyles: {
+        fillColor: [255, 255, 255]
+      },
+
+      /* Fixed widths so content wraps INSIDE the cell
+         instead of pushing to next page */
+      columnStyles: {
+        0:  { cellWidth: 16 },   // #
+        1:  { cellWidth: 62 },   // Student
+        2:  { cellWidth: 62 },   // Father
+        3:  { cellWidth: 62 },   // Mother
+        4:  { cellWidth: 42 },   // DOB
+        5:  { cellWidth: 50 },   // Mobile
+        6:  { cellWidth: 40 },   // PEN No
+        7:  { cellWidth: 55 },   // Aadhaar
+        8:  { cellWidth: 40 },   // Category
+        9:  { cellWidth: 50 },   // Father Occ.
+        10: { cellWidth: 50 },   // Admission No
+        11: { cellWidth: 85 },   // Address
+        12: { cellWidth: 75 }    // Email
+      },
+
+      margin: {
+        left: 20,
+        right: 20,
+        top: 45
+      },
+
+      tableWidth: "wrap",
+
+      didParseCell: function(data) {
+        // Address & email jaisi lambi values me line-count limit
+        // taaki row zyada tall na ho aur page pe zyada rows aa sakein
+        if (
+          (data.column.index === 11 || data.column.index === 12) &&
+          data.cell.raw
+        ) {
+          const text = String(data.cell.raw);
+          if (text.length > 60) {
+            data.cell.text = [text.substring(0, 57) + "..."];
+          }
+        }
+      }
+
+    });
+
+
+    doc.save(
+      `${displayName}_students_${new Date().toISOString().split("T")[0]}.pdf`
+    );
+
+  }
+);
+
+/* ================= REFRESH ================= */
+
+refreshBtn.addEventListener(
+  "click",
+  async function() {
+
+    const old =
+      refreshBtn.innerHTML;
+
+
+    refreshBtn.disabled =
+      true;
+
+
+    refreshBtn.innerHTML =
+      `<i class="fas fa-spinner fa-spin"></i> Loading...`;
+
+
+    await loadClassStudents();
+
+
+    refreshBtn.innerHTML =
+      old;
+
+
+    refreshBtn.disabled =
+      false;
+
+  }
+);
+
+
+/* ================= ESCAPE ================= */
+
+function escapeHtml(value) {
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* ================= LOAD ================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  loadClassStudents
+);
+
+</script>
+
+</body>
+</html>

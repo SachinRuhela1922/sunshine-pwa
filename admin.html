@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Sunshine School · Admin Panel</title>
+
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
+
+    body {
+      background: #fcf7f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ================= NAVBAR ================= */
+
+    .navbar {
+      background: linear-gradient(135deg, #f9b042, #f58a2e);
+      padding: .9rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      box-shadow: 0 6px 20px rgba(245, 138, 46, .20);
+      border-bottom: 2px solid rgba(255, 255, 255, .3);
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .navbar-brand i {
+      background: rgba(255, 255, 255, .25);
+      padding: .5rem;
+      border-radius: 20px;
+      font-size: 1.8rem;
+    }
+
+    .navbar-brand span {
+      font-weight: 300;
+      opacity: .9;
+    }
+
+    .admin-badge,
+    .logout-btn {
+      background: rgba(255, 255, 255, .15);
+      border: 1px solid rgba(255, 255, 255, .25);
+      color: white;
+      border-radius: 60px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .admin-badge {
+      padding: .35rem 1.2rem;
+      font-size: .9rem;
+    }
+
+    .logout-btn {
+      padding: .4rem 1.2rem;
+      font-size: .9rem;
+      text-decoration: none;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, .3);
+    }
+
+    /* ================= LAYOUT ================= */
+
+    .dashboard-wrapper {
+      display: flex;
+      flex: 1;
+      padding: 2rem;
+      gap: 2rem;
+      max-width: 1440px;
+      margin: auto;
+      width: 100%;
+    }
+
+    .sidebar {
+      flex: 0 0 260px;
+      background: white;
+      border-radius: 32px;
+      padding: 2rem 1.2rem;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, .03);
+      border: 1px solid rgba(245, 138, 46, .08);
+      height: fit-content;
+      position: sticky;
+      top: 2rem;
+    }
+
+    .sidebar-title {
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #b8a58b;
+      font-weight: 700;
+      margin-bottom: 1.8rem;
+      padding-left: .6rem;
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+    }
+
+    .sidebar-nav>a {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: .85rem 1rem;
+      border-radius: 60px;
+      color: #4d3e2b;
+      font-weight: 600;
+      font-size: .95rem;
+      text-decoration: none;
+      transition: .2s;
+    }
+
+    .sidebar-nav>a:hover {
+      background: #fcf3e8;
+      color: #f58a2e;
+    }
+
+    .sidebar-nav>a i {
+      width: 1.8rem;
+      color: #b8a58b;
+      text-align: center;
+    }
+
+    .sidebar-nav>a.active {
+      background: linear-gradient(135deg, #fcf3e8, #fef7ef);
+      border: 1px solid #f9b042;
+      color: #d97d22;
+    }
+
+    .sidebar-divider {
+      height: 1px;
+      background: linear-gradient(to right, #f0e2d2, transparent);
+      margin: 1.2rem .5rem;
+    }
+
+    /* ================= CLASS DROPDOWN ================= */
+
+    .class-dropdown-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .85rem 1rem;
+      border-radius: 60px;
+      color: #4d3e2b;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .class-dropdown-toggle:hover {
+      background: #fcf3e8;
+      color: #f58a2e;
+    }
+
+    .class-dropdown-toggle .arrow {
+      transition: .3s;
+      font-size: .8rem;
+    }
+
+    .class-dropdown-toggle .arrow.open {
+      transform: rotate(180deg);
+    }
+
+    .class-dropdown {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .3s ease;
+      padding-left: 2.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: .2rem;
+    }
+
+    .class-dropdown.open {
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .class-dropdown a {
+      padding: .4rem .8rem;
+      border-radius: 30px;
+      color: #4d3e2b;
+      font-size: .85rem;
+      text-decoration: none;
+    }
+
+    .class-dropdown a:hover {
+      background: #fcf3e8;
+      color: #f58a2e;
+    }
+
+    .empty-class {
+      color: #b09a7e;
+      font-size: .8rem;
+      padding: .5rem;
+    }
+
+    /* ================= MAIN ================= */
+
+    .main-content {
+      flex: 1;
+      background: white;
+      border-radius: 32px;
+      padding: 2rem 2.2rem;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, .02);
+      border: 1px solid rgba(245, 138, 46, .06);
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .page-header h2 {
+      font-size: 1.8rem;
+      color: #2d1f0c;
+    }
+
+    .page-header h2 i {
+      color: #f58a2e;
+      margin-right: .6rem;
+    }
+
+    .page-header .sub {
+      color: #7f6a4b;
+      font-size: .95rem;
+      background: #fcf3e8;
+      padding: .3rem 1.2rem;
+      border-radius: 60px;
+    }
+
+    /* ================= STATS ================= */
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: #fcf9f4;
+      border-radius: 28px;
+      padding: 1.5rem 1.2rem;
+      border: 1px solid rgba(245, 138, 46, .06);
+    }
+
+    .stat-card .number {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #2d1f0c;
+    }
+
+    .stat-card .label {
+      font-size: .85rem;
+      color: #7f6a4b;
+      margin-top: .2rem;
+      display: flex;
+      gap: .3rem;
+      align-items: center;
+    }
+
+    .icon-bg {
+      float: right;
+      font-size: 2rem;
+      color: #f9dbb8;
+    }
+
+    /* ================= CLASS SECTION ================= */
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.8rem 0 1rem;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      font-weight: 600;
+      color: #3d2e1b;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .section-title i {
+      color: #f58a2e;
+    }
+
+    .create-class-btn {
+      border: none;
+      background: linear-gradient(135deg, #f58a2e, #f9b042);
+      color: white;
+      padding: .65rem 1.2rem;
+      border-radius: 50px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(245, 138, 46, .2);
+    }
+
+    .create-class-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .classes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+
+    .class-item {
+      background: #fcf9f4;
+      border-radius: 20px;
+      padding: 1.2rem .8rem;
+      text-align: center;
+      border: 1px solid rgba(245, 138, 46, .06);
+      transition: .2s;
+    }
+
+    .class-item:hover {
+      transform: translateY(-3px);
+      border-color: #f58a2e;
+      box-shadow: 0 8px 20px rgba(245, 138, 46, .08);
+    }
+
+    .class-icon {
+      font-size: 2rem;
+      color: #f58a2e;
+      margin-bottom: .3rem;
+    }
+
+    .class-name {
+      font-weight: 700;
+      font-size: 1rem;
+      word-break: break-word;
+    }
+
+    .class-count {
+      font-size: .75rem;
+      color: #b09a7e;
+      margin-top: .2rem;
+    }
+
+    .view-btn {
+      margin-top: .6rem;
+      padding: .3rem 1rem;
+      border: none;
+      border-radius: 30px;
+      background: #fcf3e8;
+      color: #f58a2e;
+      font-weight: 600;
+      font-size: .7rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .view-btn:hover {
+      background: #f58a2e;
+      color: white;
+    }
+
+    /* ================= QUICK ACTIONS ================= */
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+      margin-top: 1.5rem;
+    }
+
+    .action-card {
+      background: white;
+      border-radius: 24px;
+      padding: 1.5rem 1rem;
+      border: 1.5px solid #f0e2d2;
+      text-decoration: none;
+      color: #2d1f0c;
+      transition: .2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: .5rem;
+    }
+
+    .action-card:hover {
+      border-color: #f58a2e;
+      background: #fefcf9;
+      transform: scale(1.01);
+    }
+
+    .action-card>i {
+      font-size: 2.2rem;
+      color: #f58a2e;
+      background: #fcf3e8;
+      padding: .6rem;
+      border-radius: 20px;
+      width: 3.8rem;
+      height: 3.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .action-card .title {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .action-card .desc {
+      font-size: .8rem;
+      color: #7f6a4b;
+    }
+
+    .action-card .badge {
+      background: #f58a2e10;
+      color: #f58a2e;
+      font-size: .7rem;
+      font-weight: 700;
+      padding: .15rem .8rem;
+      border-radius: 60px;
+      border: 1px solid #f9dbb8;
+    }
+
+    /* ================= MODAL ================= */
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(45, 31, 12, .45);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 9999;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      width: 100%;
+      max-width: 450px;
+      border-radius: 28px;
+      padding: 2rem;
+      box-shadow: 0 20px 70px rgba(0, 0, 0, .2);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-header h3 {
+      color: #2d1f0c;
+    }
+
+    .close-modal {
+      border: none;
+      background: #fcf3e8;
+      color: #f58a2e;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      color: #4d3e2b;
+      font-size: .85rem;
+      font-weight: 700;
+      margin-bottom: .4rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: .85rem 1rem;
+      border: 1px solid #e6d8c8;
+      border-radius: 14px;
+      outline: none;
+      font-size: .95rem;
+    }
+
+    .form-group input:focus {
+      border-color: #f58a2e;
+      box-shadow: 0 0 0 3px rgba(245, 138, 46, .1);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: .7rem;
+      margin-top: 1.5rem;
+    }
+
+    .modal-actions button {
+      border: none;
+      padding: .7rem 1.2rem;
+      border-radius: 50px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .cancel-btn {
+      background: #f5eee6;
+      color: #6e5b45;
+    }
+
+    .save-btn {
+      background: linear-gradient(135deg, #f58a2e, #f9b042);
+      color: white;
+    }
+
+    .modal-message {
+      font-size: .8rem;
+      margin-top: .7rem;
+      min-height: 18px;
+    }
+
+    .footer-note {
+      margin-top: 2.5rem;
+      border-top: 1px solid #f0e2d2;
+      padding-top: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      color: #b09a7e;
+      font-size: .8rem;
+    }
+
+    .footer-note i {
+      color: #f58a2e;
+    }
+
+    @media(max-width:820px) {
+      .dashboard-wrapper {
+        flex-direction: column;
+        padding: 1.2rem;
+      }
+
+      .sidebar {
+        flex: 1;
+        position: static;
+      }
+
+      .main-content {
+        padding: 1.5rem;
+      }
+    }
+
+    @media(max-width:480px) {
+      .navbar {
+        padding: .8rem 1.2rem;
+      }
+
+      .dashboard-wrapper {
+        padding: .7rem;
+      }
+
+      .main-content {
+        padding: 1rem;
+      }
+
+      .classes-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+
+    <div class="navbar-brand">
+      <i class="fas fa-sun"></i>
+      Sunshine <span>School</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+
+      <div class="admin-badge">
+        <i class="fas fa-crown"></i>
+        Admin · root
+      </div>
+
+      <a href="index.html" class="logout-btn">
+        <i class="fas fa-arrow-right-from-bracket"></i>
+        Logout
+      </a>
+
+    </div>
+
+  </nav>
+
+
+  <div class="dashboard-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <div class="sidebar-title">
+        <i class="fas fa-compass"></i>
+        navigation
+      </div>
+
+      <nav class="sidebar-nav">
+
+        <a href="#" class="active">
+          <i class="fas fa-gauge-high"></i>
+          Dashboard
+        </a>
+
+        <a href="addteacher.html">
+          <i class="fas fa-chalkboard-user"></i>
+          Add Teacher
+        </a>
+
+        <a href="student.html">
+          <i class="fas fa-user-plus"></i>
+          Add Student
+        </a>
+
+        <a href="fee.html">
+          <i class="fas fa-rupee-sign"></i>
+          Add Fee
+        </a>
+
+        <a href="teacher-profile.html">
+          <i class="fas fa-user-plus"></i>
+          View Teacher
+        </a>
+
+        <a href="extra-class.html">
+          <i class="fas fa-user-plus"></i>
+          Add Extra Class Students
+        </a>
+
+        <a href="students.html">
+          <i class="fas fa-users"></i>
+          View Students
+        </a>
+
+
+        <!-- DYNAMIC CLASSES -->
+        <div style="width:100%;">
+
+          <div class="class-dropdown-toggle"
+            onclick="toggleClassDropdown()">
+
+            <span>
+              <i class="fas fa-layer-group"></i>
+              Classes
+            </span>
+
+            <i class="fas fa-chevron-down arrow"
+              id="dropdownArrow"></i>
+
+          </div>
+
+          <div class="class-dropdown"
+            id="classDropdown">
+
+            <div class="empty-class">
+              Loading classes...
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="sidebar-divider"></div>
+
+        <a href="attendance.html">
+          <i class="fas fa-calendar-days"></i>
+          Attendance
+        </a>
+
+        <a href="result.html">
+          <i class="fas fa-credit-card"></i>
+          Result
+        </a>
+
+        <a href="exam.html">
+          <i class="fas fa-credit-card"></i>
+          Exam
+        </a>
+
+        <a href="notice-board.html">
+          <i class="fas fa-credit-card"></i>
+          Notice Board
+        </a>
+
+        <a href="time-table.html">
+          <i class="fas fa-credit-card"></i>
+          Time Table
+        </a>
+
+        <a href="setting.html">
+          <i class="fas fa-gear"></i>
+          Settings
+        </a>
+
+      </nav>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <div class="page-header">
+
+        <h2>
+          <i class="fas fa-gauge-high"></i>
+          Admin Dashboard
+        </h2>
+
+        <span class="sub">
+          <i class="far fa-calendar-alt"></i>
+          <span id="currentDate"></span>
+        </span>
+
+      </div>
+
+
+      <!-- STATS -->
+      <div class="card-grid">
+
+        <div class="stat-card">
+
+          <div class="icon-bg">
+            <i class="fas fa-users"></i>
+          </div>
+
+          <div class="number"
+            id="totalStudents">
+            0
+          </div>
+
+          <div class="label">
+            <i class="fas fa-graduation-cap"
+              style="color:#f58a2e;"></i>
+            total students
+          </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+          <div class="icon-bg">
+            <i class="fas fa-chalkboard-user"></i>
+          </div>
+
+          <div class="number">
+            14
+          </div>
+
+          <div class="label">
+            <i class="fas fa-user-tie"
+              style="color:#f58a2e;"></i>
+            teachers
+          </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+          <div class="icon-bg">
+            <i class="fas fa-star"></i>
+          </div>
+
+          <div class="number"
+            id="totalClasses">
+            0
+          </div>
+
+          <div class="label">
+            <i class="fas fa-trophy"
+              style="color:#f58a2e;"></i>
+            classes
+          </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+          <div class="icon-bg">
+            <i class="fas fa-clock"></i>
+          </div>
+
+          <div class="number">
+            92%
+          </div>
+
+          <div class="label">
+            <i class="fas fa-check-circle"
+              style="color:#f58a2e;"></i>
+            attendance
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- CLASSES -->
+      <div class="section-header">
+
+        <div class="section-title">
+          <i class="fas fa-layer-group"></i>
+          All Classes
+        </div>
+
+        <button class="create-class-btn"
+          onclick="openCreateClassModal()">
+
+          <i class="fas fa-plus"></i>
+          Create Class
+
+        </button>
+
+      </div>
+
+
+      <div class="classes-grid"
+        id="classesGrid">
+
+        <div class="empty-class">
+          Loading classes...
+        </div>
+
+      </div>
+
+
+      <!-- QUICK ACTIONS -->
+      <h3 style="font-weight:600;color:#3d2e1b;margin:1.8rem 0 1rem;">
+        <i class="fas fa-bolt"
+          style="color:#f58a2e;"></i>
+        quick actions
+      </h3>
+
+
+      <div class="action-grid">
+
+        <a href="addteacher.html"
+          class="action-card">
+
+          <i class="fas fa-chalkboard-user"></i>
+
+          <span class="title">
+            Add Teacher
+          </span>
+
+          <span class="desc">
+            register new staff
+          </span>
+
+          <span class="badge">
+            <i class="far fa-clock"></i>
+            2 min
+          </span>
+
+        </a>
+
+
+        <a href="student.html"
+          class="action-card">
+
+          <i class="fas fa-user-plus"></i>
+
+          <span class="title">
+            Add Student
+          </span>
+
+          <span class="desc">
+            enroll new student
+          </span>
+
+          <span class="badge">
+            <i class="fas fa-pen"></i>
+            form
+          </span>
+
+        </a>
+
+
+        <a href="students.html"
+          class="action-card">
+
+          <i class="fas fa-users"></i>
+
+          <span class="title">
+            View Students
+          </span>
+
+          <span class="desc">
+            full list & profiles
+          </span>
+
+        </a>
+
+
+        <a href="teacher-profile.html"
+          class="action-card">
+
+          <i class="fas fa-chalkboard-user"></i>
+
+          <span class="title">
+            View Teacher
+          </span>
+
+          <span class="desc">
+            check teacher profiles
+          </span>
+
+        </a>
+
+
+        <a href="fee.html"
+          class="action-card">
+
+          <i class="fas fa-rupee-sign"></i>
+
+          <span class="title">
+            View Fee Structure
+          </span>
+
+          <span class="desc">
+            check fee details
+          </span>
+
+        </a>
+
+
+        <a href="extra-class.html"
+          class="action-card">
+
+          <i class="fas fa-users"></i>
+
+          <span class="title">
+            Add Extra Class Students
+          </span>
+
+          <span class="desc">
+            enroll new students
+          </span>
+
+        </a>
+
+
+        <a href="attendance.html"
+          class="action-card">
+
+          <i class="fas fa-calendar-check"></i>
+
+          <span class="title">
+            Attendance
+          </span>
+
+          <span class="desc">
+            mark / view daily
+          </span>
+
+        </a>
+
+
+        <a href="result.html"
+          class="action-card">
+
+          <i class="fas fa-coins"></i>
+
+          <span class="title">
+            Result Management
+          </span>
+
+          <span class="desc">
+            academic performance
+          </span>
+
+        </a>
+
+      </div>
+
+
+      <div class="footer-note">
+
+        <span>
+          <i class="fas fa-school"></i>
+          Sunshine School · est. 2006
+        </span>
+
+        <span>
+          <i class="fas fa-shield-alt"></i>
+          admin session · secure
+        </span>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- CREATE CLASS MODAL -->
+
+  <div class="modal-overlay"
+    id="createClassModal">
+
+    <div class="modal">
+
+      <div class="modal-header">
+
+        <h3>
+          <i class="fas fa-layer-group"
+            style="color:#f58a2e;"></i>
+          Create New Class
+        </h3>
+
+        <button class="close-modal"
+          onclick="closeCreateClassModal()">
+
+          <i class="fas fa-times"></i>
+
+        </button>
+
+      </div>
+
+
+      <form id="createClassForm">
+
+        <div class="form-group">
+
+          <label>
+            Class Name
+          </label>
+
+          <input
+            type="text"
+            id="classNameInput"
+            placeholder="e.g. Don't Enter Class in Starting"
+            maxlength="100"
+            required>
+
+        </div>
+
+
+        <div class="modal-message"
+          id="modalMessage"></div>
+
+
+        <div class="modal-actions">
+
+          <button type="button"
+            class="cancel-btn"
+            onclick="closeCreateClassModal()">
+
+            Cancel
+
+          </button>
+
+          <button type="submit"
+            class="save-btn"
+            id="createClassSubmit">
+
+            <i class="fas fa-plus"></i>
+            Create Class
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    const API_URL =
+      "https://sunshine-swp6.onrender.com"; // Change this to your actual API URL
+
+
+    /* DATE */
+
+    document.getElementById("currentDate")
+      .textContent =
+      new Date().toLocaleDateString(
+        "en-IN",
+        {
+          day: "2-digit",
+          month: "short",
+          year: "numeric"
+        }
+      );
+
+
+    /* DROPDOWN */
+
+    function toggleClassDropdown() {
+
+      const dropdown =
+        document.getElementById("classDropdown");
+
+      const arrow =
+        document.getElementById("dropdownArrow");
+
+      dropdown.classList.toggle("open");
+
+      arrow.classList.toggle("open");
+
+    }
+
+
+    /* MODAL */
+
+    function openCreateClassModal() {
+
+      document
+        .getElementById("createClassModal")
+        .classList.add("show");
+
+      document
+        .getElementById("classNameInput")
+        .focus();
+
+    }
+
+
+    function closeCreateClassModal() {
+
+      document
+        .getElementById("createClassModal")
+        .classList.remove("show");
+
+      document
+        .getElementById("createClassForm")
+        .reset();
+
+      document
+        .getElementById("modalMessage")
+        .textContent = "";
+
+    }
+
+
+    /* LOAD CLASSES */
+
+    async function loadClasses() {
+
+      const grid =
+        document.getElementById("classesGrid");
+
+      const dropdown =
+        document.getElementById("classDropdown");
+
+      try {
+
+        const response =
+          await fetch(`${API_URL}/api/classes`);
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || "Unable to load classes"
+          );
+        }
+
+        const countResponse =
+  await fetch(`${API_URL}/api/class-student-counts`);
+
+const countData =
+  await countResponse.json();
+
+if (!countResponse.ok) {
+  throw new Error(
+    countData.message || "Unable to load student counts"
+  );
+}
+
+const studentCounts =
+  countData.counts || {};
+
+
+        const classes =
+          data.classes || [];
+
+
+        document
+          .getElementById("totalClasses")
+          .textContent =
+          classes.length;
+
+
+        grid.innerHTML = "";
+
+        dropdown.innerHTML = "";
+
+
+        if (!classes.length) {
+
+          grid.innerHTML = `
+            <div class="empty-class">
+              No classes created yet.
+            </div>
+          `;
+
+          dropdown.innerHTML = `
+            <div class="empty-class">
+              No classes yet.
+            </div>
+          `;
+
+          return;
+
+        }
+
+
+        classes.forEach(cls => {
+
+          const className =
+  String(cls.name || "").trim();
+
+const studentCount =
+  studentCounts[className] || 0;
+
+          const encodedName =
+            encodeURIComponent(className);
+
+
+          /* CARD */
+
+          const card =
+            document.createElement("div");
+
+          card.className =
+            "class-item";
+
+
+          card.innerHTML = `
+
+  <div class="class-icon">
+
+    <i class="fas ${
+      /nursery|lkg|ukg|play/i.test(className)
+      ? "fa-child"
+      : "fa-graduation-cap"
+    }"></i>
+
+  </div>
+
+  <div class="class-name">
+    Class
+    ${escapeHtml(className)}
+  </div>
+
+  <div class="class-count">
+
+    <i class="fas fa-users"
+      style="color:#f58a2e;"></i>
+
+    ${studentCount}
+    students
+
+  </div>
+
+  <a
+    href="class.html?class=${encodedName}"
+    class="view-btn">
+
+    <i class="fas fa-eye"></i>
+    View Class
+
+  </a>
+`;
+
+
+          grid.appendChild(card);
+
+
+          /* SIDEBAR */
+
+          const link =
+            document.createElement("a");
+
+          link.href =
+            `class.html?class=${encodedName}`;
+
+          link.innerHTML = `
+            <i class="fas fa-graduation-cap"></i>
+            Class ${escapeHtml(className)}
+          `;
+
+          dropdown.appendChild(link);
+
+        });
+
+
+        /* TOTAL STUDENTS */
+
+        const total =
+          classes.reduce(
+            (sum, cls) =>
+              sum + Number(cls.studentCount || 0),
+            0
+          );
+
+        document
+          .getElementById("totalStudents")
+          .textContent = total;
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        grid.innerHTML = `
+          <div class="empty-class">
+            Unable to load classes.
+          </div>
+        `;
+
+        dropdown.innerHTML = `
+          <div class="empty-class">
+            Unable to load classes.
+          </div>
+        `;
+
+      }
+
+    }
+
+
+    /* CREATE CLASS */
+
+    document
+      .getElementById("createClassForm")
+      .addEventListener(
+        "submit",
+        async function(e) {
+
+          e.preventDefault();
+
+
+          const input =
+            document.getElementById(
+              "classNameInput"
+            );
+
+          const message =
+            document.getElementById(
+              "modalMessage"
+            );
+
+          const button =
+            document.getElementById(
+              "createClassSubmit"
+            );
+
+
+          const name =
+            input.value.trim();
+
+
+          if (!name) {
+
+            message.textContent =
+              "Please enter class name.";
+
+            message.style.color =
+              "#d9534f";
+
+            return;
+
+          }
+
+
+          button.disabled = true;
+
+          button.innerHTML =
+            `<i class="fas fa-spinner fa-spin"></i> Creating...`;
+
+
+          try {
+
+            const response =
+              await fetch(
+                `${API_URL}/api/classes`,
+                {
+                  method: "POST",
+
+                  headers: {
+                    "Content-Type":
+                      "application/json"
+                  },
+
+                  body: JSON.stringify({
+                    name
+                  })
+                }
+              );
+
+
+            const data =
+              await response.json();
+
+
+            if (!response.ok) {
+
+              throw new Error(
+                data.message ||
+                "Unable to create class"
+              );
+
+            }
+
+
+            closeCreateClassModal();
+
+            await loadClasses();
+
+
+            alert(
+              `Class "${name}" created successfully.`
+            );
+
+
+          } catch (error) {
+
+            message.textContent =
+              error.message;
+
+            message.style.color =
+              "#d9534f";
+
+          } finally {
+
+            button.disabled = false;
+
+            button.innerHTML =
+              `<i class="fas fa-plus"></i> Create Class`;
+
+          }
+
+        }
+      );
+
+
+    /* HTML ESCAPE */
+
+    function escapeHtml(value) {
+
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    }
+
+
+    /* MODAL OUTSIDE CLICK */
+
+    document
+      .getElementById("createClassModal")
+      .addEventListener(
+        "click",
+        function(e) {
+
+          if (e.target === this) {
+            closeCreateClassModal();
+          }
+
+        }
+      );
+
+
+    /* LOAD */
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      loadClasses
+    );
+
+  </script>
+
+</body>
+</html>

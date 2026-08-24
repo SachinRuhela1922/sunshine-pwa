@@ -1,0 +1,2538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+<title>Sunshine · Exam Marks</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+/* ===== ALL STYLES REMAIN SAME ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+}
+
+body {
+    background: #f7f3ed;
+    min-height: 100vh;
+    padding: 1.5rem;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ===== HEADER ===== */
+.page-header {
+    background: white;
+    border-radius: 32px;
+    padding: 1.2rem 2rem;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+    border: 1px solid rgba(245, 138, 46, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.8rem;
+}
+
+.page-header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #2d1f0c;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.page-header h1 i {
+    color: #f58a2e;
+    background: #fcf3e8;
+    padding: 0.3rem 0.6rem;
+    border-radius: 16px;
+    font-size: 1.2rem;
+}
+
+.page-header .header-sub {
+    font-size: 0.85rem;
+    color: #b09a7e;
+    font-weight: 500;
+    margin-top: 0.2rem;
+}
+
+.page-header .header-sub i {
+    color: #f58a2e;
+    margin-right: 0.3rem;
+}
+
+.page-header .actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    padding: 0.5rem 1.2rem;
+    border: none;
+    border-radius: 60px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: #f0e2d2;
+    color: #4d3e2b;
+}
+
+.btn-secondary:hover {
+    background: #e6d5c0;
+}
+
+/* ===== EXAM BANNER ===== */
+.exam-banner {
+    background: linear-gradient(135deg, #fcf3e8, #f9dbb8);
+    border-radius: 28px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border: 1px solid rgba(245, 138, 46, 0.15);
+}
+
+.exam-banner .exam-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.exam-banner .exam-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f58a2e;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 12px rgba(245, 138, 46, 0.1);
+}
+
+.exam-banner .exam-details h2 {
+    font-size: 1.2rem;
+    color: #2d1f0c;
+    font-weight: 700;
+}
+
+.exam-banner .exam-details p {
+    color: #8a765e;
+    font-size: 0.85rem;
+    margin-top: 0.1rem;
+}
+
+.exam-banner .exam-badge {
+    background: white;
+    padding: 0.4rem 1.2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #f58a2e;
+    box-shadow: 0 2px 8px rgba(245, 138, 46, 0.08);
+}
+
+.exam-banner .exam-badge i {
+    margin-right: 0.4rem;
+}
+
+/* ===== ACTION BAR ===== */
+.action-bar {
+    background: white;
+    border-radius: 20px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.8rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    border: 1px solid rgba(245, 138, 46, 0.06);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+}
+
+.action-bar .action-group {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.action-bar .action-label {
+    font-size: 0.75rem;
+    color: #b09a7e;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.action-bar .action-label i {
+    color: #f58a2e;
+}
+
+.btn-action-primary {
+    padding: 0.5rem 1.2rem;
+    border: none;
+    border-radius: 60px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-admit {
+    background: linear-gradient(135deg, #f58a2e, #f9b042);
+    color: white;
+    box-shadow: 0 4px 12px rgba(245, 138, 46, 0.2);
+}
+
+.btn-admit:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(245, 138, 46, 0.3);
+}
+
+.btn-download {
+    background: linear-gradient(135deg, #2b7a3a, #3a9e4a);
+    color: white;
+    box-shadow: 0 4px 12px rgba(43, 122, 58, 0.2);
+}
+
+.btn-download:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(43, 122, 58, 0.3);
+}
+
+.btn-add-subject-all {
+    background: linear-gradient(135deg, #1a5276, #2e86c1);
+    color: white;
+    box-shadow: 0 4px 12px rgba(26, 82, 118, 0.2);
+}
+
+.btn-add-subject-all:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(26, 82, 118, 0.3);
+}
+
+/* ===== SECTION HEADER ===== */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+}
+
+.section-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d1f0c;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.section-header h3 i {
+    color: #f58a2e;
+}
+
+.section-header .count-badge {
+    background: #fcf3e8;
+    color: #f58a2e;
+    padding: 0.2rem 0.8rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    border: 1px solid rgba(245, 138, 46, 0.1);
+}
+
+.section-header .hint {
+    font-size: 0.8rem;
+    color: #b09a7e;
+}
+
+.section-header .hint i {
+    color: #f58a2e;
+}
+
+/* ===== STUDENT CARD ===== */
+.student-card {
+    background: white;
+    border-radius: 24px;
+    padding: 1.5rem 1.8rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+    border: 1px solid rgba(245, 138, 46, 0.06);
+    transition: all 0.3s;
+}
+
+.student-card:hover {
+    border-color: rgba(245, 138, 46, 0.15);
+    box-shadow: 0 8px 35px rgba(0,0,0,0.04);
+}
+
+.student-card .student-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid #fcf3e8;
+}
+
+.student-card .student-header .student-name {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.student-card .student-header .student-name .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fcf3e8;
+    color: #f58a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.student-card .student-header .student-name h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #2d1f0c;
+}
+
+.student-card .student-header .student-name .student-id {
+    font-size: 0.75rem;
+    color: #b09a7e;
+    font-weight: 500;
+    display: block;
+}
+
+.student-card .student-header .student-meta {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.student-card .student-header .student-meta .meta-item {
+    font-size: 0.78rem;
+    color: #7f6a4b;
+    background: #fcfaf7;
+    padding: 0.2rem 0.8rem;
+    border-radius: 30px;
+    border: 1px solid #f0e2d2;
+}
+
+.student-card .student-header .student-meta .meta-item i {
+    color: #f58a2e;
+    margin-right: 0.3rem;
+}
+
+/* ===== STUDENT INFO ===== */
+.student-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.6rem;
+    margin-bottom: 1.2rem;
+}
+
+.info-box {
+    background: #fcfaf7;
+    padding: 0.4rem 0.8rem;
+    border-radius: 10px;
+    border: 1px solid #f0e2d2;
+}
+
+.info-box strong {
+    display: block;
+    font-size: 0.65rem;
+    color: #b09a7e;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    font-weight: 600;
+}
+
+.info-box .info-value {
+    font-size: 0.88rem;
+    color: #2d1f0c;
+    font-weight: 500;
+}
+
+/* ===== SUBJECT ACTIONS ===== */
+.subject-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin: 0.8rem 0 0.6rem;
+}
+
+.subject-actions .subject-count {
+    font-size: 0.78rem;
+    color: #b09a7e;
+    font-weight: 500;
+}
+
+.subject-actions .subject-count i {
+    color: #f58a2e;
+    margin-right: 0.3rem;
+}
+
+.add-subject-btn {
+    background: #f0e2d2;
+    border: none;
+    padding: 0.35rem 1rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #4d3e2b;
+}
+
+.add-subject-btn:hover {
+    background: #e6d5c0;
+}
+
+.add-subject-btn i {
+    color: #f58a2e;
+}
+
+/* ===== TABLE ===== */
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 0.5rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #f0e2d2;
+    text-align: center;
+}
+
+th {
+    background: #fcf3e8;
+    color: #3d2e1b;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+td {
+    background: white;
+}
+
+td input {
+    padding: 0.4rem 0.6rem;
+    border: 1.5px solid #f0e2d2;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    background: #fcfaf7;
+    transition: all 0.2s;
+    outline: none;
+    color: #1f160c;
+    font-weight: 500;
+    width: 100%;
+    max-width: 150px;
+}
+
+td input:focus {
+    border-color: #f58a2e;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(245, 138, 46, 0.06);
+}
+
+td input::placeholder {
+    color: #b8a58b;
+    font-weight: 400;
+}
+
+td input[type="number"] {
+    max-width: 100px;
+}
+
+.remove-subject-btn {
+    background: #fce4e0;
+    border: none;
+    color: #b53b2e;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 700;
+}
+
+.remove-subject-btn:hover {
+    background: #f5b7b1;
+}
+
+/* ===== STATUS ===== */
+.status {
+    margin-top: 0.8rem;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: #fcfaf7;
+    border: 1px solid #f0e2d2;
+}
+
+.status .success {
+    color: #2b7a3a;
+}
+
+.status i {
+    margin-right: 0.4rem;
+}
+
+/* ===== SAVE BUTTON ===== */
+.save-btn {
+    background: linear-gradient(135deg, #2b7a3a, #3a9e4a);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.8rem;
+    border-radius: 60px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+    box-shadow: 0 4px 12px rgba(43, 122, 58, 0.15);
+}
+
+.save-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(43, 122, 58, 0.25);
+}
+
+.save-btn i {
+    font-size: 1rem;
+}
+
+/* ===== LOADING ===== */
+.loading {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.loading i {
+    font-size: 2.5rem;
+    color: #f58a2e;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading p {
+    color: #b09a7e;
+    margin-top: 0.8rem;
+    font-weight: 500;
+}
+
+/* ===== ERROR / EMPTY ===== */
+.error {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #b53b2e;
+}
+
+.error i {
+    font-size: 2.5rem;
+    color: #fce4e0;
+    display: block;
+    margin-bottom: 0.8rem;
+}
+
+/* ===== OVERLAY ===== */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.overlay.active {
+    display: flex;
+}
+
+.overlay-content {
+    background: white;
+    border-radius: 24px;
+    padding: 2rem;
+    max-width: 950px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.overlay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #fcf3e8;
+}
+
+.overlay-header h2 {
+    font-size: 1.3rem;
+    color: #2d1f0c;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.overlay-header h2 i {
+    color: #f58a2e;
+}
+
+.close-overlay {
+    background: #fce4e0;
+    color: #b53b2e;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.close-overlay:hover {
+    background: #f5b7b1;
+}
+
+.overlay-actions {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 2px solid #fcf3e8;
+    justify-content: flex-end;
+}
+
+.download-pdf-btn {
+    background: linear-gradient(135deg, #2b7a3a, #3a9e4a);
+    color: white;
+    border: none;
+    padding: 0.7rem 2rem;
+    border-radius: 60px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.download-pdf-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(43, 122, 58, 0.25);
+}
+
+/* ===== ADMIT CARD PREVIEW ===== */
+.admit-card-preview {
+    border: 2px solid #1a2a3a;
+    border-radius: 12px;
+    padding: 1.5rem;
+    background: white;
+    margin: 0.8rem 0;
+}
+
+.admit-card-preview .header-band {
+    background: linear-gradient(135deg, #1a2a3a, #2d4a6a);
+    color: white;
+    padding: 0.8rem;
+    text-align: center;
+    border-radius: 6px;
+    margin: -1.5rem -1.5rem 1rem -1.5rem;
+}
+
+.admit-card-preview .header-band h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+}
+
+.admit-card-preview .header-band p {
+    margin: 4px 0 0;
+    font-size: 0.8rem;
+    opacity: 0.85;
+}
+
+.admit-card-preview .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.4rem 1.5rem;
+    margin: 0.8rem 0;
+    padding: 0.8rem 1rem;
+    background: #fcfaf7;
+    border-radius: 8px;
+}
+
+.admit-card-preview .info-item {
+    font-size: 0.82rem;
+}
+
+.admit-card-preview .info-item strong {
+    color: #7f6a4b;
+}
+
+.admit-card-preview table {
+    font-size: 0.8rem;
+    margin: 0.5rem 0;
+}
+
+.admit-card-preview table th {
+    background: #f58a2e;
+    color: white;
+}
+
+.admit-card-preview .footer-text {
+    text-align: center;
+    color: #b09a7e;
+    font-size: 0.7rem;
+    margin-top: 0.8rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #f0e2d2;
+}
+
+.admit-card-preview .page-break {
+    border-top: 2px dashed #ddd;
+    margin: 1.2rem 0;
+}
+
+/* ===== FOOTER ===== */
+.footer-note {
+    margin-top: 2.5rem;
+    border-top: 1px solid #f0e2d2;
+    padding-top: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    color: #b09a7e;
+    font-size: 0.75rem;
+}
+
+.footer-note i {
+    color: #f58a2e;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 820px) {
+    .page-header {
+        padding: 1rem 1.2rem;
+    }
+    .page-header h1 {
+        font-size: 1.2rem;
+    }
+    .exam-banner {
+        padding: 1rem 1.2rem;
+        flex-direction: column;
+        text-align: center;
+    }
+    .exam-banner .exam-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    .exam-banner .exam-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 1.3rem;
+    }
+    .action-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .action-bar .action-group {
+        justify-content: center;
+    }
+    .student-card {
+        padding: 1rem 1.2rem;
+    }
+    .student-card .student-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    .student-card .student-header .student-name {
+        justify-content: center;
+    }
+    .student-card .student-header .student-meta {
+        justify-content: center;
+    }
+    .student-info {
+        grid-template-columns: 1fr 1fr;
+    }
+    table {
+        font-size: 0.8rem;
+    }
+    th, td {
+        padding: 0.4rem 0.5rem;
+    }
+    td input {
+        max-width: 100px;
+        font-size: 0.8rem;
+    }
+    td input[type="number"] {
+        max-width: 70px;
+    }
+    .overlay-content {
+        padding: 1.2rem;
+        margin: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .student-info {
+        grid-template-columns: 1fr;
+    }
+    .page-header .actions .btn-action {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.8rem;
+    }
+    .action-bar .action-group .btn-action-primary {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.8rem;
+    }
+    .exam-banner .exam-details h2 {
+        font-size: 1rem;
+    }
+    .overlay-actions {
+        flex-direction: column;
+    }
+    .overlay-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- ===== HEADER ===== -->
+    <div class="page-header">
+        <div>
+            <h1>
+                <i class="fas fa-pen-to-square"></i>
+                Exam Marks Entry
+            </h1>
+            <div class="header-sub">
+                <i class="fas fa-graduation-cap"></i>
+                <span id="pageTitle">Loading exam details...</span>
+            </div>
+        </div>
+        <div class="actions">
+            <button class="btn-action btn-secondary" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== EXAM BANNER ===== -->
+    <div class="exam-banner">
+        <div class="exam-info">
+            <div class="exam-icon">
+                <i class="fas fa-file-pen"></i>
+            </div>
+            <div class="exam-details">
+                <h2 id="examName">Loading Exam...</h2>
+                <p><i class="fas fa-users"></i> Class: <strong id="className">-</strong> · <i class="fas fa-calendar-alt"></i> Enter marks for each student</p>
+            </div>
+        </div>
+        <div class="exam-badge">
+            <i class="fas fa-edit"></i> Marks Entry
+        </div>
+    </div>
+
+    <!-- ===== ACTION BAR ===== -->
+    <div class="action-bar">
+        <div class="action-group">
+            <span class="action-label">
+                <i class="fas fa-tools"></i> Actions
+            </span>
+            <button class="btn-action-primary btn-admit" onclick="openAdmitCard()">
+                <i class="fas fa-ticket"></i> Admit Card
+            </button>
+            <button class="btn-action-primary btn-download" onclick="downloadAdmitCards()">
+                <i class="fas fa-download"></i> Download Admit Cards
+            </button>
+            <button class="btn-action-primary btn-add-subject-all" onclick="addSubjectToAllStudents()">
+                <i class="fas fa-plus-circle"></i> Add Subject to All
+            </button>
+        </div>
+        <div class="action-group">
+            <span class="action-label">
+                <i class="fas fa-user-graduate"></i> 
+                <span id="studentCountLabel">0 Students</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- ===== SECTION HEADER ===== -->
+    <div class="section-header">
+        <h3>
+            <i class="fas fa-users"></i> Students
+            <span class="count-badge" id="studentCount">0</span>
+        </h3>
+        <span class="hint">
+            <i class="fas fa-hand-pointer"></i> Click <strong>Save</strong> after entering marks
+        </span>
+    </div>
+
+    <!-- ===== STUDENTS ===== -->
+    <div id="studentsContainer">
+        <div class="loading">
+            <i class="fas fa-circle-notch"></i>
+            <p>Loading students...</p>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="footer-note">
+        <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
+        <span><i class="fas fa-lock"></i> secure · marks management</span>
+    </div>
+
+</div>
+
+<!-- ===== OVERLAY ===== -->
+<div class="overlay" id="admitCardOverlay">
+    <div class="overlay-content">
+        <div class="overlay-header">
+            <h2><i class="fas fa-ticket"></i> Admit Card Preview</h2>
+            <button class="close-overlay" onclick="closeOverlay()">
+                <i class="fas fa-times"></i> Close
+            </button>
+        </div>
+        <div id="overlayBody">
+            <div class="loading">
+                <i class="fas fa-circle-notch"></i>
+                <p>Loading preview...</p>
+            </div>
+        </div>
+        <div class="overlay-actions">
+            <button class="download-pdf-btn" onclick="downloadFromOverlay()">
+                <i class="fas fa-file-pdf"></i> Download All as PDF
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+// ==========================================
+// API AND INITIALIZATION
+// ==========================================
+
+const API = "https://sunshine-swp6.onrender.com";
+
+const params = new URLSearchParams(window.location.search);
+
+const exam = params.get("exam") || "";
+const className = params.get("class") || "";
+
+document.getElementById("examName").textContent = exam || "Exam Not Specified";
+document.getElementById("className").textContent = className || "Not Specified";
+document.getElementById("pageTitle").textContent = `${exam || 'Exam'} Marks Entry`;
+
+let students = [];
+let existingMarks = [];
+let studentSubjects = {}; // Will store subject list for each student
+let currentAdmitCardData = [];
+
+// ==========================================
+// LOAD STUDENTS
+// ==========================================
+
+async function loadStudents() {
+    const container = document.getElementById("studentsContainer");
+
+    try {
+        const studentResponse = await fetch(
+            `${API}/api/exam/classes/${encodeURIComponent(className)}/students`
+        );
+
+        const studentData = await studentResponse.json();
+
+        if (!studentResponse.ok || !studentData.success) {
+            throw new Error(studentData.message || "Unable to load students.");
+        }
+
+        students = studentData.students || [];
+
+        const marksResponse = await fetch(
+            `${API}/api/exam-marks/${encodeURIComponent(exam)}/${encodeURIComponent(className)}`
+        );
+
+        const marksData = await marksResponse.json();
+
+        if (marksResponse.ok && marksData.success) {
+            existingMarks = marksData.examMarks || [];
+        }
+
+        document.getElementById("studentCount").textContent = students.length;
+        document.getElementById("studentCountLabel").textContent = `${students.length} Students`;
+
+        // Initialize subjects for each student
+        // If any student has saved marks, use those subjects for ALL students
+        let commonSubjects = [];
+
+        // First, check if any student has saved marks with subjects
+        for (const student of students) {
+            const saved = existingMarks.find(
+                record => String(record.studentMongoId) === String(student._id)
+            );
+            if (saved && saved.marks && saved.marks.length) {
+                const subjects = saved.marks.map(m => m.subjectName);
+                if (subjects.length > commonSubjects.length) {
+                    commonSubjects = subjects;
+                }
+            }
+        }
+
+        students.forEach((student, index) => {
+            // Check if this student has saved marks
+            const saved = existingMarks.find(
+                record => String(record.studentMongoId) === String(student._id)
+            );
+            
+            if (saved && saved.marks && saved.marks.length) {
+                // Use the student's own saved subjects
+                studentSubjects[index] = saved.marks.map(m => m.subjectName);
+            } else if (commonSubjects.length > 0) {
+                // Use common subjects from other students
+                studentSubjects[index] = [...commonSubjects];
+            } else {
+                // Start with empty
+                studentSubjects[index] = [];
+            }
+        });
+
+        renderStudents();
+
+    } catch (error) {
+        console.error(error);
+        container.innerHTML = `<div class="error"><i class="fas fa-exclamation-triangle"></i> ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+// ==========================================
+// RENDER STUDENTS
+// ==========================================
+
+function renderStudents() {
+    const container = document.getElementById("studentsContainer");
+
+    if (!students.length) {
+        container.innerHTML = `<div class="error"><i class="fas fa-users-slash"></i> No students found in this class.</div>`;
+        return;
+    }
+
+    container.innerHTML = students.map((student, index) => 
+        createStudentCard(student, index)
+    ).join("");
+}
+
+function updateSubjectNameInState(studentIndex, rowNum, newSubjectName) {
+    if (studentSubjects[studentIndex] && studentSubjects[studentIndex][rowNum] !== undefined) {
+        studentSubjects[studentIndex][rowNum] = newSubjectName;
+    }
+}
+
+function createStudentCard(student, index) {
+    const saved = existingMarks.find(
+        record => String(record.studentMongoId) === String(student._id)
+    );
+
+    const subjects = studentSubjects[index] || [];
+    const savedMarks = saved?.marks || [];
+    const initials = (student.studentName || 'S').charAt(0).toUpperCase();
+
+    return `
+        <div class="student-card" id="student-${index}">
+            <div class="student-header">
+                <div class="student-name">
+                    <div class="avatar">${initials}</div>
+                    <div>
+                        <h4>${escapeHtml(student.studentName || "-")}</h4>
+                        <span class="student-id"><i class="fas fa-id-badge"></i> ${escapeHtml(student.studentId || "ID: N/A")}</span>
+                    </div>
+                </div>
+                <div class="student-meta">
+                    <span class="meta-item"><i class="fas fa-sort-numeric-up"></i> Roll: ${escapeHtml(student.rollNumber || "-")}</span>
+                    <span class="meta-item"><i class="fas fa-hashtag"></i> Adm: ${escapeHtml(student.admissionNumber || "-")}</span>
+                    <span class="meta-item"><i class="fas fa-user-tie"></i> ${escapeHtml(student.fatherName || "-")}</span>
+                </div>
+            </div>
+
+            <div class="student-info">
+                <div class="info-box">
+                    <strong>Student ID</strong>
+                    <div class="info-value">${escapeHtml(student.studentId || "-")}</div>
+                </div>
+                <div class="info-box">
+                    <strong>Roll Number</strong>
+                    <div class="info-value">${escapeHtml(student.rollNumber || "-")}</div>
+                </div>
+                <div class="info-box">
+                    <strong>Admission Number</strong>
+                    <div class="info-value">${escapeHtml(student.admissionNumber || "-")}</div>
+                </div>
+                <div class="info-box">
+                    <strong>Father Name</strong>
+                    <div class="info-value">${escapeHtml(student.fatherName || "-")}</div>
+                </div>
+                <div class="info-box">
+                    <strong>Mother Name</strong>
+                    <div class="info-value">${escapeHtml(student.motherName || "-")}</div>
+                </div>
+                <div class="info-box">
+                    <strong>Phone</strong>
+                    <div class="info-value">${escapeHtml(student.phone || "-")}</div>
+                </div>
+            </div>
+
+            <div class="subject-actions">
+                <button class="add-subject-btn" onclick="addSubjectToAllStudents()">
+                    <i class="fas fa-plus-circle"></i> Add Subject to All
+                </button>
+                ${subjects.length > 0 ? `<span class="subject-count"><i class="fas fa-book"></i> ${subjects.length} subject${subjects.length !== 1 ? 's' : ''}</span>` : ''}
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:30%;"><i class="fas fa-book-open"></i> Subject Name</th>
+                            <th style="width:35%;"><i class="fas fa-arrow-up"></i> Max Marks</th>
+                            <th style="width:35%;"><i class="fas fa-arrow-down"></i> Obtained Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="marks-body-${index}">
+                        ${subjects.map((subjectName, subjectIndex) => {
+                            // Find matching saved subject by index or old name
+                            const savedSubject = savedMarks[subjectIndex] || savedMarks.find(
+                                item => item.subjectName === subjectName
+                            );
+
+                            return `
+                                <tr id="subject-row-${index}-${subjectIndex}">
+                                    <td>
+                                        <input 
+                                            type="text" 
+                                            class="subject-name-input" 
+                                            data-student="${index}" 
+                                            data-row="${subjectIndex}"
+                                            value="${escapeHtml(subjectName)}"
+                                            placeholder="Enter subject name"
+                                            onchange="updateSubjectNameInState(${index}, ${subjectIndex}, this.value)"
+                                        >
+                                    </td>
+                                    <td>
+                                        <input 
+                                            type="number" 
+                                            min="0" 
+                                            class="max-mark" 
+                                            data-student="${index}" 
+                                            data-row="${subjectIndex}"
+                                            value="${savedSubject?.maxMarks || ""}"
+                                            placeholder="Max"
+                                        >
+                                    </td>
+                                    <td>
+                                        <input 
+                                            type="number" 
+                                            min="0" 
+                                            class="obtained-mark" 
+                                            data-student="${index}" 
+                                            data-row="${subjectIndex}"
+                                            value="${savedSubject?.obtainedMarks || ""}"
+                                            placeholder="Obtained"
+                                        >
+                                    </td>
+                                </tr>
+                            `;
+                        }).join("")}
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="summary-${index}" class="status">
+                ${saved ? `
+                    <span class="success">
+                        <i class="fas fa-check-circle"></i> Saved · 
+                        Total: ${saved.totalObtainedMarks} / ${saved.totalMaxMarks} · 
+                        ${saved.percentage}% · ${escapeHtml(saved.result)}
+                    </span>
+                ` : `
+                    <span><i class="fas fa-clock"></i> Marks not saved yet.</span>
+                `}
+            </div>
+
+            <button class="save-btn" onclick="saveMarks(${index})">
+                <i class="fas fa-save"></i> Save ${escapeHtml(exam)} Marks
+            </button>
+        </div>
+    `;
+}
+
+// ==========================================
+// ADD SUBJECT TO ALL STUDENTS
+// ==========================================
+
+function addSubjectToAllStudents() {
+    const subjectName = prompt("Enter the subject name to add for all students:");
+    if (!subjectName || subjectName.trim() === '') {
+        return;
+    }
+
+    const trimmedSubject = subjectName.trim();
+
+    let addedCount = 0;
+    let skippedCount = 0;
+
+    students.forEach((student, index) => {
+        if (!studentSubjects[index]) {
+            studentSubjects[index] = [];
+        }
+        if (studentSubjects[index].includes(trimmedSubject)) {
+            skippedCount++; // isko already hai, skip
+        } else {
+            studentSubjects[index].push(trimmedSubject);
+            addedCount++;
+        }
+    });
+
+    renderStudents();
+    alert(`✅ "${trimmedSubject}" added to ${addedCount} student(s).` +
+          (skippedCount ? ` Already present for ${skippedCount} student(s).` : ''));
+}
+
+// ==========================================
+// SAVE MARKS
+// ==========================================
+
+async function saveMarks(index) {
+    const student = students[index];
+    const card = document.getElementById(`student-${index}`);
+    
+    const rows = card.querySelectorAll(`#marks-body-${index} tr`);
+    const marks = [];
+    
+    rows.forEach((row) => {
+        const subjectInput = row.querySelector('.subject-name-input');
+        const maxInput = row.querySelector('.max-mark');
+        const obtainedInput = row.querySelector('.obtained-mark');
+        
+        const subjectName = subjectInput ? subjectInput.value.trim() : '';
+        const maxMarks = Number(maxInput?.value) || 0;
+        const obtainedMarks = Number(obtainedInput?.value) || 0;
+        
+        if (subjectName) {
+            marks.push({
+                subjectName,
+                maxMarks,
+                obtainedMarks
+            });
+        }
+    });
+    
+    if (!marks.length) {
+        alert('Please add at least one subject with a name.');
+        return;
+    }
+    
+    // Update stored subjects
+    studentSubjects[index] = marks.map(m => m.subjectName);
+
+    try {
+        const response = await fetch(`${API}/api/exam-marks`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                exam,
+                className,
+                studentMongoId: student._id,
+                marks
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Unable to save marks.");
+        }
+
+        const saved = data.examMarks;
+
+        document.getElementById(`summary-${index}`).innerHTML = `
+            <span class="success">
+                <i class="fas fa-check-circle"></i> Saved successfully · 
+                Total: ${saved.totalObtainedMarks} / ${saved.totalMaxMarks} · 
+                ${saved.percentage}% · ${escapeHtml(saved.result)}
+            </span>
+        `;
+
+        alert(`${student.studentName} marks saved successfully.`);
+
+    } catch (error) {
+        console.error(error);
+        alert("Error: " + error.message);
+    }
+}
+
+// ==========================================
+// OTHER FUNCTIONS (UNCHANGED)
+// ==========================================
+
+function formatDateValue(value) {
+    if (!value) return "";
+
+    const str = String(value).trim();
+
+    // Matches YYYY-MM-DD or YYYY/MM/DD (with optional time part)
+    const isoMatch = str.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+    if (isoMatch) {
+        const [, year, month, day] = isoMatch;
+        return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+    }
+
+    // Fallback: try native Date parsing for other formats
+    const parsed = new Date(str);
+    if (!isNaN(parsed.getTime()) && /\d{4}/.test(str)) {
+        const day = String(parsed.getDate()).padStart(2, "0");
+        const month = String(parsed.getMonth() + 1).padStart(2, "0");
+        const year = parsed.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+
+    return str;
+}
+
+function escapeHtml(value) {
+    return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function openAdmitCard() {
+    const params = new URLSearchParams(window.location.search);
+    const exam = params.get("exam");
+    const className = params.get("class");
+    window.location.href = `admit-card.html?exam=${encodeURIComponent(exam)}&class=${encodeURIComponent(className)}`;
+}
+
+function openOverlay(rows) {
+    const overlay = document.getElementById('admitCardOverlay');
+    const body = document.getElementById('overlayBody');
+    currentAdmitCardData = rows;
+    body.innerHTML = generateAdmitCardPreviewHTML(rows);
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeOverlay() {
+    const overlay = document.getElementById('admitCardOverlay');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeOverlay();
+    }
+});
+
+document.getElementById('admitCardOverlay').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeOverlay();
+    }
+});
+
+function generateAdmitCardPreviewHTML(rows) {
+    if (!rows || !rows.length) {
+        return '<div class="error"><i class="fas fa-file"></i> No admit card data available.</div>';
+    }
+
+    function getStudentKey(row) {
+        const keys = Object.keys(row);
+        const find = (name) =>
+            keys.find(k => k.toLowerCase().replace(/\s+/g, "") === name.toLowerCase());
+
+        const idKey = find("studentId") || find("rollNumber") || find("admissionNumber");
+        if (idKey && row[idKey]) return row[idKey];
+
+        const nameKey = find("studentName");
+        return nameKey ? row[nameKey] : JSON.stringify(row);
+    }
+
+    const infoFieldMap = [
+        ["studentName", "Student Name"],
+        ["studentId", "Student ID"],
+        ["rollNumber", "Roll Number"],
+        ["admissionNumber", "Admission Number"],
+        ["fatherName", "Father Name"],
+        ["motherName", "Mother Name"],
+        ["phone", "Phone"],
+        ["className", "Class"],
+        ["section", "Section"],
+        ["dob", "Date of Birth"]
+    ];
+
+    const infoKeysLower = infoFieldMap.map(([k]) => k.toLowerCase());
+    const groups = new Map();
+
+    rows.forEach(row => {
+        const key = getStudentKey(row);
+        if (!groups.has(key)) {
+            groups.set(key, []);
+        }
+        groups.get(key).push(row);
+    });
+
+    const studentGroups = Array.from(groups.values());
+    
+    let html = '';
+    
+    studentGroups.forEach((studentRows, index) => {
+        if (index > 0) {
+            html += '<div class="page-break"></div>';
+        }
+        
+        const firstRow = studentRows[0];
+        const usedKeysLower = new Set();
+        
+        html += `<div class="admit-card-preview">`;
+        
+        html += `
+            <div class="header-band">
+                <h3>ADMIT CARD</h3>
+                <p>${exam} | Class: ${className}</p>
+            </div>
+        `;
+        
+        html += `<div class="info-grid">`;
+        infoFieldMap.forEach(([key, label]) => {
+            const matchedKey = Object.keys(firstRow).find(
+                k => k.toLowerCase().replace(/\s+/g, "") === key.toLowerCase()
+            );
+            if (matchedKey && firstRow[matchedKey]) {
+                usedKeysLower.add(matchedKey.toLowerCase());
+                html += `
+                    <div class="info-item">
+                        <strong>${label}:</strong> ${escapeHtml(String(firstRow[matchedKey]))}
+                    </div>
+                `;
+            }
+        });
+        html += `</div>`;
+        
+        const subjectKeys = Object.keys(firstRow).filter(k => 
+            k.toLowerCase().includes('subject') || 
+            k.toLowerCase().includes('date') || 
+            k.toLowerCase().includes('day')
+        );
+        
+        if (subjectKeys.length) {
+            html += `<div style="overflow-x:auto;">`;
+            html += `<table>
+                <thead>
+                    <tr>
+                        ${subjectKeys.map(k => `<th>${escapeHtml(k)}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${studentRows.map(row => `
+                        <tr>
+                            ${subjectKeys.map(k => {
+                                const rawValue = row[k] || '';
+                                const displayValue = k.toLowerCase().includes('date')
+                                    ? formatDateValue(rawValue)
+                                    : String(rawValue);
+                                return `<td>${escapeHtml(displayValue)}</td>`;
+                            }).join('')}
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>`;
+            html += `</div>`;
+        }
+        
+        html += `
+            <div class="footer-text">
+                This is a system generated admit card.
+            </div>
+        `;
+        
+        html += `</div>`;
+    });
+    
+    return html;
+}
+
+function downloadFromOverlay() {
+    if (!currentAdmitCardData || !currentAdmitCardData.length) {
+        alert('No data to download.');
+        return;
+    }
+    generateAdmitCardsPDF(currentAdmitCardData);
+}
+
+async function downloadAdmitCards() {
+    try {
+        if (!className) {
+            alert("Class not selected.");
+            return;
+        }
+
+        if (!exam) {
+            alert("Exam not selected.");
+            return;
+        }
+
+        const response = await fetch(
+            `${API}/api/admitcard/download?exam=${encodeURIComponent(exam)}&className=${encodeURIComponent(className)}`
+        );
+
+        if (!response.ok) {
+            const result = await response.json().catch(() => ({}));
+            alert(result.message || "Failed to download admit cards.");
+            return;
+        }
+
+        const csvText = await response.text();
+        const parsed = Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true
+        });
+
+        const rows = parsed.data || [];
+
+        if (!rows.length) {
+            alert("No admit card data found.");
+            return;
+        }
+
+        openOverlay(rows);
+
+    } catch (error) {
+        console.error("Download admit cards error:", error);
+        alert("Unable to download admit cards.");
+    }
+}
+
+function addSchoolLogoToPDF(doc, x, y, size) {
+    doc.setFillColor(180, 30, 30);
+    doc.circle(x + size/2, y + size/2, size/2, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(size * 0.4);
+    doc.text("S", x + size/2, y + size/2 + 2, { align: "center" });
+}
+
+// Loads an image but never throws — resolves false on failure so a missing
+// signature/stamp image doesn't stop the whole PDF from generating.
+function loadImageSafe(img) {
+    return new Promise((resolve) => {
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+    });
+}
+
+async function generateAdmitCardsPDF(rows) {
+    const { jsPDF } = window.jspdf;
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+        alert("No admit card data available.");
+        return;
+    }
+
+    // ---------------------------------------------------------------
+    // IMAGE LOADER
+    // ---------------------------------------------------------------
+    function loadImageSafe(src) {
+        return new Promise(resolve => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = () => resolve(null);
+            img.src = src;
+        });
+    }
+
+    // ---------------------------------------------------------------
+    // LOAD LOGO + TWO BOTTOM STAMPS
+    // ---------------------------------------------------------------
+    const [logo, leftSignImg, rightSignImg] = await Promise.all([
+        loadImageSafe("./images/logo.png"),
+        loadImageSafe("./images/stamp2.png"),
+        loadImageSafe("./images/stamp1.png")
+    ]);
+
+    const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+    });
+
+    // ---------------------------------------------------------------
+    // HELPERS
+    // ---------------------------------------------------------------
+    function getStudentKey(row) {
+        const keys = Object.keys(row);
+
+        const find = (name) =>
+            keys.find(
+                k =>
+                    k.toLowerCase().replace(/\s+/g, "") ===
+                    name.toLowerCase()
+            );
+
+        const idKey =
+            find("studentId") ||
+            find("rollNumber") ||
+            find("admissionNumber");
+
+        if (idKey && row[idKey]) return String(row[idKey]);
+
+        const nameKey = find("studentName");
+        return nameKey ? String(row[nameKey]) : JSON.stringify(row);
+    }
+
+    function getField(row, fieldName) {
+        const key = Object.keys(row).find(
+            k =>
+                k.toLowerCase().replace(/\s+/g, "") ===
+                fieldName.toLowerCase()
+        );
+        return key ? row[key] : "";
+    }
+
+    function getExamValue(row) {
+        return (
+            getField(row, "exam") ||
+            getField(row, "examName") ||
+            getField(row, "examination") ||
+            ""
+        );
+    }
+
+    function getClassValue(row) {
+        return (
+            getField(row, "className") ||
+            getField(row, "class") ||
+            ""
+        );
+    }
+
+    function formatDateValue(value) {
+        if (!value) return "";
+
+        const date = new Date(value);
+
+        if (!Number.isNaN(date.getTime())) {
+            return date.toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            });
+        }
+
+        return String(value);
+    }
+
+    function drawCheckMark(pdf, x, y, size = 2.8) {
+        pdf.setDrawColor(25, 135, 84);
+        pdf.setLineWidth(0.65);
+        pdf.line(
+            x,
+            y,
+            x + size * 0.32,
+            y + size * 0.42
+        );
+        pdf.line(
+            x + size * 0.32,
+            y + size * 0.42,
+            x + size,
+            y - size * 0.42
+        );
+    }
+
+    function drawCrossMark(pdf, x, y, size = 2.8) {
+        pdf.setDrawColor(198, 40, 40);
+        pdf.setLineWidth(0.65);
+        pdf.line(
+            x,
+            y - size * 0.42,
+            x + size,
+            y + size * 0.42
+        );
+        pdf.line(
+            x + size,
+            y - size * 0.42,
+            x,
+            y + size * 0.42
+        );
+    }
+
+    // ---------------------------------------------------------------
+    // 10 EXAMINATION INSTRUCTIONS
+    // 5 RIGHT + 5 WRONG
+    // ---------------------------------------------------------------
+    const instructions = [
+        {
+            type: "right",
+            text: "Arrive at least 15 minutes before the exam time."
+        },
+        {
+            type: "right",
+            text: "Bring your Admit Card daily."
+        },
+        {
+            type: "right",
+            text: "Carry your own lunch and water bottle."
+        },
+        {
+            type: "right",
+            text: "Bring required stationery (pen, pencil, eraser, ruler, etc)."
+        },
+        {
+            type: "right",
+            text: "Write your name, class, and roll number clearly."
+        },
+        {
+            type: "right",
+            text: "Maintain silence in the examination hall."
+        },
+        {
+            type: "right",
+            text: "Follow all instructions given by the invigilator."
+        },
+        {
+            type: "wrong",
+            text: "Do not use unfair means during the exam."
+        },
+        {
+            type: "wrong",
+            text: "Mobile phones & electronic devices are strictly prohibited."
+        },
+        {
+            type: "right",
+            text: "Submit your answer sheet before leaving the hall."
+        }
+    ];
+
+    // ---------------------------------------------------------------
+    // GROUP STUDENTS
+    // ---------------------------------------------------------------
+    const infoFieldMap = [
+        ["studentName", "Student Name"],
+        ["studentId", "Student ID"],
+        ["rollNumber", "Roll Number"],
+        ["admissionNumber", "Admission Number"],
+        ["fatherName", "Father Name"],
+        ["motherName", "Mother Name"],
+        ["phone", "Phone"],
+        ["className", "Class"],
+        ["section", "Section"],
+        ["dob", "Date of Birth"]
+    ];
+
+    const groups = new Map();
+
+    rows.forEach(row => {
+        const key = getStudentKey(row);
+
+        if (!groups.has(key)) {
+            groups.set(key, []);
+        }
+
+        groups.get(key).push(row);
+    });
+
+    const studentGroups = Array.from(groups.values());
+
+    // ---------------------------------------------------------------
+    // GENERATE EACH ADMIT CARD
+    // ---------------------------------------------------------------
+    studentGroups.forEach((studentRows, index) => {
+        if (index > 0) {
+            doc.addPage();
+        }
+
+        const firstRow = studentRows[0];
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 12;
+
+        const exam = String(getExamValue(firstRow) || "Examination");
+        const className = String(
+            getClassValue(firstRow) || "N/A"
+        );
+
+        // -----------------------------------------------------------
+        // HEADER
+        // -----------------------------------------------------------
+        const logoSize = 32;
+        const logoX = margin + 2;
+        const logoY = margin + 2;
+
+        if (logo) {
+            doc.addImage(
+                logo,
+                "PNG",
+                logoX,
+                logoY,
+                logoSize,
+                logoSize
+            );
+        }
+
+        const textStartX = logoX + logoSize + 5;
+
+        doc.setTextColor(180, 30, 30);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(19);
+        doc.text(
+            "SUN SHINE JUNIOR HIGH SCHOOL",
+            textStartX,
+            margin + 10
+        );
+
+        doc.setDrawColor(180, 30, 30);
+        doc.setLineWidth(0.6);
+
+        const textWidth =
+            doc.getStringUnitWidth(
+                "SUN SHINE JUNIOR HIGH SCHOOL"
+            ) *
+            19 /
+            doc.internal.scaleFactor;
+
+        doc.line(
+            textStartX,
+            margin + 12,
+            textStartX + textWidth,
+            margin + 12
+        );
+
+        doc.setTextColor(60, 60, 60);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+
+        doc.text(
+            "Admit Card  •  est. 2006",
+            textStartX,
+            margin + 18
+        );
+
+        doc.setFontSize(9);
+        doc.setTextColor(80, 80, 80);
+
+        doc.text(
+            "20 Futa Road, Mohaila Garhi Nai Aabadi Pilkhuwa Hapur",
+            textStartX,
+            margin + 23
+        );
+
+        doc.text(
+            "Uttar Pradesh-245304",
+            textStartX,
+            margin + 28
+        );
+
+        doc.setFontSize(8.5);
+
+        doc.text(
+            "Mobile: +91 87917-64372 | 92596-95556",
+            textStartX,
+            margin + 33
+        );
+
+        doc.setTextColor(30, 100, 180);
+
+        doc.text(
+            "sunshinejuniorhighschool.com",
+            textStartX,
+            margin + 38
+        );
+
+        doc.setDrawColor(180, 180, 180);
+        doc.setLineWidth(0.4);
+
+        doc.line(
+            margin,
+            margin + 42,
+            pageWidth - margin,
+            margin + 42
+        );
+
+        // -----------------------------------------------------------
+        // STUDENT INFORMATION
+        // -----------------------------------------------------------
+        let y = margin + 50;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.setTextColor(30, 30, 30);
+
+        doc.text(
+            "Student Information",
+            margin + 2,
+            y
+        );
+
+        y += 8;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(40, 40, 40);
+
+        const usedKeysLower = new Set();
+
+        const leftX = margin + 2;
+        const rightX = pageWidth / 2 + 5;
+
+        let leftY = y;
+        let rightY = y;
+        let col = 0;
+
+        infoFieldMap.forEach(([key, label]) => {
+            const matchedKey = Object.keys(firstRow).find(
+                k =>
+                    k.toLowerCase().replace(/\s+/g, "") ===
+                    key.toLowerCase()
+            );
+
+            if (
+                matchedKey &&
+                firstRow[matchedKey] !== undefined &&
+                firstRow[matchedKey] !== null &&
+                String(firstRow[matchedKey]).trim() !== ""
+            ) {
+                usedKeysLower.add(matchedKey.toLowerCase());
+
+                const value = String(firstRow[matchedKey]);
+
+                if (col % 2 === 0) {
+                    doc.setFont("helvetica", "bold");
+                    doc.text(label + ":", leftX, leftY);
+
+                    doc.setFont("helvetica", "bold");
+                    doc.text(
+                        value,
+                        leftX + 38,
+                        leftY
+                    );
+
+                    leftY += 7;
+                } else {
+                    doc.setFont("helvetica", "bold");
+                    doc.text(label + ":", rightX, rightY);
+
+                    doc.setFont("helvetica", "bold");
+                    doc.text(
+                        value,
+                        rightX + 38,
+                        rightY
+                    );
+
+                    rightY += 7;
+                }
+
+                col++;
+            }
+        });
+
+        y = Math.max(leftY, rightY) + 4;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(50, 50, 50);
+
+        doc.text(
+            `Exam: ${exam}    |    Class: ${className}`,
+            margin + 2,
+            y
+        );
+
+        y += 8;
+
+        doc.setDrawColor(200, 200, 200);
+
+        doc.line(
+            margin,
+            y,
+            pageWidth - margin,
+            y
+        );
+
+        y += 8;
+
+        // -----------------------------------------------------------
+        // EXAM SCHEDULE
+        // -----------------------------------------------------------
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.setTextColor(30, 30, 30);
+
+        doc.text(
+            "Exam Schedule",
+            margin + 2,
+            y
+        );
+
+        y += 5;
+
+        const sampleKeys = Object.keys(firstRow).filter(k =>
+            !usedKeysLower.has(k.toLowerCase()) &&
+            (
+                k.toLowerCase().includes("subject") ||
+                k.toLowerCase().includes("date") ||
+                k.toLowerCase().includes("day")
+            )
+        );
+
+        const tableHead = [
+            [...sampleKeys, "Signature"]
+        ];
+
+        const tableBody = studentRows.map(row => [
+            ...sampleKeys.map(k => {
+                if (row[k] === undefined || row[k] === null) {
+                    return "";
+                }
+
+                return k.toLowerCase().includes("date")
+                    ? formatDateValue(row[k])
+                    : String(row[k]);
+            }),
+            ""
+        ]);
+
+        if (sampleKeys.length) {
+            doc.autoTable({
+                startY: y,
+                margin: {
+                    left: margin,
+                    right: margin
+                },
+                head: tableHead,
+                body: tableBody,
+                theme: "grid",
+
+                headStyles: {
+                    fillColor: [180, 30, 30],
+                    textColor: 255,
+                    fontStyle: "bold",
+                    fontSize: 9
+                },
+
+                styles: {
+                    fontSize: 9,
+                    fontStyle: "bold",
+                    cellPadding: 2.7,
+                    textColor: [40, 40, 40],
+                    overflow: "linebreak",
+                    valign: "middle"
+                },
+
+                alternateRowStyles: {
+                    fillColor: [252, 248, 245]
+                },
+
+                columnStyles: {
+                    [sampleKeys.length]: {
+                        cellWidth: 28,
+                        minCellHeight: 9
+                    }
+                },
+
+                rowPageBreak: "avoid"
+            });
+        } else {
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+
+            doc.text(
+                "No subject schedule data available.",
+                margin + 2,
+                y + 10
+            );
+        }
+
+        // -----------------------------------------------------------
+        // CALCULATE AVAILABLE SPACE
+        // -----------------------------------------------------------
+        const tableEndY =
+            doc.lastAutoTable &&
+            doc.lastAutoTable.finalY
+                ? doc.lastAutoTable.finalY
+                : y + 12;
+
+        /*
+         * Everything below this point is intentionally kept compact.
+         * The target is ONE A4 page:
+         *
+         *   Schedule
+         *   Instructions
+         *   Two stamps
+         *   Footer
+         */
+        const footerY1 = pageHeight - 12;
+        const footerY2 = pageHeight - 7;
+
+        const stampTopY = pageHeight - 39;
+        const stampLineY = pageHeight - 25;
+        const stampLabelY = pageHeight - 20;
+
+        const instructionsTopY =
+            Math.min(
+                tableEndY + 5,
+                stampTopY - 27
+            );
+
+        // -----------------------------------------------------------
+        // INSTRUCTIONS SECTION
+        // -----------------------------------------------------------
+        const instructionTitleHeight = 6;
+        const instructionRowHeight = 4.9;
+        const instructionHeight =
+            instructionTitleHeight +
+            instructionRowHeight * 5;
+
+        const availableInstructionSpace =
+            stampTopY - 3 - tableEndY;
+
+        /*
+         * If the schedule is slightly longer, make the instruction
+         * rows even more compact instead of creating another page.
+         */
+        let actualInstructionRowHeight =
+            instructionRowHeight;
+
+        let instructionFontSize = 7.2;
+
+        if (availableInstructionSpace < instructionHeight + 5) {
+            actualInstructionRowHeight = Math.max(
+                4.1,
+                (availableInstructionSpace -
+                    instructionTitleHeight -
+                    2) / 5
+            );
+
+            instructionFontSize =
+                actualInstructionRowHeight <= 4.3
+                    ? 6.2
+                    : 6.7;
+        }
+
+        const finalInstructionHeight =
+            instructionTitleHeight +
+            actualInstructionRowHeight * 5;
+
+        const finalInstructionsY =
+            Math.min(
+                tableEndY + 5,
+                stampTopY -
+                    finalInstructionHeight -
+                    2
+            );
+
+        const instructionWidth =
+            pageWidth - margin * 2;
+
+        const columnGap = 3;
+
+        const instructionColumnWidth =
+            (instructionWidth - columnGap) / 2;
+
+        // Title
+        doc.setFillColor(245, 245, 245);
+        doc.setDrawColor(170, 170, 170);
+        doc.setLineWidth(0.35);
+
+        doc.rect(
+            margin,
+            finalInstructionsY,
+            instructionWidth,
+            instructionTitleHeight,
+            "FD"
+        );
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.setTextColor(35, 35, 35);
+
+        doc.text(
+            "EXAMINATION INSTRUCTIONS",
+            pageWidth / 2,
+            finalInstructionsY + 4,
+            { align: "center" }
+        );
+
+        const leftInstructions =
+            instructions.slice(0, 5);
+
+        const rightInstructions =
+            instructions.slice(5, 10);
+
+        function drawInstructionColumn(
+            items,
+            columnX
+        ) {
+            items.forEach((item, i) => {
+                const rowY =
+                    finalInstructionsY +
+                    instructionTitleHeight +
+                    i * actualInstructionRowHeight;
+
+                doc.setDrawColor(225, 225, 225);
+                doc.setLineWidth(0.2);
+
+                doc.rect(
+                    columnX,
+                    rowY,
+                    instructionColumnWidth,
+                    actualInstructionRowHeight
+                );
+
+                const signX = columnX + 2.5;
+                const signY =
+                    rowY +
+                    actualInstructionRowHeight / 2;
+
+                if (item.type === "right") {
+                    drawCheckMark(
+                        doc,
+                        signX,
+                        signY,
+                        2.5
+                    );
+                } else {
+                    drawCrossMark(
+                        doc,
+                        signX,
+                        signY,
+                        2.5
+                    );
+                }
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(instructionFontSize);
+                doc.setTextColor(55, 55, 55);
+
+                const textX = columnX + 7;
+                const maxTextWidth =
+                    instructionColumnWidth - 9;
+
+                const lines = doc.splitTextToSize(
+                    item.text,
+                    maxTextWidth
+                );
+
+                const safeLines = lines.slice(0, 2);
+
+                doc.text(
+                    safeLines,
+                    textX,
+                    rowY +
+                        actualInstructionRowHeight / 2 +
+                        0.9,
+                    {
+                        baseline: "middle"
+                    }
+                );
+            });
+        }
+
+        drawInstructionColumn(
+            leftInstructions,
+            margin
+        );
+
+        drawInstructionColumn(
+            rightInstructions,
+            margin +
+                instructionColumnWidth +
+                columnGap
+        );
+
+        // -----------------------------------------------------------
+        // TWO BOTTOM STAMPS + CLASS TEACHER SIGNATURE
+        // -----------------------------------------------------------
+        const sigBoxWidth = 52;
+        const sigImgWidth = 30;
+        const sigImgHeight = 14;
+
+        const leftBoxX = margin + 2;
+        const rightBoxX =
+            pageWidth -
+            margin -
+            2 -
+            sigBoxWidth;
+
+        const sigLineY = stampLineY;
+        const sigImgY =
+            sigLineY -
+            sigImgHeight -
+            1;
+
+        // Left stamp image
+        if (leftSignImg) {
+            doc.addImage(
+                leftSignImg,
+                "PNG",
+                leftBoxX +
+                    (sigBoxWidth -
+                        sigImgWidth) / 2,
+                sigImgY,
+                sigImgWidth,
+                sigImgHeight
+            );
+        }
+
+        // Right stamp image
+        if (rightSignImg) {
+            doc.addImage(
+                rightSignImg,
+                "PNG",
+                rightBoxX +
+                    (sigBoxWidth -
+                        sigImgWidth) / 2,
+                sigImgY,
+                sigImgWidth,
+                sigImgHeight
+            );
+        }
+
+        doc.setDrawColor(55, 55, 55);
+        doc.setLineWidth(0.45);
+
+        // Left stamp signature line
+        doc.line(
+            leftBoxX,
+            sigLineY,
+            leftBoxX + sigBoxWidth,
+            sigLineY
+        );
+
+        // Right stamp signature line
+        doc.line(
+            rightBoxX,
+            sigLineY,
+            rightBoxX + sigBoxWidth,
+            sigLineY
+        );
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(45, 45, 45);
+
+        doc.text(
+            "Director Signature / Stamp",
+            leftBoxX +
+                sigBoxWidth / 2,
+            stampLabelY,
+            { align: "center" }
+        );
+
+        doc.text(
+            "Principal Signature / Stamp",
+            rightBoxX +
+                sigBoxWidth / 2,
+            stampLabelY,
+            { align: "center" }
+        );
+
+        // -----------------------------------------------------------
+        // CLASS TEACHER SIGNATURE - BETWEEN THE TWO STAMPS
+        // -----------------------------------------------------------
+        const teacherBoxWidth = 52;
+        const teacherCenterX = pageWidth / 2;
+        const teacherLineY = sigImgY + sigImgHeight / 2 + 1;
+
+        // Signature line in the middle of the two stamps
+        doc.setDrawColor(55, 55, 55);
+        doc.setLineWidth(0.45);
+
+        doc.line(
+            teacherCenterX - teacherBoxWidth / 2,
+            teacherLineY,
+            teacherCenterX + teacherBoxWidth / 2,
+            teacherLineY
+        );
+
+        // Class Teacher Signature label below the line
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(45, 45, 45);
+
+        doc.text(
+            "Class Teacher Signature",
+            teacherCenterX,
+            teacherLineY + 5,
+            { align: "center" }
+        );
+
+        // -----------------------------------------------------------
+        // FOOTER
+        // -----------------------------------------------------------
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.setTextColor(120, 120, 120);
+
+        doc.text(
+            "This is a system-generated admit card for examination purposes - Sunshine School",
+            pageWidth / 2,
+            footerY1,
+            {
+                align: "center"
+            }
+        );
+
+        doc.text(
+            `Generated on ${new Date().toLocaleString(
+                "en-IN",
+                {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                }
+            )}`,
+            pageWidth / 2,
+            footerY2,
+            {
+                align: "center"
+            }
+        );
+    });
+
+    // ---------------------------------------------------------------
+    // SAVE PDF
+    // ---------------------------------------------------------------
+    const safeExam =
+        String(exam || "Examination")
+            .replace(/[\\/:*?"<>|]/g, "")
+            .replace(/\s+/g, "_");
+
+    const safeClass =
+        String(className || "Class")
+            .replace(/[\\/:*?"<>|]/g, "")
+            .replace(/\s+/g, "_");
+
+    doc.save(
+        `Admit_Cards_${safeExam}_${safeClass}.pdf`
+    );
+}
+// ==========================================
+// START
+// ==========================================
+
+if (!exam || !className) {
+    document.getElementById("studentsContainer").innerHTML = `
+        <div class="error">
+            <i class="fas fa-exclamation-triangle"></i>
+            Invalid exam or class.
+        </div>
+    `;
+} else {
+    loadStudents();
+}
+
+</script>
+
+</body>
+
+</html>
