@@ -66,29 +66,73 @@
     sub-document/object with those 10 Number fields (default 0),
     matching what's already in your live database.
 
-    The frontend JS in this file reads additionalFees.* first and
-    falls back to flat top-level fields if present, so it stays
-    compatible with older records too — but new submissions from
-    this form now send the nested shape to match your real schema.
-
     ============================================================
-    FIX (this version): DUE AMOUNT NOW INCLUDES ADDITIONAL FEES
+    FIX (THIS VERSION): SAME-MONTH MULTI-TRANSACTION HANDLING
     ============================================================
-    Previously the per-row "Due" column and the Invoice/PDF "Due"
-    both trusted payment.dueAmount exactly as returned by the
-    backend. If the backend only computed dueAmount from
-    (monthlyFee - amount) and did NOT add additionalFees into it,
-    the due shown was wrong (e.g. fee 500, paid 400, additional
-    fees 4600 -> due showed as just 100 instead of 4700).
+    Problem this version fixes:
 
-    This file no longer trusts payment.dueAmount blindly. It now
-    always recomputes:
+    A student's monthly fee is charged only ONCE per month, but a
+    student may pay it across several visits/transactions in that
+    same month (partial payments). Previously:
 
-        due = max( (monthlyFee + sum(additionalFees)) - amountPaid, 0 )
+      - Every transaction's own "Monthly Fee" field was shown as-is
+        in the table/invoice/WhatsApp message. If a later
+        transaction in the same month was submitted with
+        Monthly Fee = 0 (because it was already billed on an
+        earlier slip that month), the invoice for THAT transaction
+        wrongly showed "Monthly Fee: 0" instead of the real amount
+        for the month.
 
-    both in the payment history table AND in the invoice / PDF, so
-    additional fees are always included in the due shown to the
-    user, regardless of what the backend sent.
+      - "Old Balance" (the scoutFee field) was included in the
+        table's due calculation, but was MISSING from the invoice
+        breakdown and from the WhatsApp message (it was explicitly
+        skipped there) — so the invoice/WhatsApp due could look
+        different from the table's due.
+
+      - The invoice/WhatsApp message didn't clearly separate
+        "Previous Balance" vs "New Charges this slip" vs
+        "Total Payable" vs "Amount Paid" vs "Balance Due", so it
+        wasn't obvious that a same-month follow-up payment was
+        correctly reducing the running due.
+
+    What changed:
+
+      1. Every payment is still processed in chronological order to
+         build ONE continuous running due across the student's whole
+         history (unchanged, correct approach).
+
+      2. NEW: for every month name, the first non-zero Monthly Fee
+         entered for that month is remembered
+         (`monthlyFeeByMonth[month]`). Any later transaction in the
+         same month that was submitted with Monthly Fee = 0 will
+         DISPLAY that remembered amount (table + invoice + PDF +
+         WhatsApp) — but it is NEVER added to the running due again.
+         The running due only ever adds a transaction's OWN entered
+         Monthly Fee amount, so a month's fee is charged exactly
+         once, no matter how many payments are made against it.
+
+      3. "Old Balance" (scoutFee) is now included and labelled
+         consistently ("Old Balance") in the table tooltip, the
+         invoice breakdown, the PDF, and the WhatsApp message — it
+         is no longer skipped anywhere.
+
+      4. The invoice, the PDF, and the WhatsApp message now all read
+         from ONE shared function, `buildInvoiceData()`, so they can
+         never show different numbers for the same transaction. Each
+         now clearly shows:
+            - Previous Balance (B/F)      — due before this payment
+            - New Charges (this slip)     — monthly fee (only if
+                                             actually billed on this
+                                             slip) + any new extra
+                                             fees entered this slip
+            - Total Payable               — previous + new charges
+            - Amount Paid
+            - Balance Due                 — after this payment
+
+      5. After a fee is submitted, the WhatsApp message is now built
+         from the freshly reloaded, fully-calculated payment (with
+         the running-balance fields on it) instead of the raw record
+         returned by the backend, which never had those fields.
     ============================================================
 -->
 <!DOCTYPE html>
@@ -1068,8 +1112,8 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label><i class="fas fa-hashtag"></i> Transaction ID</label>
-                            <input type="text" id="transactionId" placeholder="Optional reference / UTR number">
+                            <label><i class="fas fa-hashtag"></i> R.T.E Exam Fee</label>
+                            <input type="text" id="transactionId" placeholder="RTE Exam Fee">
                         </div>
                         <!-- EXTRA FEES -->
 
@@ -1087,14 +1131,14 @@
 
 <div class="form-group">
     <label>
-        <i class="fas fa-bus"></i> Conveyance Fee
+        <i class="fas fa-bus"></i> Ptm no attendance fee
     </label>
     <input
         type="number"
         id="conveyanceFee"
         min="0"
         value="0"
-        placeholder="Conveyance Fee">
+        placeholder="Ptm no attendance fee">
 </div>
 
 <div class="form-group">
@@ -1111,14 +1155,14 @@
 
 <div class="form-group">
     <label>
-        <i class="fas fa-pencil"></i> Stationary Fee
+        <i class="fas fa-pencil"></i> Late Fine Fee
     </label>
     <input
         type="number"
         id="stationaryFee"
         min="0"
         value="0"
-        placeholder="Stationary Fee">
+        placeholder="Late Fine Fee">
 </div>
 
 <div class="form-group">
@@ -1255,6 +1299,42 @@ const ADMIN_PHONE = "9259695556"; // 👈 YEH LINE ADD KAREIN
     // used so a row click can look up the exact payment for the invoice
     let currentPayments = [];
 
+    // ==========================================================
+    // Human-friendly labels for every extra fee head. Used by the
+    // table tooltip, the invoice, the PDF, AND the WhatsApp message
+    // so all four places show the exact same name for each fee —
+    // including "Old Balance" (the scoutFee field), which used to
+    // be missing / inconsistently labelled between them.
+    // ==========================================================
+
+    const EXTRA_FEE_LABELS = {
+        registrationFee: "Registration Fee",
+        conveyanceFee: "Ptm no attendance fee",
+        bookFee: "Book Fee",
+        stationaryFee: "Late Fine Fee",
+        examFee: "Exam Fee",
+        redCrossFee: "Diary Fee",
+        scoutFee: "Old Balance",
+        tieBalance: "Tie Balance",
+        beltBalance: "Belt Balance",
+        shirtPantBalance: "Shirt/Pant Balance",
+        rteFee: "RTE Exam Fee"
+    };
+
+    const EXTRA_FEE_EMOJI_LABELS = {
+        registrationFee: "📋 Registration",
+        conveyanceFee: "🚌 Conveyance",
+        bookFee: "📚 Book",
+        stationaryFee: "✏️ Stationary",
+        examFee: "📝 Exam",
+        redCrossFee: "❤️ Diary",
+        scoutFee: "🏦 Old Balance",
+        tieBalance: "👔 Tie",
+        beltBalance: "🎽 Belt",
+        shirtPantBalance: "👕 Shirt/Pant",
+        rteFee: "🆔 RTE Exam Fee"
+    };
+
     // ==========================================
     // LOAD STUDENT
     // ==========================================
@@ -1389,204 +1469,351 @@ function convertToISODate(ddmmyyyy) {
     // LOAD PAYMENTS
     // ==========================================
 
-    async function loadPayments() {
+async function loadPayments() {
 
-        try {
+    try {
 
-            const response =
-                await fetch(
-                    `${API_URL}/api/payments/student/${studentData.studentId}`
-                );
+        const response = await fetch(
+            `${API_URL}/api/payments/student/${studentData.studentId}`
+        );
 
-            const data =
-                await response.json();
+        const data = await response.json();
 
-            if (!data.success) {
+        if (!data.success) {
+            renderEmptyPayments();
+            return;
+        }
 
-                renderEmptyPayments();
+        const payments = data.payments || [];
 
-                return;
+        if (payments.length === 0) {
+            renderEmptyPayments();
+            return;
+        }
+
+        // ==========================================================
+        // SORT PAYMENTS CHRONOLOGICALLY
+        // ==========================================================
+
+        const sortedPayments = [...payments].sort((a, b) => {
+
+            const dateA = a.paymentDate
+                ? new Date(a.paymentDate).getTime()
+                : 0;
+
+            const dateB = b.paymentDate
+                ? new Date(b.paymentDate).getTime()
+                : 0;
+
+            if (dateA !== dateB) {
+                return dateA - dateB;
             }
 
-            const payments =
-                data.payments || [];
-
-            // keep a reference for invoice generation
-            currentPayments = payments;
-
-            const table =
-                document.getElementById("paymentTable");
+            // Same date -> keep creation order using _id
+            return String(a._id || "").localeCompare(
+                String(b._id || "")
+            );
+        });
 
 
-            // ==========================================
-            // NO PAYMENTS
-            // ==========================================
+        // ==========================================================
+        // ALL EXTRA FEE HEADS
+        //
+        // IMPORTANT:
+        // scoutFee (Old Balance) IS INCLUDED and DOES contribute to
+        // the running Due — consistently across the table, the
+        // invoice, the PDF, and the WhatsApp message.
+        //
+        // No fee field name is changed.
+        // ==========================================================
 
-            if (payments.length === 0) {
+        const extraFeeKeys = [
+            "registrationFee",
+            "conveyanceFee",
+            "bookFee",
+            "stationaryFee",
+            "examFee",
+            "redCrossFee",
+            "scoutFee",
+            "tieBalance",
+            "beltBalance",
+            "shirtPantBalance"
+        ];
 
-                renderEmptyPayments();
 
-                return;
+        // ==========================================================
+        // MONTHLY FEE — CHARGED ONCE PER MONTH
+        //
+        // A student can pay the same month's fee across several
+        // transactions (partial payments). Only the FIRST
+        // transaction of a given month is expected to carry the
+        // actual Monthly Fee amount; later transactions for that
+        // same month should be submitted with Monthly Fee = 0 so
+        // it isn't billed twice.
+        //
+        // For DISPLAY (table + invoice + PDF + WhatsApp) every
+        // transaction of that month should still show the correct
+        // monthly fee — so we remember the first non-zero monthly
+        // fee entered for each month name here, purely for display.
+        // It is NEVER added to the running due a second time.
+        // ==========================================================
+
+        const monthlyFeeByMonth = {};
+
+
+        // ==========================================================
+        // RUNNING BALANCE
+        // ==========================================================
+
+        let runningDue = 0;
+
+        let totalFee = 0;
+
+        let totalPaid = 0;
+
+
+        // ==========================================================
+        // CALCULATE EVERY TRANSACTION
+        // ==========================================================
+
+        const calculatedPayments = sortedPayments.map(payment => {
+
+            const monthlyFee =
+                Number(payment.monthlyFee) || 0;
+
+            const paid =
+                Number(payment.amount) || 0;
+
+            const additionalFees =
+                payment.additionalFees || {};
+
+
+            // remember the month's real fee the first time it's seen
+            if (monthlyFee > 0 && !monthlyFeeByMonth[payment.month]) {
+                monthlyFeeByMonth[payment.month] = monthlyFee;
             }
 
+            // what to DISPLAY for this transaction's monthly fee
+            const displayMonthlyFee =
+                monthlyFee > 0
+                    ? monthlyFee
+                    : (monthlyFeeByMonth[payment.month] || 0);
 
-            // ==========================================
-            // CALCULATE TOTALS
-            // ==========================================
 
-            let totalFee = 0;
-            let totalPaid = 0;
+            // ======================================================
+            // CURRENT TRANSACTION EXTRA FEES
+            // ======================================================
 
-            // fee heads that count toward what was actually charged,
-            // beyond the base monthly fee. Real schema nests these
-            // under payment.additionalFees.*, with a flat top-level
-            // fallback for any older records saved differently.
-            const extraFeeKeys = [
-                "registrationFee", "conveyanceFee", "bookFee", "stationaryFee",
-                "examFee", "redCrossFee", "scoutFee", "tieBalance",
-                "beltBalance", "shirtPantBalance"
-            ];
+            let extraFeesTotal = 0;
 
-            payments.forEach(payment => {
+            const extraFeeParts = [];
 
-                totalFee +=
-                    Number(payment.monthlyFee) || 0;
 
-                const additionalFees = payment.additionalFees || {};
+            extraFeeKeys.forEach(key => {
 
-                extraFeeKeys.forEach(key => {
-                    totalFee += Number(additionalFees[key] ?? payment[key]) || 0;
-                });
+                const value =
+                    Number(
+                        additionalFees[key] ??
+                        payment[key]
+                    ) || 0;
 
-                totalPaid +=
-                    Number(payment.amount) || 0;
+
+                if (value > 0) {
+
+                    extraFeesTotal += value;
+
+                    extraFeeParts.push(
+                        `${EXTRA_FEE_LABELS[key] || key}: ₹${value}`
+                    );
+                }
 
             });
 
 
-            // ==========================================
-            // ACTUAL TOTAL DUE
+            // ======================================================
+            // RTE EXAM FEE
             //
-            // Example:
-            //
-            // July      Fee 500 Paid 500
-            // August    Fee 500 Paid 400
-            // September Fee 600 Paid 600
-            //
-            // Total Fee  = 1600
-            // Total Paid = 1500
-            //
-            // BUT because September payment clears
-            // previous due:
-            //
-            // Actual Due = 100
-            //
-            // If September paid 700:
-            //
-            // Total Paid = 1600
-            // Actual Due = 0
-            //
-            // (Total Fee here already includes every
-            // additionalFees.* head for every payment,
-            // so this overall summary was always correct.
-            // The bug was only in the PER-ROW due amount
-            // below, which used payment.dueAmount straight
-            // from the backend instead of recomputing it.)
-            //
-            // ==========================================
+            // Existing code stores RTE fee in transactionId.
+            // Keep that behavior unchanged.
+            // ======================================================
 
-            const actualDue =
+            const rteFee =
+                Number(payment.transactionId) || 0;
+
+
+            if (rteFee > 0) {
+
+                extraFeesTotal += rteFee;
+
+                extraFeeParts.push(
+                    `${EXTRA_FEE_LABELS.rteFee}: ₹${rteFee}`
+                );
+            }
+
+
+            // ======================================================
+            // NEW CHARGE ADDED BY *THIS* TRANSACTION ONLY
+            //
+            // Uses the ACTUAL entered monthly fee (never the
+            // inherited display value), so a month's fee is only
+            // ever added to the running due once — on the
+            // transaction where it was actually entered.
+            // ======================================================
+
+            const currentCharge =
+                monthlyFee + extraFeesTotal;
+
+
+            // ======================================================
+            // BALANCE BROUGHT FORWARD (before this transaction)
+            // ======================================================
+
+            const previousDue = runningDue;
+
+
+            // ======================================================
+            // RUNNING DUE
+            //
+            // Previous Due + Current Charge - Current Payment
+            // ======================================================
+
+            runningDue =
                 Math.max(
-                    totalFee - totalPaid,
+                    previousDue +
+                    currentCharge -
+                    paid,
                     0
                 );
 
 
-            // ==========================================
-            // SUMMARY
-            // ==========================================
+            // ======================================================
+            // TOTALS
+            // ======================================================
 
-            document.getElementById("totalPaid").innerText =
-                `₹${totalPaid}`;
+            totalFee += currentCharge;
 
-            document.getElementById("totalDue").innerText =
-                `₹${actualDue}`;
-
-            document.getElementById("totalPayments").innerText =
-                payments.length;
+            totalPaid += paid;
 
 
-            // ==========================================
-            // PAYMENT TABLE
-            // ==========================================
+            // ======================================================
+            // STORE CALCULATED VALUES
+            //
+            // These are frontend-only calculated properties.
+            // Original database values remain untouched.
+            // ======================================================
 
-            table.innerHTML =
-                payments.map((payment, index) => {
+            return {
+
+                ...payment,
+
+                _calculatedMonthlyFee:
+                    monthlyFee,
+
+                _displayMonthlyFee:
+                    displayMonthlyFee,
+
+                _calculatedPaid:
+                    paid,
+
+                _calculatedExtraFeesTotal:
+                    extraFeesTotal,
+
+                _calculatedCurrentCharge:
+                    currentCharge,
+
+                _previousDue:
+                    previousDue,
+
+                _calculatedRunningDue:
+                    runningDue,
+
+                _calculatedExtraFeeParts:
+                    extraFeeParts
+
+            };
+
+        });
+
+
+        // ==========================================================
+        // SAVE CALCULATED PAYMENTS
+        // ==========================================================
+
+        currentPayments = calculatedPayments;
+
+
+        // ==========================================================
+        // SUMMARY
+        // ==========================================================
+
+        document.getElementById("totalPaid").innerText =
+            `₹${totalPaid}`;
+
+        document.getElementById("totalDue").innerText =
+            `₹${runningDue}`;
+
+        document.getElementById("totalPayments").innerText =
+            calculatedPayments.length;
+
+
+        // ==========================================================
+        // TABLE
+        // ==========================================================
+
+        const table =
+            document.getElementById("paymentTable");
+
+
+        table.innerHTML =
+            calculatedPayments.map(
+                (payment, index) => {
+
+                    // NOTE: use the DISPLAY monthly fee here, so a
+                    // same-month follow-up transaction (submitted
+                    // with Monthly Fee = 0) still shows the real
+                    // fee amount for that month in the table.
+                    const monthlyFee =
+                        payment._displayMonthlyFee;
 
                     const paid =
-                        Number(payment.amount) || 0;
+                        payment._calculatedPaid;
 
-                    const monthlyFee =
-                        Number(payment.monthlyFee) || 0;
-
-                    // extra fees live nested under additionalFees.*
-                    // in the real schema; fall back to flat fields
-                    const additionalFees = payment.additionalFees || {};
-                    const extraFeeKeys = [
-                        "registrationFee", "conveyanceFee", "bookFee", "stationaryFee",
-                        "examFee", "redCrossFee", "scoutFee", "tieBalance",
-                        "beltBalance", "shirtPantBalance"
-                    ];
-                    const extraFeeLabels = {
-                        registrationFee: "Registration", conveyanceFee: "Conveyance",
-                        bookFee: "Book", stationaryFee: "Stationary", examFee: "Exam",
-                        redCrossFee: "Red Cross", scoutFee: "Scout", tieBalance: "Tie",
-                        beltBalance: "Belt", shirtPantBalance: "Shirt/Pant"
-                    };
-                    let extraFeesTotal = 0;
-                    const extraFeeParts = [];
-                    extraFeeKeys.forEach(key => {
-                        const val = Number(additionalFees[key] ?? payment[key]) || 0;
-                        if (val > 0) {
-                            extraFeesTotal += val;
-                            extraFeeParts.push(`${extraFeeLabels[key]}: ₹${val}`);
-                        }
-                    });
-                    const extraFeesTitle = extraFeeParts.length
-                        ? extraFeeParts.join(", ")
-                        : "No additional fees";
-
-                    // ==========================================
-                    // DUE — recomputed on the frontend so it always
-                    // reflects monthly fee + every additional fee
-                    // head, not just whatever payment.dueAmount the
-                    // backend happened to store.
-                    //
-                    // due = (monthlyFee + extraFeesTotal) - paid
-                    // ==========================================
+                    const extraFeesTotal =
+                        payment._calculatedExtraFeesTotal;
 
                     const due =
-                        Math.max(
-                            (monthlyFee + extraFeesTotal) - paid,
-                            0
-                        );
+                        payment._calculatedRunningDue;
 
+                    const extraFeeParts =
+                        payment._calculatedExtraFeeParts;
+
+
+                    const extraFeesTitle =
+                        extraFeeParts.length
+                            ? extraFeeParts.join(", ")
+                            : "No additional fees";
+
+
+                    // ==================================================
+                    // DATE
+                    // ==================================================
 
                     const date =
                         payment.paymentDate
                             ? new Date(
                                 payment.paymentDate
-                              ).toLocaleDateString(
+                            ).toLocaleDateString(
                                 "en-IN"
-                              )
+                            )
                             : "-";
 
 
-                    // ==========================================
+                    // ==================================================
                     // STATUS
-                    // ==========================================
+                    // ==================================================
 
                     let status = "Paid";
+
                     let statusClass = "paid";
 
 
@@ -1594,107 +1821,307 @@ function convertToISODate(ddmmyyyy) {
 
                         if (paid > 0) {
 
-                            status =
-                                "Partial";
+                            status = "Partial";
 
-                            statusClass =
-                                "partial";
+                            statusClass = "partial";
 
                         } else {
 
-                            status =
-                                "Due";
+                            status = "Due";
 
-                            statusClass =
-                                "due";
+                            statusClass = "due";
                         }
-
                     }
 
 
+                    // ==================================================
+                    // ROW
+                    // ==================================================
+
                     return `
-    <tr class="payment-row">
-        <td><strong>${payment.month || "-"}</strong></td>
-        <td>₹${monthlyFee}</td>
-        <td title="${extraFeesTitle}">₹${extraFeesTotal}</td>
-        <td>₹${paid}</td>
-        <td>₹${due}</td>
-        <td>${date}</td>
-        <td>${payment.paymentMode || "-"}</td>
-        <td><span class="status-badge ${statusClass}">${status}</span></td>
-        <td>
-            <button class="btn-action" style="padding:4px 10px;font-size:12px;background:#25D366;color:white;border:none;border-radius:30px;cursor:pointer;" 
-                    onclick="event.stopPropagation(); sendWhatsAppFromRow(${index})">
-                <i class="fab fa-whatsapp"></i>
-            </button>
-            <button class="btn-action btn-secondary" style="padding:4px 10px;font-size:12px;border:none;border-radius:30px;cursor:pointer;" 
-                    onclick="event.stopPropagation(); openInvoice(${index})">
-                <i class="fas fa-eye"></i>
-            </button>
-            <button class="btn-action" style="padding:4px 10px;font-size:12px;background:#b53b2e;color:white;border:none;border-radius:30px;cursor:pointer;" 
-                    onclick="event.stopPropagation(); deletePayment('${payment._id}')" title="Delete Payment">
-                <i class="fas fa-trash"></i>
-            </button>
-        </td>
-    </tr>
-`;
+                        <tr class="payment-row">
 
-                }).join("");
+                            <td>
+                                <strong>
+                                    ${payment.month || "-"}
+                                </strong>
+                            </td>
+
+                            <td>
+                                ₹${monthlyFee}
+                            </td>
+
+                            <td
+                                title="${extraFeesTitle}">
+                                ₹${extraFeesTotal}
+                            </td>
+
+                            <td>
+                                ₹${paid}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    ₹${due}
+                                </strong>
+                            </td>
+
+                            <td>
+                                ${date}
+                            </td>
+
+                            <td>
+                                ${payment.paymentMode || "-"}
+                            </td>
+
+                            <td>
+                                <span
+                                    class="status-badge ${statusClass}">
+                                    ${status}
+                                </span>
+                            </td>
+
+                            <td>
+
+                                <button
+                                    class="btn-action"
+                                    style="
+                                        padding:4px 10px;
+                                        font-size:12px;
+                                        background:#25D366;
+                                        color:white;
+                                        border:none;
+                                        border-radius:30px;
+                                        cursor:pointer;
+                                    "
+                                    onclick="
+                                        event.stopPropagation();
+                                        sendWhatsAppFromRow(${index})
+                                    "
+                                    title="WhatsApp">
+
+                                    <i class="fab fa-whatsapp"></i>
+
+                                </button>
 
 
-        } catch (error) {
+                                <button
+                                    class="btn-action btn-secondary"
+                                    style="
+                                        padding:4px 10px;
+                                        font-size:12px;
+                                        border:none;
+                                        border-radius:30px;
+                                        cursor:pointer;
+                                    "
+                                    onclick="
+                                        event.stopPropagation();
+                                        openInvoice(${index})
+                                    "
+                                    title="View Invoice">
 
-            console.error(
-                "Payment history error:",
-                error
-            );
+                                    <i class="fas fa-eye"></i>
 
-            renderEmptyPayments();
-        }
+                                </button>
+
+
+                                <button
+                                    class="btn-action"
+                                    style="
+                                        padding:4px 10px;
+                                        font-size:12px;
+                                        background:#b53b2e;
+                                        color:white;
+                                        border:none;
+                                        border-radius:30px;
+                                        cursor:pointer;
+                                    "
+                                    onclick="
+                                        event.stopPropagation();
+                                        deletePayment('${payment._id}')
+                                    "
+                                    title="Delete Payment">
+
+                                    <i class="fas fa-trash"></i>
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+                    `;
+
+                }
+            ).join("");
+
+
+    } catch (error) {
+
+        console.error(
+            "Payment history error:",
+            error
+        );
+
+        renderEmptyPayments();
+    }
+}
+
+// ==========================================================
+// SINGLE SOURCE OF TRUTH FOR EVERY INVOICE / RECEIPT NUMBER.
+//
+// Used by BOTH the on-screen invoice overlay (openInvoice), the
+// PDF generator (downloadInvoicePDF), AND the WhatsApp message
+// (generateWhatsAppMessage). Because all three now read from this
+// one function, they can never show different numbers for the
+// same transaction again.
+//
+// It also correctly separates:
+//   - previousDue        -> balance owed BEFORE this transaction
+//   - newChargeThisSlip  -> NEW charge added by this transaction
+//                            only (monthly fee counted ONLY if it
+//                            was actually entered on this slip —
+//                            never the inherited display value)
+//   - grandTotal          -> previousDue + newChargeThisSlip
+//                            (total payable at the time of this slip)
+//   - due                 -> running balance AFTER this payment
+// ==========================================================
+
+function buildInvoiceData(payment) {
+
+    const paid = Number(payment.amount) || 0;
+
+    // Amount actually entered as "Monthly Fee" ON THIS transaction.
+    // 0 for a later same-month transaction, because that month's
+    // fee was already billed on an earlier slip.
+    const monthlyFeeChargeAmount = Number(payment.monthlyFee) || 0;
+
+    // Monthly fee to DISPLAY on this slip — pulled from the first
+    // transaction of the month when this slip's own value is 0, so
+    // every invoice for that month shows the real fee amount.
+    const displayMonthlyFee =
+        Number(payment._displayMonthlyFee ?? payment.monthlyFee) || 0;
+
+    const monthlyFeeChargedThisSlip = monthlyFeeChargeAmount > 0;
+
+    const extraFeeDefs = [
+        { key: "registrationFee", label: EXTRA_FEE_LABELS.registrationFee },
+        { key: "conveyanceFee", label: EXTRA_FEE_LABELS.conveyanceFee },
+        { key: "bookFee", label: EXTRA_FEE_LABELS.bookFee },
+        { key: "stationaryFee", label: EXTRA_FEE_LABELS.stationaryFee },
+        { key: "examFee", label: EXTRA_FEE_LABELS.examFee },
+        { key: "redCrossFee", label: EXTRA_FEE_LABELS.redCrossFee },
+        { key: "scoutFee", label: EXTRA_FEE_LABELS.scoutFee },
+        { key: "tieBalance", label: EXTRA_FEE_LABELS.tieBalance },
+        { key: "beltBalance", label: EXTRA_FEE_LABELS.beltBalance },
+        { key: "shirtPantBalance", label: EXTRA_FEE_LABELS.shirtPantBalance },
+        { key: "rteFee", label: EXTRA_FEE_LABELS.rteFee, source: "transactionId" }
+    ];
+
+    const additionalFees = payment.additionalFees || {};
+
+    const extraFees = extraFeeDefs
+        .map(f => {
+            let value = 0;
+            if (f.source === "transactionId") {
+                value = Number(payment.transactionId) || 0;
+            } else {
+                value = Number(additionalFees[f.key] ?? payment[f.key]) || 0;
+            }
+            return { key: f.key, label: f.label, value: value };
+        })
+        .filter(f => f.value > 0);
+
+    const extraFeesTotal = extraFees.reduce((sum, f) => sum + f.value, 0);
+
+    // New charge added to the ledger BY THIS transaction only.
+    const newChargeThisSlip =
+        payment._calculatedCurrentCharge !== undefined
+            ? Number(payment._calculatedCurrentCharge) || 0
+            : (monthlyFeeChargeAmount + extraFeesTotal);
+
+    // Balance already outstanding before this transaction.
+    const previousDue = Number(payment._previousDue) || 0;
+
+    // Total payable at the moment of this slip, before this payment.
+    const grandTotal = previousDue + newChargeThisSlip;
+
+    // Running balance after this payment.
+    const due = Number(payment._calculatedRunningDue) || 0;
+
+    const date = payment.paymentDate
+        ? new Date(payment.paymentDate).toLocaleDateString("en-IN", {
+            day: "2-digit", month: "short", year: "numeric"
+          })
+        : "-";
+
+    let status = "Paid";
+    if (due > 0) {
+        status = paid > 0 ? "Partial" : "Due";
     }
 
-    // ==========================================================
+    const invoiceNo =
+        "INV-" +
+        (studentData.studentId || "STU") +
+        "-" +
+        (payment.month || "").slice(0, 3).toUpperCase() +
+        "-" +
+        (payment._id ? String(payment._id).slice(-5).toUpperCase() : Date.now().toString().slice(-5));
+
+    return {
+        month: payment.month || "-",
+        paymentMode: payment.paymentMode || "-",
+        transactionId: payment.transactionId || "-",
+        paid,
+        monthlyFee: displayMonthlyFee,
+        monthlyFeeChargedThisSlip,
+        monthlyFeeChargeAmount,
+        previousDue,
+        newChargeThisSlip,
+        due,
+        date,
+        status,
+        invoiceNo,
+        extraFees,
+        extraFeesTotal,
+        grandTotal,
+        studentName: studentData.studentName || "-",
+        studentId: studentData.studentId || "-",
+        studentClass: studentData.academic?.class || "-",
+        studentSection: studentData.academic?.section || "-",
+        studentRoll: studentData.rollNumber || "-",
+        studentAdmission: studentData.admissionNumber || "-",
+        studentPhone: studentData.phone || studentData.father?.phone || "-",
+        studentFather: studentData.father?.name || studentData.fatherName || "-"
+    };
+}
+
+// ==========================================================
 // 🔥 WHATSAPP FUNCTIONS (Frontend Only - wa.me link)
+//
+// Now built on buildInvoiceData(), the same function the invoice
+// and PDF use — so the WhatsApp message can never disagree with
+// what's shown on screen (Old Balance included, monthly fee
+// inherited correctly for same-month transactions, due computed
+// the same way everywhere).
 // ==========================================================
 
 function generateWhatsAppMessage(student, payment) {
-    // Get extra fees
-    const additionalFees = payment.additionalFees || {};
-    const extraFeeLabels = {
-        registrationFee: "📋 Registration",
-        conveyanceFee: "🚌 Conveyance",
-        bookFee: "📚 Book",
-        stationaryFee: "✏️ Stationary",
-        examFee: "📝 Exam",
-        redCrossFee: "❤️ Red Cross",
-        scoutFee: "🏕️ Scout",
-        tieBalance: "👔 Tie",
-        beltBalance: "🎽 Belt",
-        shirtPantBalance: "👕 Shirt/Pant"
-    };
 
-    // Build extra fees text
+    const info = buildInvoiceData(payment);
+
     let extraText = "";
-    let extraTotal = 0;
-    Object.entries(additionalFees).forEach(([key, val]) => {
-        if (val > 0) {
-            extraText += `   ${extraFeeLabels[key] || key}: ₹${val}\n`;
-            extraTotal += val;
-        }
+
+    info.extraFees.forEach(f => {
+        const emojiLabel = EXTRA_FEE_EMOJI_LABELS[f.key] || f.label;
+        extraText += `   ${emojiLabel}: ₹${f.value}\n`;
     });
 
-    const totalCharged = (payment.monthlyFee || 0) + extraTotal;
-
-    // Due now recomputed to include additional fees, same as the
-    // table / invoice, instead of trusting payment.dueAmount as-is.
-    const dueAmount = Math.max(totalCharged - (payment.amount || 0), 0);
-
-    // Build status
     let status = "✅ Fully Paid";
     let statusEmoji = "✅";
-    if (dueAmount > 0) {
-        status = "⚠️ Partial Payment";
-        statusEmoji = "⚠️";
+
+    if (info.due > 0) {
+        status = info.paid > 0 ? "⚠️ Partial Payment" : "❌ Payment Due";
+        statusEmoji = info.paid > 0 ? "⚠️" : "❌";
     }
 
     // Student message
@@ -1705,17 +2132,17 @@ function generateWhatsAppMessage(student, payment) {
 📚 *Class:* ${student.academic?.class || '-'} ${student.academic?.section || ''}
 👨 *Father:* ${student.father?.name || student.fatherName || '-'}
 
-📅 *Month:* ${payment.month || '-'}
-💰 *Monthly Fee:* ₹${payment.monthlyFee || 0}
+📅 *Month:* ${info.month}
+💰 *Monthly Fee:* ₹${info.monthlyFee}
 
-${extraText ? `📋 *Additional Fees:*\n${extraText}` : '📋 *Additional Fees:* None'}
+${extraText ? `📋 *New Additional Fees (this slip):*\n${extraText}` : '📋 *New Additional Fees:* None'}
 
 ━━━━━━━━━━━━━━━━━━━
-💵 *Total Charged:* ₹${totalCharged}
-💳 *Amount Paid:* ₹${payment.amount || 0}
-📊 *Remaining Due:* ₹${dueAmount}
+${info.previousDue > 0 ? `📌 *Previous Balance:* ₹${info.previousDue}\n` : ''}💵 *New Charges (this slip):* ₹${info.newChargeThisSlip}
+💳 *Amount Paid:* ₹${info.paid}
+📊 *Remaining Due:* ₹${info.due}
 
-🕒 *Payment Date:* ${payment.paymentDate ? new Date(payment.paymentDate).toLocaleDateString('en-IN') : '-'}
+🕒 *Payment Date:* ${info.date}
 💳 *Mode:* ${payment.paymentMode || 'Cash'}
 🧾 *Txn ID:* ${payment.transactionId || 'N/A'}
 
@@ -1977,6 +2404,12 @@ if (!isoPaymentDate) {
                 // ₹600 -> current month
                 // Total due = ₹0
                 //
+                // TIP: if this is a follow-up payment for a month
+                // whose fee was already charged earlier, leave
+                // "Monthly Fee" as 0 here — the table/invoice will
+                // still display the correct monthly fee for that
+                // month automatically, without charging it twice.
+                //
                 // ==========================================
 
 
@@ -2111,28 +2544,41 @@ if (!isoPaymentDate) {
                     // SUCCESS
                     // ==========================================
 
-                    // ==========================================
-// SUCCESS
-// ==========================================
+                    alert("✅ Fee submitted successfully!");
 
-alert("✅ Fee submitted successfully!");
+                    // ==========================================================
+                    // Refresh payment history FIRST so the WhatsApp message
+                    // (and any invoice) uses the fully-calculated payment
+                    // (_displayMonthlyFee, _previousDue,
+                    // _calculatedRunningDue, etc.) instead of the raw record
+                    // returned by the backend, which has none of those
+                    // fields — that mismatch was causing the WhatsApp
+                    // message to show different numbers than the table.
+                    // ==========================================================
 
-// 🔥 NEW: Send WhatsApp automatically after successful payment
-// Use the payment data returned from backend
-const savedPayment = data.payment;
+                    const savedPayment = data.payment;
 
-// Wait for studentData to be loaded
-if (studentData && savedPayment) {
-    // Send to both student and admin
-    sendBothWhatsApp(studentData, savedPayment);
-} else {
-    console.error('Student data or payment data missing');
-}
+                    await loadPayments();
 
-// ==========================================
-// KEEP MONTHLY FEE
-// ==========================================
+                    let enrichedPayment = null;
 
+                    if (savedPayment && savedPayment._id) {
+                        enrichedPayment = currentPayments.find(
+                            p => String(p._id) === String(savedPayment._id)
+                        );
+                    }
+
+                    if (!enrichedPayment) {
+                        // fallback: most recent transaction chronologically
+                        enrichedPayment =
+                            currentPayments[currentPayments.length - 1];
+                    }
+
+                    if (studentData && enrichedPayment) {
+                        sendBothWhatsApp(studentData, enrichedPayment);
+                    } else {
+                        console.error('Student data or payment data missing');
+                    }
 
                     // ==========================================
                     // KEEP MONTHLY FEE
@@ -2164,13 +2610,6 @@ if (studentData && savedPayment) {
                     // Set today's date
 
                     document.getElementById("paymentDate").value = getTodayFormatted();
-
-
-                    // ==========================================
-                    // REFRESH HISTORY
-                    // ==========================================
-
-                    await loadPayments();
 
 
                 } catch (error) {
@@ -2227,118 +2666,12 @@ if (studentData && savedPayment) {
 
 
     // ==========================================================
-    // INVOICE OVERLAY LOGIC (new — does not touch existing logic
-    // above; only reads studentData + currentPayments to render
-    // a printable invoice for the clicked month's payment)
+    // INVOICE OVERLAY LOGIC (reads studentData + currentPayments
+    // via buildInvoiceData() to render a printable invoice for the
+    // clicked month's payment)
     // ==========================================================
 
     let activeInvoicePayment = null;
-
-    // ==========================================================
-    // Single source of truth for every field shown in the invoice.
-    // Used by BOTH the on-screen overlay (openInvoice) and the PDF
-    // generator (downloadInvoicePDF), so they can never go out of
-    // sync / never show different data.
-    // ==========================================================
-
-    function buildInvoiceData(payment) {
-
-        const paid = Number(payment.amount) || 0;
-        const monthlyFee = Number(payment.monthlyFee) || 0;
-
-        // ==========================================================
-        // ITEMIZED EXTRA FEES
-        //
-        // These were being collected in the "Submit Fee" form and
-        // sent to the API, but were never shown anywhere afterwards
-        // (not in the payment table, not in the invoice, not in the
-        // PDF). They're pulled in here so every fee head the office
-        // charged actually appears on the slip.
-        // ==========================================================
-
-        const extraFeeDefs = [
-            { key: "registrationFee", label: "Registration Fee" },
-            { key: "conveyanceFee", label: "Conveyance Fee" },
-            { key: "bookFee", label: "Book Fee" },
-            { key: "stationaryFee", label: "Stationary Fee" },
-            { key: "examFee", label: "Exam Fee" },
-            { key: "redCrossFee", label: "Diary Fee" },
-            { key: "scoutFee", label: "Old Balance" },
-            { key: "tieBalance", label: "Tie Balance" },
-            { key: "beltBalance", label: "Belt Balance" },
-            { key: "shirtPantBalance", label: "Shirt/Pant Balance" }
-        ];
-
-        // Real schema nests these under payment.additionalFees.*
-        // Fall back to a flat top-level field (payment.registrationFee
-        // etc.) in case any older record was saved without nesting.
-        const additionalFees = payment.additionalFees || {};
-
-        const extraFees = extraFeeDefs
-            .map(f => ({
-                label: f.label,
-                value: Number(additionalFees[f.key] ?? payment[f.key]) || 0
-            }))
-            .filter(f => f.value > 0);
-
-        const extraFeesTotal = extraFees.reduce((sum, f) => sum + f.value, 0);
-
-        // Grand total = base monthly fee + every extra fee head charged
-        // this slip (does not include amount paid or previous due).
-        const grandTotal = monthlyFee + extraFeesTotal;
-
-        // ==========================================================
-        // DUE — recomputed here too (same formula as the table),
-        // instead of trusting payment.dueAmount as-is, so the
-        // invoice / PDF due always includes the additional fees.
-        //
-        // due = grandTotal (monthlyFee + extraFeesTotal) - paid
-        // ==========================================================
-
-        const due = Math.max(grandTotal - paid, 0);
-
-        const date = payment.paymentDate
-            ? new Date(payment.paymentDate).toLocaleDateString("en-IN", {
-                day: "2-digit", month: "short", year: "numeric"
-              })
-            : "-";
-
-        let status = "Paid";
-        if (due > 0) {
-            status = paid > 0 ? "Partial" : "Due";
-        }
-
-        const invoiceNo =
-            "INV-" +
-            (studentData.studentId || "STU") +
-            "-" +
-            (payment.month || "").slice(0, 3).toUpperCase() +
-            "-" +
-            (payment._id ? String(payment._id).slice(-5).toUpperCase() : Date.now().toString().slice(-5));
-
-        return {
-            month: payment.month || "-",
-            paymentMode: payment.paymentMode || "-",
-            transactionId: payment.transactionId || "-",
-            paid,
-            monthlyFee,
-            due,
-            date,
-            status,
-            invoiceNo,
-            extraFees,
-            extraFeesTotal,
-            grandTotal,
-            studentName: studentData.studentName || "-",
-            studentId: studentData.studentId || "-",
-            studentClass: studentData.academic?.class || "-",
-            studentSection: studentData.academic?.section || "-",
-            studentRoll: studentData.rollNumber || "-",
-            studentAdmission: studentData.admissionNumber || "-",
-            studentPhone: studentData.phone || studentData.father?.phone || "-",
-            studentFather: studentData.father?.name || studentData.fatherName || "-"
-        };
-    }
 
     function openInvoice(index) {
 
@@ -2351,8 +2684,9 @@ if (studentData && savedPayment) {
         activeInvoicePayment = payment;
 
         const info = buildInvoiceData(payment);
-        const { paid, monthlyFee, due, date, status, invoiceNo,
-                extraFees, extraFeesTotal, grandTotal,
+        const { paid, monthlyFee, monthlyFeeChargedThisSlip, previousDue,
+                newChargeThisSlip, due, date, status, invoiceNo,
+                extraFees, grandTotal,
                 studentClass, studentSection, studentRoll,
                 studentAdmission, studentPhone, studentFather } = info;
 
@@ -2361,12 +2695,21 @@ if (studentData && savedPayment) {
             hour: "2-digit", minute: "2-digit"
         });
 
-        // itemized fee-head rows (monthly fee + only the extra fees
-        // that were actually charged on this slip)
-        const itemRows = [
-            `<tr><td>Monthly Tuition Fee (${payment.month || "-"})</td><td>₹${monthlyFee}</td></tr>`,
+        // itemized fee-head rows — only show "Monthly Tuition Fee"
+        // as a NEW charge if it was actually billed on THIS slip;
+        // otherwise this slip's new charges are just the extra fees
+        // (if any) entered on it, or nothing at all if it's a pure
+        // follow-up payment against an earlier balance.
+        const itemRowsList = [
+            ...(monthlyFeeChargedThisSlip
+                ? [`<tr><td>Monthly Tuition Fee (${payment.month || "-"})</td><td>₹${monthlyFeeChargedThisSlip ? info.monthlyFeeChargeAmount : 0}</td></tr>`]
+                : []),
             ...extraFees.map(f => `<tr><td>${f.label}</td><td>₹${f.value}</td></tr>`)
-        ].join("");
+        ];
+
+        const itemRows = itemRowsList.length
+            ? itemRowsList.join("")
+            : `<tr><td colspan="2" style="text-align:center;color:#b09a7e;">No new charges this transaction — payment applied to previous balance</td></tr>`;
 
         document.getElementById("invoiceContent").innerHTML = `
             <div class="invoice-brand">
@@ -2395,12 +2738,13 @@ if (studentData && savedPayment) {
             <div class="invoice-section-title">Payment Details</div>
             <div class="invoice-grid">
                 <div class="invoice-row"><span class="label">Month</span><span class="value">${payment.month || "-"}</span></div>
+                <div class="invoice-row"><span class="label">Monthly Fee (this month)</span><span class="value">₹${monthlyFee}</span></div>
                 <div class="invoice-row"><span class="label">Payment Date</span><span class="value">${date}</span></div>
                 <div class="invoice-row"><span class="label">Payment Mode</span><span class="value">${payment.paymentMode || "-"}</span></div>
-                <div class="invoice-row"><span class="label">Transaction ID</span><span class="value">${payment.transactionId || "-"}</span></div>
+                <div class="invoice-row"><span class="label">RTE Exam Fee</span><span class="value">${payment.transactionId || "-"}</span></div>
             </div>
 
-            <div class="invoice-section-title">Fee Breakdown</div>
+            <div class="invoice-section-title">Fee Breakdown${monthlyFeeChargedThisSlip || extraFees.length ? " (New charges this slip)" : ""}</div>
             <table class="invoice-items-table">
                 <thead>
                     <tr><th>Fee Head</th><th>Amount</th></tr>
@@ -2409,12 +2753,14 @@ if (studentData && savedPayment) {
                     ${itemRows}
                 </tbody>
                 <tfoot>
-                    <tr><td>Total Charged (this slip)</td><td>₹${grandTotal}</td></tr>
+                    <tr><td>New Charges (this slip)</td><td>₹${newChargeThisSlip}</td></tr>
                 </tfoot>
             </table>
 
             <div class="invoice-amount-box">
-                <div class="amt-row"><span>Total Charged (Monthly Fee + Other Heads)</span><span>₹${grandTotal}</span></div>
+                ${previousDue > 0 ? `<div class="amt-row"><span>Previous Balance (B/F)</span><span>₹${previousDue}</span></div>` : ""}
+                <div class="amt-row"><span>New Charges (this slip)</span><span>₹${newChargeThisSlip}</span></div>
+                <div class="amt-row"><span>Total Payable</span><span>₹${grandTotal}</span></div>
                 <div class="amt-row"><span>Amount Paid</span><span>₹${paid}</span></div>
                 <div class="amt-row total ${due > 0 ? "has-due" : ""}"><span>${due > 0 ? "Balance Due" : "Status"}</span><span>${due > 0 ? "₹" + due : "Fully Paid"}</span></div>
             </div>
@@ -2495,16 +2841,10 @@ function sendWhatsAppFromInvoice() {
     // ==========================================================
     // PDF GENERATION — TEXT BASED (jsPDF), NOT A SCREENSHOT.
     //
-    // Earlier versions used html2canvas to "photograph" the on-screen
-    // overlay. That approach kept breaking (scroll-clipping from the
-    // modal's overflow, page-scroll offset bugs, partial captures)
-    // because it depends on exactly how the DOM happens to be laid
-    // out / scrolled at the moment of the click.
-    //
-    // This version draws every field directly onto the PDF page with
-    // doc.text(...). There is no DOM screenshot involved, so there is
-    // nothing to clip or cut off — every value in buildInvoiceData()
-    // is guaranteed to appear on the page.
+    // Draws every field directly onto the PDF page with
+    // doc.text(...), reading from the same buildInvoiceData() used
+    // by the on-screen invoice and the WhatsApp message, so the PDF
+    // can never disagree with what's shown elsewhere.
     // ==========================================================
 
     async function downloadInvoicePDF() {
@@ -2813,6 +3153,19 @@ function sendWhatsAppFromInvoice() {
             y
         );
 
+        y += 20;
+
+        // Monthly Fee (this month) — always shown, pulled from the
+        // first transaction of the month if this slip's own value
+        // was 0.
+        detailRow(
+            "Monthly Fee:",
+            `Rs. ${info.monthlyFee}`,
+            col1LabelX,
+            col1ValueX,
+            y
+        );
+
         // Student ID + Phone
         y += 20;
 
@@ -2837,16 +3190,18 @@ function sendWhatsAppFromInvoice() {
         doc.setTextColor(...colors.dark);
 
         doc.text(
-            "Fee Breakdown",
+            "Fee Breakdown (New charges this slip)",
             marginX,
             y
         );
 
+        // Monthly Fee is always shown here (using the DISPLAY value,
+        // pulled from the first transaction of the month if this
+        // slip itself was submitted with 0), so the PDF always tells
+        // the parent what the month's fee actually is — even on a
+        // pure follow-up payment slip.
         const feeItems = [
-            {
-                label: `Monthly Tuition Fee (${info.month})`,
-                value: info.monthlyFee
-            },
+            { label: `Monthly Tuition Fee (${info.month})`, value: info.monthlyFee },
             ...info.extraFees
         ];
 
@@ -2892,7 +3247,7 @@ function sendWhatsAppFromInvoice() {
 
         y += 40;
 
-        const amtLabelX = pageWidth - marginX - 140;
+        const amtLabelX = pageWidth - marginX - 150;
         const amtValueX = pageWidth - marginX;
 
         function amountRow(label, value, yy, color) {
@@ -2925,38 +3280,47 @@ function sendWhatsAppFromInvoice() {
             );
         }
 
+        let amtY = y;
+
+        if (info.previousDue > 0) {
+            amountRow("Previous Balance (B/F) :", info.previousDue, amtY);
+            amtY += 22;
+        }
+
         amountRow(
-            "Total Amount :",
-            info.grandTotal,
-            y
+            "New Charges (this slip) :",
+            info.newChargeThisSlip,
+            amtY
         );
 
-        y += 22;
+        amtY += 22;
+
+        amountRow(
+            "Total Payable :",
+            info.grandTotal,
+            amtY
+        );
+
+        amtY += 22;
 
         amountRow(
             "Paid Amount :",
             info.paid,
-            y
+            amtY
         );
 
-        y += 22;
-
-        amountRow(
-            "Discount Amount :",
-            info.discount ?? 0,
-            y
-        );
-
-        y += 22;
+        amtY += 22;
 
         amountRow(
             "Due :",
             info.due,
-            y,
+            amtY,
             info.due > 0
                 ? colors.red
                 : colors.green
         );
+
+        y = amtY;
 
         // =====================================================
         // STATUS

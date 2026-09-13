@@ -321,6 +321,18 @@
             border-color: #f58a2e;
         }
 
+        .class-box .subject-select {
+            margin-top: .45rem;
+        }
+
+        .class-box .select-label {
+            display: block;
+            font-size: .65rem;
+            font-weight: 700;
+            color: #9a856a;
+            margin: .35rem 0 .2rem;
+        }
+
         /* LUNCH */
 
         .lunch-card {
@@ -656,7 +668,7 @@
 
 <script>
 
-const API_URL = "https://sunshine-swp6.onrender.com";
+const API_URL = "https://sunshine-swp6.onrender.com"; // Change this to your actual backend URL
 
 
 /* ================= STATE ================= */
@@ -674,6 +686,22 @@ let timetableId = null;
 */
 
 let teachers = [];
+
+/* ================= SUBJECTS ================= */
+const subjects = [
+    "Hindi",
+    "English",
+    "Mathematics",
+    "Science",
+    "Social Science",
+    "EVS",
+    "Computer",
+    "General Knowledge",
+    "Sanskrit",
+    "Drawing",
+    "Physical Education",
+    "Moral Education"
+];
 
 /* ================= SEASON ================= */
 
@@ -764,6 +792,8 @@ function changeSeason(season) {
 
 /* ================= ADD LECTURE ================= */
 
+/* ================= ADD LECTURE ================= */
+
 function addLecture() {
 
     const lectureNumbers = lectures
@@ -775,35 +805,101 @@ function addLecture() {
             ? Math.max(...lectureNumbers) + 1
             : 1;
 
-
     const classTeachers = {};
 
     for (let i = 1; i <= 10; i++) {
+        classTeachers[`Class ${i}`] = {
+            teacherId: "",
+            teacherName: "",
+            subject: ""
+        };
+    }
 
-        classTeachers[`Class ${i}`] = "";
+    const newLecture = {
+        type: "lecture",
+        lectureNumber: nextNumber,
+        from: "",
+        to: "",
+        classes: classTeachers
+    };
+
+    /*
+     * AUTOMATIC LUNCH LOGIC
+     *
+     * Jab Lecture 4 add hoga:
+     * Lecture 1
+     * Lecture 2
+     * Lecture 3
+     * Lecture 4
+     * Lunch
+     *
+     * Uske baad next Add Lecture:
+     * Lecture 5
+     */
+
+    if (nextNumber === 4) {
+
+        // Pehle Lecture 4 add karo
+        lectures.push(newLecture);
+
+        // Check karo Lunch already present na ho
+        const lunchExists = lectures.some(
+            lecture => lecture.type === "lunch"
+        );
+
+        if (!lunchExists) {
+
+            lectures.push({
+                type: "lunch",
+                from: "",
+                to: "",
+                classes: {}
+            });
+
+        }
+
+    } else {
+
+        /*
+         * Agar Lecture 5 ya uske baad add ho raha hai,
+         * toh ensure karo ki Lunch Lecture 4 ke baad hi ho.
+         */
+
+        const lunchIndex = lectures.findIndex(
+            lecture => lecture.type === "lunch"
+        );
+
+        if (nextNumber >= 5 && lunchIndex !== -1) {
+
+            // Lunch ko temporarily remove karo
+            const lunch = lectures.splice(lunchIndex, 1)[0];
+
+            // Lecture add karo
+            lectures.push(newLecture);
+
+            // Lecture 4 ke baad Lunch insert karo
+            const lecture4Index = lectures.findIndex(
+                lecture =>
+                    lecture.type === "lecture" &&
+                    Number(lecture.lectureNumber) === 4
+            );
+
+            if (lecture4Index !== -1) {
+                lectures.splice(lecture4Index + 1, 0, lunch);
+            } else {
+                lectures.push(lunch);
+            }
+
+        } else {
+
+            lectures.push(newLecture);
+
+        }
 
     }
 
-
-    lectures.push({
-
-        type: "lecture",
-
-        lectureNumber: nextNumber,
-
-        from: "",
-
-        to: "",
-
-        classes: classTeachers
-
-    });
-
-
     renderLectures();
 }
-
-
 /* ================= ADD LUNCH ================= */
 
 function addLunch() {
@@ -921,9 +1017,9 @@ function renderLecture(lecture, index) {
 
         const className = `Class ${i}`;
 
-        const selected =
-            lecture.classes?.[className] || "";
-
+        const classData = normalizeClassData(
+            lecture.classes?.[className]
+        );
 
         classHtml += `
 
@@ -933,6 +1029,8 @@ function renderLecture(lecture, index) {
                     ${className}
                 </label>
 
+                <span class="select-label">Teacher</span>
+
                 <select
                     onchange="updateTeacher(
                         ${index},
@@ -941,41 +1039,67 @@ function renderLecture(lecture, index) {
                     )">
 
                     <option value="">
-    Select Teacher
-</option>
+                        Select Teacher
+                    </option>
 
-${teachers.map(teacher => {
+                    ${teachers.map(teacher => {
 
-    const teacherName =
-        typeof teacher === "string"
-            ? teacher
-            : (
-                teacher.name ||
-                teacher.teacherName ||
-                teacher.fullName ||
-                ""
-            );
+                        const teacherId =
+                            getTeacherId(teacher);
 
-    return `
+                        const teacherName =
+                            getTeacherName(teacher);
 
-        <option
-            value="${escapeHtml(teacherName)}"
-            ${selected === teacherName ? "selected" : ""}>
+                        return `
 
-            ${escapeHtml(teacherName)}
+                            <option
+                                value="${escapeHtml(teacherId)}"
+                                ${classData.teacherId === teacherId ||
+                                  (!classData.teacherId && classData.teacherName === teacherName)
+                                  ? "selected"
+                                  : ""}>
 
-        </option>
+                                ${escapeHtml(teacherName)}
 
-    `;
+                            </option>
 
-}).join("")}
+                        `;
+
+                    }).join("")}
+
+                </select>
+
+                <span class="select-label">Subject</span>
+
+                <select
+                    class="subject-select"
+                    onchange="updateSubject(
+                        ${index},
+                        '${className}',
+                        this.value
+                    )">
+
+                    <option value="">
+                        Select Subject
+                    </option>
+
+                    ${subjects.map(subject => `
+
+                        <option
+                            value="${escapeHtml(subject)}"
+                            ${classData.subject === subject ? "selected" : ""}>
+
+                            ${escapeHtml(subject)}
+
+                        </option>
+
+                    `).join("")}
 
                 </select>
 
             </div>
 
         `;
-
     }
 
 
@@ -1035,7 +1159,7 @@ ${teachers.map(teacher => {
 
                     <i class="fas fa-users"></i>
 
-                    Teacher for each class
+                    Teacher & Subject for each class
 
                 </div>
 
@@ -1053,7 +1177,6 @@ ${teachers.map(teacher => {
     `;
 
 }
-
 
 /* ================= RENDER LUNCH ================= */
 
@@ -1116,20 +1239,59 @@ function renderLunch(lecture, index) {
 function updateTeacher(
     lectureIndex,
     className,
-    teacher
+    teacherId
 ) {
 
     if (!lectures[lectureIndex].classes) {
-
         lectures[lectureIndex].classes = {};
-
     }
 
-    lectures[lectureIndex]
-        .classes[className] = teacher;
+    const teacher =
+        teachers.find(
+            item => getTeacherId(item) === String(teacherId)
+        );
+
+    const teacherName =
+        teacher
+            ? getTeacherName(teacher)
+            : "";
+
+    const current =
+        normalizeClassData(
+            lectures[lectureIndex].classes[className]
+        );
+
+    lectures[lectureIndex].classes[className] = {
+        teacherId: String(teacherId || ""),
+        teacherName,
+        subject: current.subject || ""
+    };
 
 }
 
+
+function updateSubject(
+    lectureIndex,
+    className,
+    subject
+) {
+
+    if (!lectures[lectureIndex].classes) {
+        lectures[lectureIndex].classes = {};
+    }
+
+    const current =
+        normalizeClassData(
+            lectures[lectureIndex].classes[className]
+        );
+
+    lectures[lectureIndex].classes[className] = {
+        teacherId: current.teacherId || "",
+        teacherName: current.teacherName || "",
+        subject: subject || ""
+    };
+
+}
 
 /* ================= UPDATE TIME ================= */
 
@@ -1141,6 +1303,73 @@ function updateTime(
 
     lectures[index][field] = value;
 
+}
+
+
+/* ================= TEACHER / SUBJECT HELPERS ================= */
+
+function getTeacherId(teacher) {
+
+    if (typeof teacher === "string") {
+        return teacher;
+    }
+
+    return String(
+        teacher?.teacherId ??
+        teacher?._id ??
+        teacher?.id ??
+        teacher?.employeeId ??
+        teacher?.name ??
+        teacher?.teacherName ??
+        teacher?.fullName ??
+        ""
+    );
+}
+
+
+function getTeacherName(teacher) {
+
+    if (typeof teacher === "string") {
+        return teacher;
+    }
+
+    return String(
+        teacher?.name ??
+        teacher?.teacherName ??
+        teacher?.fullName ??
+        ""
+    );
+}
+
+
+function normalizeClassData(value) {
+
+    if (!value) {
+        return {
+            teacherId: "",
+            teacherName: "",
+            subject: ""
+        };
+    }
+
+    /* New backend format */
+    if (
+        typeof value === "object" &&
+        !Array.isArray(value)
+    ) {
+        return {
+            teacherId: String(value.teacherId || ""),
+            teacherName: String(value.teacherName || ""),
+            subject: String(value.subject || "")
+        };
+    }
+
+    /* Old backend format: Class 1: "Rahul Sir" */
+    return {
+        teacherId: "",
+        teacherName: String(value || ""),
+        subject: ""
+    };
 }
 
 
@@ -1241,8 +1470,10 @@ async function loadTimetable() {
                             formatTimeValue(lecture.to),
 
                         classes:
-                            mapToObject(
-                                lecture.classes
+                            normalizeClasses(
+                                mapToObject(
+                                    lecture.classes
+                                )
                             )
 
                     };
@@ -1286,6 +1517,23 @@ function mapToObject(value) {
         ...value
     };
 
+}
+
+
+function normalizeClasses(classes) {
+
+    const result = {};
+
+    Object.entries(classes || {}).forEach(
+        ([className, value]) => {
+
+            result[className] =
+                normalizeClassData(value);
+
+        }
+    );
+
+    return result;
 }
 
 
@@ -1355,8 +1603,21 @@ async function saveTimetable() {
 
                     const key = `Class ${i}`;
 
-                    classes[key] =
-                        lecture.classes?.[key] || "";
+                    const classData =
+                        normalizeClassData(
+                            lecture.classes?.[key]
+                        );
+
+                    classes[key] = {
+                        teacherId:
+                            classData.teacherId || "",
+
+                        teacherName:
+                            classData.teacherName || "",
+
+                        subject:
+                            classData.subject || ""
+                    };
 
                 }
 
@@ -1568,9 +1829,20 @@ function downloadPDF() {
 
             const key = `Class ${i + 1}`;
 
-            return classesObj[key] && classesObj[key].trim() !== ""
-                ? classesObj[key]
-                : "-";
+            const classData =
+                normalizeClassData(classesObj[key]);
+
+            if (
+                !classData.teacherName &&
+                !classData.subject
+            ) {
+                return "-";
+            }
+
+            return [
+                classData.teacherName || "-",
+                classData.subject || "-"
+            ].join("\n");
 
         });
 
@@ -1600,11 +1872,12 @@ function downloadPDF() {
         theme: "grid",
 
         styles: {
-            fontSize: 7.5,
+            fontSize: 6.8,
             cellPadding: 2,
             valign: "middle",
             overflow: "linebreak",
-            halign: "center"
+            halign: "center",
+            lineHeightFactor: 1.15
         },
 
         headStyles: {

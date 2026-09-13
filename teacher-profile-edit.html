@@ -496,6 +496,40 @@
 
                 <div class="form-group">
 
+                    <label>Father Name</label>
+
+                    <input
+                        type="text"
+                        id="fatherName"
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Department</label>
+
+                    <input
+                        type="text"
+                        id="department"
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Mother Name</label>
+
+                    <input
+                        type="text"
+                        id="motherName"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
                     <label>Email</label>
 
                     <input
@@ -943,6 +977,14 @@ function populateForm(teacher) {
     document.getElementById("name").value =
         teacher.name || "";
 
+    document.getElementById("fatherName").value =
+        teacher.fatherName || "";
+    document.getElementById("department").value =
+        teacher.department || "";
+
+    document.getElementById("motherName").value =
+        teacher.motherName || "";
+
     document.getElementById("email").value =
         teacher.email || "";
 
@@ -1330,6 +1372,20 @@ document.getElementById(
                 name:
                     document.getElementById(
                         "name"
+                    ).value.trim(),
+
+                fatherName:
+                    document.getElementById(
+                        "fatherName"
+                    ).value.trim(),
+                department:
+                    document.getElementById(
+                        "department"
+                    ).value.trim(),
+
+                motherName:
+                    document.getElementById(
+                        "motherName"
                     ).value.trim(),
 
                 email:

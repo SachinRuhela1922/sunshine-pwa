@@ -493,7 +493,7 @@
     <input
       type="text"
       id="searchInput"
-      placeholder="Search by name, father, mother, admission no, email...">
+      placeholder="Search by name, father, mother, admission no...">
 
     <div class="search-divider"></div>
 
@@ -887,11 +887,6 @@ searchInput.addEventListener(
               student.motherName,
 
               student.admissionNumber,
-
-              student.email,
-
-              student.contact?.email,
-
               student.studentId,
 
               student.phone,
@@ -1011,6 +1006,10 @@ function renderTable(students) {
 
             <th>DOB</th>
 
+            <th>Caste</th>
+
+            <th>S.R Number</th>
+
             <th>Mobile</th>
 
             <th>PEN No</th>
@@ -1024,10 +1023,7 @@ function renderTable(students) {
             <th>Admission No</th>
 
             <th>Address</th>
-
-            <th>Email</th>
-
-            <th>Action</th>
+<th>Action</th>
 
           </tr>
 
@@ -1042,6 +1038,18 @@ function renderTable(students) {
     (student,index) => {
 
       const dob = formatDOB(student.dob);
+
+      const bloodGroup =
+        student.bloodGroup ||
+        student.personal?.bloodGroup ||
+        student.medical?.bloodGroup ||
+        student.documents?.bloodGroup ||
+        "-";
+
+      const previousClass =
+        student.academic?.previousClass ||
+        student.previousClass ||
+        "-";
 
 
       const name =
@@ -1098,14 +1106,6 @@ function renderTable(students) {
         student.contact?.address ||
         student.address ||
         "-";
-
-
-      const email =
-        student.email ||
-        student.contact?.email ||
-        "-";
-
-
       tableHtml += `
 
         <tr>
@@ -1148,6 +1148,14 @@ function renderTable(students) {
             ${dob}
           </td>
 
+          <td>
+            ${escapeHtml(bloodGroup)}
+          </td>
+
+          <td>
+            ${escapeHtml(previousClass)}
+          </td>
+
 
           <td>
             ${escapeHtml(mobile)}
@@ -1188,20 +1196,7 @@ function renderTable(students) {
             </span>
 
           </td>
-
-
-          <td>
-
-            <span class="wrap-text">
-
-              ${escapeHtml(email)}
-
-            </span>
-
-          </td>
-
-
-          <td>
+<td>
 
             <button
               class="view-btn"
@@ -1369,213 +1364,141 @@ function viewStudent(
 
 /* ================= PDF ================= */
 
-/* ================= PDF ================= */
+exportPdfBtn.addEventListener("click", function () {
 
-exportPdfBtn.addEventListener(
-  "click",
-  function() {
-
-    const data =
-      filteredData.length
-      ? filteredData
-      : allStudentsData;
-
+    const data = filteredData.length
+        ? filteredData
+        : allStudentsData;
 
     if (!data.length) {
-
-      alert(
-        "No data to export."
-      );
-
-      return;
-
+        alert("No data to export.");
+        return;
     }
 
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF("landscape", "pt", "a4");
 
-    const {
-      jsPDF
-    } = window.jspdf;
+    const FONT_SIZE = 7;
+    const CELL_PADDING = 2.5;
+    const MIN_CELL_HEIGHT = 18;
 
-
-    const doc =
-      new jsPDF(
-        "landscape",
-        "pt",
-        "a4"
-      );
-
-
-    doc.setTextColor(0, 0, 0);
-
-    doc.setFontSize(14);
-
-    doc.text(
-      `Class = ${displayName} [Students List - Sunshine School]`,
-      40,
-      40
-    );
-
-
-    const rows =
-      data.map(
-        (student,index) => {
-
-          const dob = formatDOB(student.dob);
-
-
-          return [
-
+    function createStudentRow(student, index) {
+        return [
             index + 1,
-
             student.studentName || "-",
+            student.father?.name || student.fatherName || "-",
+            student.mother?.name || student.motherName || "-",
+            formatDOB(student.dob),
+            student.bloodGroup || student.personal?.bloodGroup || student.medical?.bloodGroup || student.documents?.bloodGroup || "-",
+            student.academic?.previousClass || student.previousClass || "-",
+            student.phone || student.father?.phone || student.contact?.phone || "-",
+            student.fees?.transactionId || student.transactionId || "-",
+            student.documents?.aadhaarNumber || student.aadhaarNumber || "-",
+            student.category || "-",
+            student.father?.occupation || "-",
+            student.admissionNumber || "-",
+            student.contact?.address || student.address || "-"
+        ];
+    }
 
-            student.father?.name ||
-              student.fatherName ||
-              "-",
+    const headers = [[
+        "#", "Student", "Father", "Mother", "DOB", "Caste",
+        "S.R Number", "Mobile", "PEN No", "Aadhaar",
+        "Category", "Father Occ.", "Admission No", "Address"
+    ]];
 
-            student.mother?.name ||
-              student.motherName ||
-              "-",
+    const columnStyles = {
+        0: { cellWidth: 18 }, 1: { cellWidth: 65 }, 2: { cellWidth: 65 },
+        3: { cellWidth: 65 }, 4: { cellWidth: 45 }, 5: { cellWidth: 52 },
+        6: { cellWidth: 55 }, 7: { cellWidth: 52 }, 8: { cellWidth: 45 },
+        9: { cellWidth: 58 }, 10: { cellWidth: 48 }, 11: { cellWidth: 55 },
+        12: { cellWidth: 55 }, 13: { cellWidth: 110 }
+    };
 
-            dob,
-
-            student.phone ||
-              student.father?.phone ||
-              student.contact?.phone ||
-              "-",
-
-            student.fees?.transactionId ||
-              student.transactionId ||
-              "-",
-
-            student.documents?.aadhaarNumber ||
-              student.aadhaarNumber ||
-              "-",
-
-            student.category ||
-              "-",
-
-            student.father?.occupation ||
-              "-",
-
-            student.admissionNumber ||
-              "-",
-
-            student.contact?.address ||
-              student.address ||
-              "-",
-
-            student.email ||
-              student.contact?.email ||
-              "-"
-
-          ];
-
-        }
-      );
-
+    // Ab saare rows ek hi baar me — koi manual slicing nahi
+    const rows = data.map((student, index) => createStudentRow(student, index));
 
     doc.autoTable({
+        head: headers,
+        body: rows,
+        theme: "grid",
+        startY: 38,
+        margin: { left: 20, right: 20, top: 38, bottom: 25 },
+        tableWidth: "wrap",
 
-      head: [[
-        "#",
-        "Student",
-        "Father",
-        "Mother",
-        "DOB",
-        "Mobile",
-        "PEN No",
-        "Aadhaar",
-        "Category",
-        "Father Occ.",
-        "Admission No",
-        "Address",
-        "Email"
-      ]],
+        // Yehi key setting hai — page bharte hi khud naya page banayega
+        pageBreak: "auto",
+        rowPageBreak: "avoid",   // ek row beech me nahi kategi
+        showHead: "everyPage",   // har page pe header repeat hoga
 
-      body: rows,
+        styles: {
+            font: "helvetica",
+            fontSize: FONT_SIZE,
+            cellPadding: CELL_PADDING,
+            minCellHeight: MIN_CELL_HEIGHT,
+            textColor: [0, 0, 0],
+            lineColor: [0, 0, 0],
+            lineWidth: 0.5,
+            overflow: "linebreak",
+            valign: "middle",
+            halign: "left",
+            fontStyle: "normal"
+        },
 
-      startY: 55,
+        headStyles: {
+            fillColor: [255, 255, 255],
+            textColor: [0, 0, 0],
+            fontStyle: "bold",
+            fontSize: FONT_SIZE,
+            cellPadding: CELL_PADDING,
+            minCellHeight: 20,
+            lineColor: [0, 0, 0],
+            lineWidth: 0.5,
+            halign: "left",
+            valign: "middle"
+        },
 
-      theme: "grid",
+        alternateRowStyles: { fillColor: [255, 255, 255] },
+        columnStyles: columnStyles,
 
-      styles: {
-        fontSize: 6,
-        cellPadding: 2,
-        minCellHeight: 12,
-        textColor: [0, 0, 0],
-        lineColor: [0, 0, 0],
-        lineWidth: 0.4,
-        overflow: "linebreak",
-        valign: "middle",
-        halign: "left"
-      },
+        // Title aur footer har page pe autoTable khud draw karega jab bhi naya page bane
+        didDrawPage: function () {
+            doc.setTextColor(0, 0, 0);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.text(
+                `Class = ${displayName} [Students List - Sunshine School]`,
+                20, 28
+            );
 
-      headStyles: {
-        fillColor: [255, 255, 255],
-        textColor: [0, 0, 0],
-        fontStyle: "bold",
-        fontSize: 6.5,
-        lineColor: [0, 0, 0],
-        lineWidth: 0.4,
-        halign: "left",
-        minCellHeight: 14
-      },
-
-      alternateRowStyles: {
-        fillColor: [255, 255, 255]
-      },
-
-      /* Fixed widths so content wraps INSIDE the cell
-         instead of pushing to next page */
-      columnStyles: {
-        0:  { cellWidth: 16 },   // #
-        1:  { cellWidth: 62 },   // Student
-        2:  { cellWidth: 62 },   // Father
-        3:  { cellWidth: 62 },   // Mother
-        4:  { cellWidth: 42 },   // DOB
-        5:  { cellWidth: 50 },   // Mobile
-        6:  { cellWidth: 40 },   // PEN No
-        7:  { cellWidth: 55 },   // Aadhaar
-        8:  { cellWidth: 40 },   // Category
-        9:  { cellWidth: 50 },   // Father Occ.
-        10: { cellWidth: 50 },   // Admission No
-        11: { cellWidth: 85 },   // Address
-        12: { cellWidth: 75 }    // Email
-      },
-
-      margin: {
-        left: 20,
-        right: 20,
-        top: 45
-      },
-
-      tableWidth: "wrap",
-
-      didParseCell: function(data) {
-        // Address & email jaisi lambi values me line-count limit
-        // taaki row zyada tall na ho aur page pe zyada rows aa sakein
-        if (
-          (data.column.index === 11 || data.column.index === 12) &&
-          data.cell.raw
-        ) {
-          const text = String(data.cell.raw);
-          if (text.length > 60) {
-            data.cell.text = [text.substring(0, 57) + "..."];
-          }
+            const pageNumber = doc.internal.getNumberOfPages();
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(7);
+            doc.text(
+                `Sunshine School | Students List | Page ${pageNumber}`,
+                20,
+                doc.internal.pageSize.getHeight() - 10
+            );
         }
-      }
-
     });
 
+    // Total pages ab pata chalega tabhi jab poora table ban chuka ho
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.text(
+            `Page ${i} of ${totalPages}`,
+            doc.internal.pageSize.getWidth() - 75,
+            28
+        );
+    }
 
     doc.save(
-      `${displayName}_students_${new Date().toISOString().split("T")[0]}.pdf`
+        `${displayName}_students_${new Date().toISOString().split("T")[0]}.pdf`
     );
-
-  }
-);
-
+});
 /* ================= REFRESH ================= */
 
 refreshBtn.addEventListener(

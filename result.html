@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sunshine · Student Results</title>
     <!-- html2pdf library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -32,7 +38,7 @@
             background: white;
             border-radius: 32px;
             padding: 1.2rem 2rem;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.02);
             border: 1px solid rgba(245, 138, 46, 0.06);
             display: flex;
             align-items: center;
@@ -249,7 +255,7 @@
             padding: 1.8rem 1.2rem;
             text-align: center;
             cursor: pointer;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.02);
             border: 1px solid rgba(245, 138, 46, 0.06);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -337,7 +343,7 @@
             border-radius: 24px;
             padding: 1.2rem 1.5rem;
             margin-bottom: 1rem;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.02);
             border: 1px solid rgba(245, 138, 46, 0.06);
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -409,14 +415,14 @@
             border-radius: 24px;
             padding: 1.5rem 1.8rem;
             margin-bottom: 1.2rem;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.02);
             border: 1px solid rgba(245, 138, 46, 0.06);
             transition: all 0.3s;
         }
 
         .result-card:hover {
             border-color: rgba(245, 138, 46, 0.15);
-            box-shadow: 0 8px 35px rgba(0,0,0,0.04);
+            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.04);
         }
 
         .result-card .card-header {
@@ -535,13 +541,33 @@
             display: inline-block;
         }
 
-        .grade-badge.Aplus { background: #1a5a1a; }
-        .grade-badge.A { background: #2a7a2a; }
-        .grade-badge.B { background: #8a7a2a; }
-        .grade-badge.C { background: #8a6a2a; }
-        .grade-badge.D { background: #8a5a2a; }
-        .grade-badge.E { background: #8a4a2a; }
-        .grade-badge.F { background: #8a2a2a; }
+        .grade-badge.Aplus {
+            background: #1a5a1a;
+        }
+
+        .grade-badge.A {
+            background: #2a7a2a;
+        }
+
+        .grade-badge.B {
+            background: #8a7a2a;
+        }
+
+        .grade-badge.C {
+            background: #8a6a2a;
+        }
+
+        .grade-badge.D {
+            background: #8a5a2a;
+        }
+
+        .grade-badge.E {
+            background: #8a4a2a;
+        }
+
+        .grade-badge.F {
+            background: #8a2a2a;
+        }
 
         .division-badge {
             background: #4a2d8a;
@@ -553,10 +579,21 @@
             display: inline-block;
         }
 
-        .division-badge.first { background: #1a5a1a; }
-        .division-badge.second { background: #8a7a2a; }
-        .division-badge.third { background: #8a5a2a; }
-        .division-badge.fail { background: #8a2a2a; }
+        .division-badge.first {
+            background: #1a5a1a;
+        }
+
+        .division-badge.second {
+            background: #8a7a2a;
+        }
+
+        .division-badge.third {
+            background: #8a5a2a;
+        }
+
+        .division-badge.fail {
+            background: #8a2a2a;
+        }
 
         /* ===== EDIT BUTTON ===== */
         .btn-edit-result {
@@ -664,7 +701,7 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             display: none;
             align-items: center;
             justify-content: center;
@@ -685,7 +722,7 @@
             overflow-y: auto;
             border-radius: 28px;
             padding: 2rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             animation: modalIn 0.3s ease;
         }
 
@@ -694,6 +731,7 @@
                 opacity: 0;
                 transform: translateY(20px) scale(0.98);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -848,7 +886,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .loading-state p {
@@ -902,65 +942,81 @@
             body {
                 padding: 1rem;
             }
+
             .page-header {
                 padding: 1rem 1.2rem;
                 flex-direction: column;
                 align-items: flex-start;
             }
+
             .page-header h1 {
                 font-size: 1.2rem;
             }
+
             .banner {
                 padding: 1rem 1.2rem;
                 flex-direction: column;
                 text-align: center;
             }
+
             .banner .banner-info {
                 flex-direction: column;
                 text-align: center;
             }
+
             .banner .banner-icon {
                 width: 44px;
                 height: 44px;
                 font-size: 1.3rem;
             }
+
             .banner .banner-details h2 {
                 font-size: 1rem;
             }
+
             .class-grid {
                 grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
                 gap: 0.8rem;
             }
+
             .student-card {
                 flex-direction: column;
                 align-items: flex-start;
             }
+
             .student-card .student-info {
                 width: 100%;
             }
+
             .result-card {
                 padding: 1rem 1.2rem;
             }
+
             .result-card .card-header {
                 flex-direction: column;
                 align-items: flex-start;
             }
+
             .result-summary {
                 flex-direction: column;
                 gap: 0.5rem;
             }
+
             .edit-row {
                 grid-template-columns: 1fr;
                 gap: 0.4rem;
             }
+
             .edit-division-row {
                 grid-template-columns: 1fr;
                 gap: 0.4rem;
             }
+
             .modal-box {
                 padding: 1.2rem;
                 margin: 0.5rem;
             }
+
             .section-header {
                 flex-direction: column;
                 align-items: flex-start;
@@ -972,30 +1028,38 @@
                 font-size: 0.7rem;
                 padding: 0.3rem 0.7rem;
             }
+
             .class-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 0.6rem;
             }
+
             .class-card {
                 padding: 1.2rem 0.8rem;
             }
+
             .class-card h4 {
                 font-size: 0.95rem;
             }
+
             .student-card .student-info .details .meta {
                 flex-direction: column;
                 gap: 0.2rem;
             }
+
             .action-bar {
                 flex-direction: column;
             }
+
             .action-bar button {
                 width: 100%;
                 justify-content: center;
             }
+
             .modal-actions {
                 flex-direction: column;
             }
+
             .modal-actions button {
                 width: 100%;
                 justify-content: center;
@@ -1003,191 +1067,192 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <!-- ===== HEADER ===== -->
-    <div class="page-header">
-        <div>
-            <h1>
-                <i class="fas fa-graduation-cap"></i>
-                Student Results
-            </h1>
-            <div class="header-sub">
-                <i class="fas fa-edit"></i>
-                View and manage student results
+        <!-- ===== HEADER ===== -->
+        <div class="page-header">
+            <div>
+                <h1>
+                    <i class="fas fa-graduation-cap"></i>
+                    Student Results
+                </h1>
+                <div class="header-sub">
+                    <i class="fas fa-edit"></i>
+                    View and manage student results
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn-action btn-secondary" onclick="history.back()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
             </div>
         </div>
-        <div class="actions">
-            <button class="btn-action btn-secondary" onclick="history.back()">
-                <i class="fas fa-arrow-left"></i> Back
-            </button>
-        </div>
-    </div>
 
-    <!-- ===== BANNER ===== -->
-    <div class="banner">
-        <div class="banner-info">
-            <div class="banner-icon">
-                <i class="fas fa-file-alt"></i>
+        <!-- ===== BANNER ===== -->
+        <div class="banner">
+            <div class="banner-info">
+                <div class="banner-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="banner-details">
+                    <h2>Student Results Dashboard</h2>
+                    <p><i class="fas fa-info-circle"></i> Browse classes and view student performance</p>
+                </div>
             </div>
-            <div class="banner-details">
-                <h2>Student Results Dashboard</h2>
-                <p><i class="fas fa-info-circle"></i> Browse classes and view student performance</p>
+            <div class="banner-badge">
+                <i class="fas fa-clock"></i> Academic Year 2026-27
             </div>
         </div>
-        <div class="banner-badge">
-            <i class="fas fa-clock"></i> Academic Year 2026-27
-        </div>
-    </div>
 
-    <!-- ===== CLASSES SECTION ===== -->
-    <div id="classesSection" class="section">
-        <div class="section-header">
-            <h3>
-                <i class="fas fa-school"></i> Select Class
-                <span class="count-badge" id="classCount">0</span>
-            </h3>
-            <span class="hint">
-                <i class="fas fa-hand-pointer"></i> Click a class to view students
-            </span>
+        <!-- ===== CLASSES SECTION ===== -->
+        <div id="classesSection" class="section">
+            <div class="section-header">
+                <h3>
+                    <i class="fas fa-school"></i> Select Class
+                    <span class="count-badge" id="classCount">0</span>
+                </h3>
+                <span class="hint">
+                    <i class="fas fa-hand-pointer"></i> Click a class to view students
+                </span>
+            </div>
+            <div id="classes" class="class-grid"></div>
         </div>
-        <div id="classes" class="class-grid"></div>
-    </div>
 
-    <!-- ===== STUDENTS SECTION ===== -->
-    <div id="studentsSection" class="section hidden">
-        <button class="btn-back" onclick="showClasses()">
-            <i class="fas fa-arrow-left"></i> Back to Classes
-        </button>
-        <div class="section-header">
-            <h3 id="classTitle">
-                <i class="fas fa-users"></i> Students
-            </h3>
-            <span class="hint">
-                <i class="fas fa-hand-pointer"></i> Click a student to view results
-            </span>
-        </div>
-        <div id="students"></div>
-    </div>
-
-    <!-- ===== RESULT SECTION ===== -->
-    <div id="resultSection" class="section hidden">
-        <div class="action-bar">
-            <button class="btn-back" onclick="showStudents()">
-                <i class="fas fa-arrow-left"></i> Back to Students
+        <!-- ===== STUDENTS SECTION ===== -->
+        <div id="studentsSection" class="section hidden">
+            <button class="btn-back" onclick="showClasses()">
+                <i class="fas fa-arrow-left"></i> Back to Classes
             </button>
-            <button class="btn-pdf" id="pdfBtn" onclick="downloadResultPDF()">
-                <i class="fas fa-file-pdf"></i> Download PDF
-            </button>
+            <div class="section-header">
+                <h3 id="classTitle">
+                    <i class="fas fa-users"></i> Students
+                </h3>
+                <span class="hint">
+                    <i class="fas fa-hand-pointer"></i> Click a student to view results
+                </span>
+            </div>
+            <div id="students"></div>
         </div>
-        <div id="result"></div>
+
+        <!-- ===== RESULT SECTION ===== -->
+        <div id="resultSection" class="section hidden">
+            <div class="action-bar">
+                <button class="btn-back" onclick="showStudents()">
+                    <i class="fas fa-arrow-left"></i> Back to Students
+                </button>
+                <button class="btn-pdf" id="pdfBtn" onclick="downloadResultPDF()">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </button>
+            </div>
+            <div id="result"></div>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div class="footer-note">
+            <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
+            <span><i class="fas fa-lock"></i> secure · results management</span>
+        </div>
+
     </div>
 
-    <!-- ===== FOOTER ===== -->
-    <div class="footer-note">
-        <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
-        <span><i class="fas fa-lock"></i> secure · results management</span>
-    </div>
-
-</div>
-
-<!-- ===== EDIT MARKS MODAL ===== -->
-<div class="modal-overlay" id="editModal">
-    <div class="modal-box">
-        <h2 id="editModalTitle">
-            <i class="fas fa-edit"></i> Edit Marks
-        </h2>
-        <div class="edit-division-row">
-            <label><i class="fas fa-award" style="color:#4a2d8a;margin-right:0.3rem;"></i> Division</label>
-            <select id="editDivision">
-                <option value="">-- Select Division --</option>
-                <option value="Ist Division">Ist Division</option>
-                <option value="IInd Division">IInd Division</option>
-                <option value="IIIrd Division">IIIrd Division</option>
-                <option value="Fail">Fail</option>
-                <option value="Pass">Pass</option>
-            </select>
-        </div>
-        <div id="editRows"></div>
-        <div class="modal-actions">
-            <button class="btn-cancel-modal" onclick="closeEditModal()">
-                <i class="fas fa-times"></i> Cancel
-            </button>
-            <button class="btn-save-modal" id="saveMarksBtn" onclick="saveMarks()">
-                <i class="fas fa-save"></i> Save Changes
-            </button>
+    <!-- ===== EDIT MARKS MODAL ===== -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <h2 id="editModalTitle">
+                <i class="fas fa-edit"></i> Edit Marks
+            </h2>
+            <div class="edit-division-row">
+                <label><i class="fas fa-award" style="color:#4a2d8a;margin-right:0.3rem;"></i> Division</label>
+                <select id="editDivision">
+                    <option value="">-- Select Division --</option>
+                    <option value="Ist Division">Ist Division</option>
+                    <option value="IInd Division">IInd Division</option>
+                    <option value="IIIrd Division">IIIrd Division</option>
+                    <option value="Fail">Fail</option>
+                    <option value="Pass">Pass</option>
+                </select>
+            </div>
+            <div id="editRows"></div>
+            <div class="modal-actions">
+                <button class="btn-cancel-modal" onclick="closeEditModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="btn-save-modal" id="saveMarksBtn" onclick="saveMarks()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-const API_URL = "https://sunshine-swp6.onrender.com/api/exam-marks";
+    <script>
+        const API_URL = "https://sunshine-swp6.onrender.com/api/exam-marks";
 
-let allExamMarks = [];
-let selectedClass = "";
-let selectedStudent = "";
-let currentStudentResults = [];
-window.editingExam = null;
+        let allExamMarks = [];
+        let selectedClass = "";
+        let selectedStudent = "";
+        let currentStudentResults = [];
+        window.editingExam = null;
 
-// ======================== FETCH ========================
-async function loadData(silent) {
-    try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        console.log("ExamMarks loaded:", data);
-        allExamMarks = data.examMarks || data.data || data;
-        if (!Array.isArray(allExamMarks)) {
-            console.error("Unexpected data format:", data);
-            allExamMarks = [];
-        }
-        if (!silent) showClasses();
-    } catch (error) {
-        console.error("Load error:", error);
-        document.getElementById("classes").innerHTML = `
+        // ======================== FETCH ========================
+        async function loadData(silent) {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                console.log("ExamMarks loaded:", data);
+                allExamMarks = data.examMarks || data.data || data;
+                if (!Array.isArray(allExamMarks)) {
+                    console.error("Unexpected data format:", data);
+                    allExamMarks = [];
+                }
+                if (!silent) showClasses();
+            } catch (error) {
+                console.error("Load error:", error);
+                document.getElementById("classes").innerHTML = `
             <div class="empty-state" style="grid-column:1/-1;">
                 <i class="fas fa-exclamation-triangle"></i>
                 <h4>Unable to Load Results</h4>
                 <p>${escapeHtml(error.message)}</p>
             </div>
         `;
-    }
-}
+            }
+        }
 
-// ======================== GRADE HELPER ========================
-function getGrade(percentage) {
-    if (percentage >= 90) return { grade: "A+", remark: "Outstanding" };
-    if (percentage >= 80) return { grade: "A", remark: "Excellent" };
-    if (percentage >= 70) return { grade: "B", remark: "Very Good" };
-    if (percentage >= 60) return { grade: "C", remark: "Good" };
-    if (percentage >= 50) return { grade: "D", remark: "Average" };
-    if (percentage >= 40) return { grade: "E", remark: "Pass" };
-    return { grade: "F", remark: "Fail" };
-}
+        // ======================== GRADE HELPER ========================
+        function getGrade(percentage) {
+            if (percentage >= 90) return { grade: "A+", remark: "Outstanding" };
+            if (percentage >= 80) return { grade: "A", remark: "Excellent" };
+            if (percentage >= 70) return { grade: "B", remark: "Very Good" };
+            if (percentage >= 60) return { grade: "C", remark: "Good" };
+            if (percentage >= 50) return { grade: "D", remark: "Average" };
+            if (percentage >= 40) return { grade: "E", remark: "Pass" };
+            return { grade: "F", remark: "Fail" };
+        }
 
-// ======================== DIVISION HELPER ========================
-// Standard UP-board style division cutoffs. Used only as a suggestion —
-// the actual division stored comes from the manually-selected dropdown.
-function getSuggestedDivision(percentage) {
-    if (percentage >= 60) return "Ist Division";
-    if (percentage >= 45) return "IInd Division";
-    if (percentage >= 33) return "IIIrd Division";
-    return "Fail";
-}
+        // ======================== DIVISION HELPER ========================
+        // Standard UP-board style division cutoffs. Used only as a suggestion —
+        // the actual division stored comes from the manually-selected dropdown.
+        function getSuggestedDivision(percentage) {
+            if (percentage >= 60) return "Ist Division";
+            if (percentage >= 45) return "IInd Division";
+            if (percentage >= 33) return "IIIrd Division";
+            return "Fail";
+        }
 
-function divisionBadgeClass(division) {
-    const d = String(division || "").toLowerCase();
-    if (d.startsWith("ist") || d.startsWith("1st") || d.startsWith("first")) return "first";
-    if (d.startsWith("iind") || d.startsWith("2nd") || d.startsWith("second")) return "second";
-    if (d.startsWith("iiird") || d.startsWith("3rd") || d.startsWith("third")) return "third";
-    if (d.startsWith("fail")) return "fail";
-    if (d.startsWith("pass")) return "pass";
-    return "";
-}
+        function divisionBadgeClass(division) {
+            const d = String(division || "").toLowerCase();
+            if (d.startsWith("ist") || d.startsWith("1st") || d.startsWith("first")) return "first";
+            if (d.startsWith("iind") || d.startsWith("2nd") || d.startsWith("second")) return "second";
+            if (d.startsWith("iiird") || d.startsWith("3rd") || d.startsWith("third")) return "third";
+            if (d.startsWith("fail")) return "fail";
+            if (d.startsWith("pass")) return "pass";
+            return "";
+        }
 
-function getGradeTableHTML() {
-    return `
+        function getGradeTableHTML() {
+            return `
         <div class="grade-table">
             <table style="width:100%;">
                 <thead><tr><th>Percentage</th><th>Grade</th><th>Remark</th></tr></thead>
@@ -1203,72 +1268,72 @@ function getGradeTableHTML() {
             </table>
         </div>
     `;
-}
+        }
 
-// ======================== NAVIGATION ========================
-function showClasses() {
-    document.getElementById("classesSection").classList.remove("hidden");
-    document.getElementById("studentsSection").classList.add("hidden");
-    document.getElementById("resultSection").classList.add("hidden");
+        // ======================== NAVIGATION ========================
+        function showClasses() {
+            document.getElementById("classesSection").classList.remove("hidden");
+            document.getElementById("studentsSection").classList.add("hidden");
+            document.getElementById("resultSection").classList.add("hidden");
 
-    const container = document.getElementById("classes");
-    container.innerHTML = "";
-    const classes = [...new Set(allExamMarks.map(item => item.className).filter(Boolean))];
-    document.getElementById("classCount").textContent = classes.length;
-    
-    if (classes.length === 0) {
-        container.innerHTML = `
+            const container = document.getElementById("classes");
+            container.innerHTML = "";
+            const classes = [...new Set(allExamMarks.map(item => item.className).filter(Boolean))];
+            document.getElementById("classCount").textContent = classes.length;
+
+            if (classes.length === 0) {
+                container.innerHTML = `
             <div class="empty-state" style="grid-column:1/-1;">
                 <i class="fas fa-users-slash"></i>
                 <h4>No Classes Found</h4>
                 <p>No exam results available for any class.</p>
             </div>
         `;
-        return;
-    }
-    classes.forEach(className => {
-        const div = document.createElement("div");
-        div.className = "class-card";
-        div.innerHTML = `
+                return;
+            }
+            classes.forEach(className => {
+                const div = document.createElement("div");
+                div.className = "class-card";
+                div.innerHTML = `
             <div class="card-icon"><i class="fas fa-school"></i></div>
             <h4>${escapeHtml(className)}</h4>
             <div class="class-sub"><i class="fas fa-user-graduate"></i> View Students</div>
             <div class="arrow-hint"><i class="fas fa-arrow-right"></i> Select</div>
         `;
-        div.onclick = () => showStudents(className);
-        container.appendChild(div);
-    });
-}
+                div.onclick = () => showStudents(className);
+                container.appendChild(div);
+            });
+        }
 
-function showStudents(className) {
-    if (className) selectedClass = className;
-    document.getElementById("classesSection").classList.add("hidden");
-    document.getElementById("studentsSection").classList.remove("hidden");
-    document.getElementById("resultSection").classList.add("hidden");
-    document.getElementById("classTitle").innerHTML = `<i class="fas fa-users"></i> Class ${escapeHtml(selectedClass)} · Students`;
+        function showStudents(className) {
+            if (className) selectedClass = className;
+            document.getElementById("classesSection").classList.add("hidden");
+            document.getElementById("studentsSection").classList.remove("hidden");
+            document.getElementById("resultSection").classList.add("hidden");
+            document.getElementById("classTitle").innerHTML = `<i class="fas fa-users"></i> Class ${escapeHtml(selectedClass)} · Students`;
 
-    const container = document.getElementById("students");
-    container.innerHTML = "";
-    const studentsMap = new Map();
-    allExamMarks.filter(item => item.className === selectedClass).forEach(item => {
-        const id = item.studentMongoId;
-        if (!studentsMap.has(id)) studentsMap.set(id, item);
-    });
-    if (studentsMap.size === 0) {
-        container.innerHTML = `
+            const container = document.getElementById("students");
+            container.innerHTML = "";
+            const studentsMap = new Map();
+            allExamMarks.filter(item => item.className === selectedClass).forEach(item => {
+                const id = item.studentMongoId;
+                if (!studentsMap.has(id)) studentsMap.set(id, item);
+            });
+            if (studentsMap.size === 0) {
+                container.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-user-slash"></i>
                 <h4>No Students Found</h4>
                 <p>No students have results in this class.</p>
             </div>
         `;
-        return;
-    }
-    studentsMap.forEach(student => {
-        const initials = (student.studentName || 'S').charAt(0).toUpperCase();
-        const div = document.createElement("div");
-        div.className = "student-card";
-        div.innerHTML = `
+                return;
+            }
+            studentsMap.forEach(student => {
+                const initials = (student.studentName || 'S').charAt(0).toUpperCase();
+                const div = document.createElement("div");
+                div.className = "student-card";
+                div.innerHTML = `
             <div class="student-info">
                 <div class="avatar">${initials}</div>
                 <div class="details">
@@ -1282,44 +1347,44 @@ function showStudents(className) {
             </div>
             <div class="student-arrow"><i class="fas fa-chevron-right"></i></div>
         `;
-        div.onclick = () => showResult(student.studentMongoId);
-        container.appendChild(div);
-    });
-}
+                div.onclick = () => showResult(student.studentMongoId);
+                container.appendChild(div);
+            });
+        }
 
-// ======================== SHOW RESULT ========================
-function showResult(studentMongoId) {
-    document.getElementById("classesSection").classList.add("hidden");
-    document.getElementById("studentsSection").classList.add("hidden");
-    document.getElementById("resultSection").classList.remove("hidden");
+        // ======================== SHOW RESULT ========================
+        function showResult(studentMongoId) {
+            document.getElementById("classesSection").classList.add("hidden");
+            document.getElementById("studentsSection").classList.add("hidden");
+            document.getElementById("resultSection").classList.remove("hidden");
 
-    const container = document.getElementById("result");
-    container.innerHTML = `
+            const container = document.getElementById("result");
+            container.innerHTML = `
         <div class="loading-state">
             <i class="fas fa-circle-notch"></i>
             <p>Loading result...</p>
         </div>
     `;
 
-    const studentResults = allExamMarks.filter(
-        item => item.studentMongoId === studentMongoId && item.className === selectedClass
-    );
+            const studentResults = allExamMarks.filter(
+                item => item.studentMongoId === studentMongoId && item.className === selectedClass
+            );
 
-    if (studentResults.length === 0) {
-        container.innerHTML = `
+            if (studentResults.length === 0) {
+                container.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-file-alt"></i>
                 <h4>No Result Found</h4>
                 <p>This student has no exam results yet.</p>
             </div>
         `;
-        return;
-    }
+                return;
+            }
 
-    currentStudentResults = studentResults;
-    const student = studentResults[0];
+            currentStudentResults = studentResults;
+            const student = studentResults[0];
 
-    let html = `
+            let html = `
         <div class="result-card" id="studentInfoCard">
             <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
                 <div style="width:56px;height:56px;border-radius:50%;background:#fcf3e8;color:#f58a2e;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:700;">
@@ -1339,14 +1404,14 @@ function showResult(studentMongoId) {
         </div>
     `;
 
-    studentResults.forEach((exam, examIndex) => {
-        const subjectCount = (exam.marks || []).length;
-        const gradeInfo = getGrade(exam.percentage || 0);
-        const gradeClass = gradeInfo.grade === 'A+' ? 'Aplus' : gradeInfo.grade;
-        const divisionValue = exam.division || getSuggestedDivision(exam.percentage || 0);
-        const divisionClass = divisionBadgeClass(divisionValue);
-        
-        html += `
+            studentResults.forEach((exam, examIndex) => {
+                const subjectCount = (exam.marks || []).length;
+                const gradeInfo = getGrade(exam.percentage || 0);
+                const gradeClass = gradeInfo.grade === 'A+' ? 'Aplus' : gradeInfo.grade;
+                const divisionValue = exam.division || getSuggestedDivision(exam.percentage || 0);
+                const divisionClass = divisionBadgeClass(divisionValue);
+
+                html += `
             <div class="result-card exam-card" data-examindex="${examIndex}">
                 <div class="card-header">
                     <h3>
@@ -1363,10 +1428,22 @@ function showResult(studentMongoId) {
                         <thead><tr><th><i class="fas fa-book-open"></i> Subject</th><th><i class="fas fa-arrow-up"></i> Max Marks</th><th><i class="fas fa-arrow-down"></i> Obtained</th></tr></thead>
                         <tbody>
         `;
-        (exam.marks || []).forEach(mark => {
-            html += `<tr><td>${escapeHtml(mark.subjectName || "-")}</td><td>${mark.maxMarks ?? 0}</td><td>${mark.obtainedMarks ?? 0}</td></tr>`;
-        });
-        html += `
+                (exam.marks || []).forEach(mark => {
+
+                    const obtained =
+                        String(mark.status || "").toUpperCase() === "ABSENT"
+                            ? "AB"
+                            : (mark.obtainedMarks ?? 0);
+
+                    html += `
+        <tr>
+            <td>${escapeHtml(mark.subjectName || "-")}</td>
+            <td>${mark.maxMarks ?? 0}</td>
+            <td>${obtained}</td>
+        </tr>
+    `;
+                });
+                html += `
                         </tbody>
                     </table>
                 </div>
@@ -1394,2276 +1471,941 @@ function showResult(studentMongoId) {
                 </div>
             </div>
         `;
-    });
+            });
 
-    html += `<div class="result-card"><h3 style="font-size:1rem;color:#2d1f0c;margin-bottom:0.5rem;"><i class="fas fa-chart-bar" style="color:#f58a2e;"></i> Grade Chart</h3>${getGradeTableHTML()}</div>`;
+            html += `<div class="result-card"><h3 style="font-size:1rem;color:#2d1f0c;margin-bottom:0.5rem;"><i class="fas fa-chart-bar" style="color:#f58a2e;"></i> Grade Chart</h3>${getGradeTableHTML()}</div>`;
 
-    container.innerHTML = html;
-}
+            container.innerHTML = html;
+        }
 
-function downloadResultPDF() {
+        async function downloadResultPDF() {
+
+    // =========================================================
+    // BASIC VALIDATION
+    // =========================================================
     if (!currentStudentResults || currentStudentResults.length === 0) {
         alert("No result data to export. Please view a student result first.");
         return;
     }
 
     const student = currentStudentResults[0];
-
     if (!student) {
         alert("No student data found.");
         return;
     }
 
     // =========================================================
-    // NORMALIZE HELPERS
+    // CHECK jsPDF
     // =========================================================
-    function normalizeExamName(name) {
-        return String(name || "")
-            .toLowerCase()
-            .replace(/\s+/g, " ")
-            .trim();
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+        alert("jsPDF is not loaded. Please check the PDF library <script> tags.");
+        console.error("window.jspdf is undefined.");
+        return;
     }
 
-    function normalizeSubjectName(name) {
-        return String(name || "")
-            .toLowerCase()
-            .replace(/\s+/g, " ")
-            .trim();
+    const { jsPDF } = window.jspdf;
+
+    // =========================================================
+    // CHECK AUTOTABLE
+    // =========================================================
+    const testDoc = new jsPDF();
+    if (typeof testDoc.autoTable !== "function") {
+        alert("jspdf-autotable is not loaded. Make sure it is included AFTER jsPDF.");
+        console.error("jspdf-autotable plugin missing.");
+        return;
     }
 
     // =========================================================
-    // COLLECT ALL EXAMS
+    // BUTTON STATE
     // =========================================================
-    const rawExamNames = [];
+    const pdfBtn = document.querySelector(".pdf-btn");
+    const originalButtonText = pdfBtn ? pdfBtn.textContent : "";
+    if (pdfBtn) {
+        pdfBtn.disabled = true;
+        pdfBtn.textContent = "⏳ Generating PDF...";
+    }
 
-    currentStudentResults.forEach(exam => {
-        const examName = String(exam.exam || "Exam").trim();
+    try {
 
-        if (
-            !rawExamNames.some(
-                e => normalizeExamName(e) === normalizeExamName(examName)
-            )
-        ) {
-            rawExamNames.push(examName);
+        // =====================================================
+        // HELPERS
+        // =====================================================
+        function normalizeExamName(name) {
+            return String(name || "").toLowerCase().replace(/\s+/g, " ").trim();
         }
-    });
 
-    const preferredOrder = [
-        "unit 1",
-        "unit 2",
-        "half yearly",
-        "half-yearly",
-        "halfyearly",
-        "unit 3",
-        "unit 4",
-        "annual",
-        "final"
-    ];
+        function normalizeSubjectName(name) {
+            return String(name || "").toLowerCase().replace(/\s+/g, " ").trim();
+        }
 
-    function examOrderIndex(name) {
-        const key = normalizeExamName(name);
-        const index = preferredOrder.indexOf(key);
-        return index === -1 ? 999 : index;
-    }
-
-    const examOrder = [...rawExamNames].sort((a, b) => {
-        const ai = examOrderIndex(a);
-        const bi = examOrderIndex(b);
-
-        if (ai !== bi) return ai - bi;
-
-        return rawExamNames.indexOf(a) - rawExamNames.indexOf(b);
-    });
-
-    // =========================================================
-    // BUILD SUBJECT MAP
-    // =========================================================
-    const subjectMap = {};
-
-    currentStudentResults.forEach(exam => {
-        const examName = String(exam.exam || "Exam").trim();
-        const examKey = normalizeExamName(examName);
-
-        (exam.marks || []).forEach(mark => {
-            const displaySubject = String(
-                mark.subjectName || "N/A"
-            ).trim();
-
-            const subjectKey = normalizeSubjectName(displaySubject);
-
-            if (!subjectMap[subjectKey]) {
-                subjectMap[subjectKey] = {
-                    displayName: displaySubject,
-                    exams: {}
-                };
+        function safeValue(value, fallback = "N/A") {
+            if (value === undefined || value === null || String(value).trim() === "") {
+                return fallback;
             }
-
-            const maxMarks =
-                mark.maxMarks !== undefined &&
-                mark.maxMarks !== null &&
-                mark.maxMarks !== ""
-                    ? Number(mark.maxMarks)
-                    : "-";
-
-            const obtainedMarks =
-                mark.obtainedMarks !== undefined &&
-                mark.obtainedMarks !== null &&
-                mark.obtainedMarks !== ""
-                    ? Number(mark.obtainedMarks)
-                    : "-";
-
-            subjectMap[subjectKey].exams[examKey] = {
-                max: Number.isFinite(maxMarks) ? maxMarks : "-",
-                obtained: Number.isFinite(obtainedMarks)
-                    ? obtainedMarks
-                    : "-"
-            };
-        });
-    });
-
-    const subjects = Object.keys(subjectMap);
-
-    // =========================================================
-    // FIND TERM EXAMS
-    // =========================================================
-    function isHalfYearly(name) {
-        return /half\s*yearly|half-yearly|halfyearly/i.test(
-            String(name || "")
-        );
-    }
-
-    function isAnnual(name) {
-        return (
-            /^annual$/i.test(String(name || "").trim()) ||
-            /^final$/i.test(String(name || "").trim())
-        );
-    }
-
-    const halfYearlyIndex = examOrder.findIndex(isHalfYearly);
-    const annualIndex = examOrder.findIndex(isAnnual);
-
-    const firstTermExams = examOrder.slice(
-        0,
-        halfYearlyIndex >= 0 ? halfYearlyIndex + 1 : 0
-    );
-
-    const secondTermExams =
-        annualIndex >= 0
-            ? examOrder.slice(
-                  halfYearlyIndex >= 0
-                      ? halfYearlyIndex + 1
-                      : 0,
-                  annualIndex + 1
-              )
-            : [];
-
-    const fallbackSplit =
-        !firstTermExams.length && !secondTermExams.length;
-
-    let term1Exams = firstTermExams;
-    let term2Exams = secondTermExams;
-
-    if (fallbackSplit) {
-        const mid = Math.ceil(examOrder.length / 2);
-
-        term1Exams = examOrder.slice(0, mid);
-        term2Exams = examOrder.slice(mid);
-    }
-
-    // =========================================================
-    // GROUP TOTAL
-    // =========================================================
-    function groupSum(subjectKey, examNames) {
-        let max = 0;
-        let obtained = 0;
-
-        let hasMax = false;
-        let hasObtained = false;
-
-        examNames.forEach(examName => {
-            const examKey = normalizeExamName(examName);
-            const subjectData = subjectMap[subjectKey];
-
-            if (!subjectData || !subjectData.exams) return;
-
-            const mark = subjectData.exams[examKey];
-
-            if (!mark) return;
-
-            if (typeof mark.max === "number") {
-                max += mark.max;
-                hasMax = true;
-            }
-
-            if (typeof mark.obtained === "number") {
-                obtained += mark.obtained;
-                hasObtained = true;
-            }
-        });
-
-        return {
-            max: hasMax ? max : "-",
-            obtained: hasObtained ? obtained : "-"
-        };
-    }
-
-    // =========================================================
-    // FINAL SUBJECT TOTALS
-    // =========================================================
-    const subjectFinalTotals = {};
-
-    let grandTotalMax = 0;
-    let grandTotalObtained = 0;
-
-    let hasGrandMax = false;
-    let hasGrandObtained = false;
-
-    subjects.forEach(subjectKey => {
-        const term1Total = groupSum(subjectKey, term1Exams);
-        const term2Total = groupSum(subjectKey, term2Exams);
-
-        let finalMax = 0;
-        let finalObtained = 0;
-
-        let hasFinalMax = false;
-        let hasFinalObtained = false;
-
-        if (typeof term1Total.max === "number") {
-            finalMax += term1Total.max;
-            hasFinalMax = true;
-        }
-
-        if (typeof term2Total.max === "number") {
-            finalMax += term2Total.max;
-            hasFinalMax = true;
-        }
-
-        if (typeof term1Total.obtained === "number") {
-            finalObtained += term1Total.obtained;
-            hasFinalObtained = true;
-        }
-
-        if (typeof term2Total.obtained === "number") {
-            finalObtained += term2Total.obtained;
-            hasFinalObtained = true;
-        }
-
-        subjectFinalTotals[subjectKey] = {
-            term1: term1Total,
-            term2: term2Total,
-            final: {
-                max: hasFinalMax ? finalMax : "-",
-                obtained: hasFinalObtained
-                    ? finalObtained
-                    : "-"
-            }
-        };
-
-        if (hasFinalMax) {
-            grandTotalMax += finalMax;
-            hasGrandMax = true;
-        }
-
-        if (hasFinalObtained) {
-            grandTotalObtained += finalObtained;
-            hasGrandObtained = true;
-        }
-    });
-
-    const totalMarks = hasGrandMax ? grandTotalMax : 0;
-
-    const totalMarksObtained = hasGrandObtained
-        ? grandTotalObtained
-        : 0;
-
-    const overallPercentage =
-        totalMarks > 0
-            ? (totalMarksObtained / totalMarks) * 100
-            : 0;
-
-    // =========================================================
-    // GRADE / REMARK / DIVISION
-    // =========================================================
-    function pdfGetGrade(percentage) {
-        if (percentage >= 90) return "A+";
-        if (percentage >= 80) return "A";
-        if (percentage >= 70) return "B";
-        if (percentage >= 60) return "C";
-        if (percentage >= 50) return "D";
-        if (percentage >= 40) return "E";
-
-        return "F";
-    }
-
-    function pdfGetRemark(percentage) {
-        if (percentage >= 90) return "Outstanding";
-        if (percentage >= 80) return "Excellent";
-        if (percentage >= 70) return "Very Good";
-        if (percentage >= 60) return "Good";
-        if (percentage >= 50) return "Average";
-        if (percentage >= 40) return "Pass";
-
-        return "Fail";
-    }
-
-    function pdfGetDivision(percentage) {
-        if (percentage >= 60) return "First Division";
-        if (percentage >= 45) return "Second Division";
-        if (percentage >= 33) return "Third Division";
-
-        return "Fail";
-    }
-
-    function pdfFormatDate(value) {
-        if (!value) return "N/A";
-
-        const d = new Date(value);
-
-        if (isNaN(d.getTime())) {
             return String(value);
         }
 
-        const day = String(d.getDate()).padStart(2, "0");
+        function cleanFileName(value) {
+            return String(value || "")
+                .replace(/[\\/:*?"<>|]/g, "")
+                .replace(/\s+/g, "_")
+                .trim();
+        }
 
-        const months = [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec"
+        function pdfFormatDate(value) {
+            if (!value) return "N/A";
+            const d = new Date(value);
+            if (isNaN(d.getTime())) {
+                return String(value);
+            }
+            const day = String(d.getDate()).padStart(2, "0");
+            const months = [
+                "Jan", "Feb", "Mar", "Apr",
+                "May", "Jun", "Jul", "Aug",
+                "Sep", "Oct", "Nov", "Dec"
+            ];
+            return `${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
+        function loadImageSafe(src) {
+            return new Promise(resolve => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => {
+                    console.warn("Could not load image:", src);
+                    resolve(null);
+                };
+                img.src = src;
+            });
+        }
+
+        // =====================================================
+        // LOAD IMAGES (tophead.png removed — header now manual)
+        // =====================================================
+        const [
+            logo,
+            leftStamp,
+            rightStamp
+        ] = await Promise.all([
+            loadImageSafe("./images/logo.png"),
+            loadImageSafe("./images/stamp2.png"),
+            loadImageSafe("./images/stamp1.png")
+        ]);
+
+        // =====================================================
+        // CREATE A4 PDF
+        // =====================================================
+        const doc = new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: "a4",
+            compress: true
+        });
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const marginLeft = 10;
+        const marginRight = 10;
+        const marginBottom = 9;
+        const contentWidth = pageWidth - marginLeft - marginRight;
+
+        // =====================================================
+        // COLLECT EXAMS
+        // =====================================================
+        const rawExamNames = [];
+        currentStudentResults.forEach(exam => {
+            const examName = String(exam.exam || "Exam").trim();
+            if (!rawExamNames.some(e => normalizeExamName(e) === normalizeExamName(examName))) {
+                rawExamNames.push(examName);
+            }
+        });
+
+        const preferredOrder = [
+            "unit 1", "unit 2", "half yearly", "half-yearly",
+            "halfyearly", "unit 3", "unit 4", "annual", "final"
         ];
 
-        return `${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
-    }
-
-    const grade = pdfGetGrade(overallPercentage);
-    const remark = pdfGetRemark(overallPercentage);
-
-    const latestExamForDivision =
-        currentStudentResults[
-            currentStudentResults.length - 1
-        ];
-
-    const overallDivision =
-        latestExamForDivision &&
-        latestExamForDivision.division
-            ? latestExamForDivision.division
-            : pdfGetDivision(overallPercentage);
-
-    // =========================================================
-    // TABLE WIDTH
-    // =========================================================
-    const examColumnCount = examOrder.length + 3;
-
-    const subjectColWidth = 18;
-
-    const remainingWidth = 100 - subjectColWidth;
-
-    const perColumnGroupWidth =
-        remainingWidth / examColumnCount;
-
-    const perSmallColumnWidth =
-        perColumnGroupWidth / 2;
-
-    let tableFontSize = 9;
-
-    if (examColumnCount <= 6) {
-        tableFontSize = 11;
-    } else if (examColumnCount <= 8) {
-        tableFontSize = 10;
-    } else if (examColumnCount <= 10) {
-        tableFontSize = 9;
-    } else {
-        tableFontSize = 8;
-    }
-
-    let examHeaderFontSize = 9;
-
-    if (examColumnCount <= 6) {
-        examHeaderFontSize = 10;
-    } else if (examColumnCount <= 8) {
-        examHeaderFontSize = 9;
-    } else if (examColumnCount <= 10) {
-        examHeaderFontSize = 8.5;
-    } else {
-        examHeaderFontSize = 8;
-    }
-
-    // =========================================================
-    // PDF HTML
-    // =========================================================
-    let pdfHTML = `
-        <div
-            style="
-                position:relative;
-                font-family:'Segoe UI',Arial,sans-serif;
-                color:#000;
-                width:1000px;
-                margin:0 auto;
-                background:#fff;
-                font-size:11px;
-                font-weight:700;
-                padding:15px;
-                box-sizing:border-box;
-                overflow:hidden;
-            "
-        >
-
-            <!-- WATERMARK -->
-            <img
-                src="./images/logo.svg"
-                alt="Watermark"
-                style="
-                    position:absolute;
-                    top:50%;
-                    left:50%;
-                    transform:translate(-50%,-50%);
-                    width:700px;
-                    height:700px;
-                    object-fit:contain;
-                    opacity:0.20;
-                    z-index:0;
-                    pointer-events:none;
-                "
-                onerror="this.style.display='none'"
-            >
-
-            <!-- CONTENT -->
-            <div
-                style="
-                    position:relative;
-                    z-index:1;
-                    min-height:100%;
-                    padding:0;
-                    font-weight:700;
-                "
-            >
-
-                <!-- SCHOOL HEADER -->
-                <div
-                    style="
-                        text-align:center;
-                        border-bottom:2px solid #ddd;
-                        padding-top:16px;
-                        padding-bottom:12px;
-                        margin-bottom:12px;
-                        background:rgba(255,255,255,0.78);
-                        font-weight:700;
-                    "
-                >
-
-                    <div
-                        style="
-                            display:flex;
-                            align-items:center;
-                            justify-content:center;
-                            gap:26px;
-                        "
-                    >
-
-                        <!-- SCHOOL LOGO -->
-                        <img
-                            src="./images/logo.svg"
-                            alt="School Logo"
-                            style="
-                                width:135px;
-                                height:135px;
-                                object-fit:contain;
-                                border:none;
-                                border-radius:0;
-                                background:transparent;
-                                padding:0;
-                            "
-                            onerror="this.style.display='none'"
-                        >
-
-                        <div>
-
-                            <!-- RECOGNIZED TEXT -->
-                            <div
-                                style="
-                                    font-size:11px;
-                                    font-weight:800;
-                                    color:#444;
-                                    letter-spacing:1px;
-                                "
-                            >
-                                ★ RECOGNIZED BY U.P. GOVERNMENT ★
-                            </div>
-
-                            <!-- SCHOOL NAME -->
-                            <div
-                                style="
-                                    font-size:35px;
-                                    font-weight:900;
-                                    color:#8b0000;
-                                    margin:2px 0;
-                                    letter-spacing:2px;
-                                    line-height:1.15;
-                                "
-                            >
-                                SUN SHINE JUNIOR HIGH SCHOOL
-                            </div>
-
-                            <!-- ADDRESS -->
-                            <div
-                                style="
-                                    font-size:14px;
-                                    font-weight:700;
-                                    line-height:1.5;
-                                    color:#222;
-                                "
-                            >
-                                20 Futa Road, Mohalla Garhi Nai Aabadi Pilkhuwa Hapur, Uttar Pradesh - 245304
-                            </div>
-
-                            <!-- PHONE / EMAIL -->
-                            <div
-                                style="
-                                    font-size:13px;
-                                    font-weight:700;
-                                    color:#333;
-                                    margin-top:5px;
-                                "
-                            >
-                                📞 +91-8791-764-372 | 92596-95556 |
-                                ✉️ info@sunshinejuniorhighschool.com
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- TITLE -->
-                <div
-                    style="
-                        text-align:center;
-                        font-size:15px;
-                        font-weight:800;
-                        margin:4px 0 3px;
-                        text-transform:uppercase;
-                        color:#1a2a3a;
-                        letter-spacing:.5px;
-                        background:rgba(255,255,255,0.72);
-                    "
-                >
-                    📊 ASSESSMENT SHEET FOR ACADEMIC SESSION 2026-27
-                </div>
-
-                <div
-                    style="
-                        text-align:center;
-                        font-size:15px;
-                        font-weight:700;
-                        color:#000;
-                        margin-bottom:12px;
-                        border-bottom:2px dashed #ddd;
-                        padding-bottom:8px;
-                        font-style:italic;
-                        background:rgba(255,255,255,0.72);
-                    "
-                >
-                    "Empowering Young Minds for a Brighter Future" 🌟
-                </div>
-
-                <!-- STUDENT PROFILE -->
-                <table
-                    style="
-                        width:100%;
-                        border-collapse:collapse;
-                        border:2px solid #1a2a3a;
-                        margin-bottom:12px;
-                        font-size:11px;
-                        font-weight:700;
-                        background:rgba(255,255,255,0.82);
-                    "
-                >
-
-                    <tr>
-                        <td
-                            colspan="4"
-                            style="
-                                background:rgba(240,230,211,0.90);
-                                text-align:center;
-                                font-weight:800;
-                                padding:7px;
-                                border:1px solid #1a2a3a;
-                                font-size:13px;
-                            "
-                        >
-                            👤 STUDENT PROFILE
-                        </td>
-                    </tr>
-
-                    <tr>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                width:15%;
-                                font-weight:700;
-                                background:rgba(248,244,238,0.90);
-                            "
-                        >
-                            📌 Roll No.
-                        </td>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                width:35%;
-                                font-weight:700;
-                            "
-                        >
-                            ${student.rollNumber || student.studentId || "N/A"}
-                        </td>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                width:15%;
-                                font-weight:700;
-                                background:rgba(248,244,238,0.90);
-                            "
-                        >
-                            👦 Student Name
-                        </td>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                width:35%;
-                                font-weight:800;
-                                color:#1a2a3a;
-                                font-size:12px;
-                            "
-                        >
-                            ${student.studentName || "N/A"}
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                font-weight:700;
-                                background:rgba(248,244,238,0.90);
-                            "
-                        >
-                            📚 Class
-                        </td>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                font-weight:700;
-                            "
-                        >
-                            ${student.className || "N/A"}
-                        </td>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                font-weight:700;
-                                background:rgba(248,244,238,0.90);
-                            "
-                        >
-                            📅 Session
-                        </td>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                font-weight:700;
-                            "
-                        >
-                            2026-27
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                font-weight:700;
-                                background:rgba(248,244,238,0.90);
-                            "
-                        >
-                            👨 Father Name
-                        </td>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                font-weight:700;
-                            "
-                        >
-                            ${student.fatherName || "N/A"}
-                        </td>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                font-weight:700;
-                                background:rgba(248,244,238,0.90);
-                            "
-                        >
-                            👩 Mother Name
-                        </td>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                font-weight:700;
-                            "
-                        >
-                            ${student.motherName || "N/A"}
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                font-weight:700;
-                                background:rgba(248,244,238,0.90);
-                            "
-                        >
-                            🎂 D.O.B
-                        </td>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                font-weight:700;
-                            "
-                        >
-                            ${pdfFormatDate(student.dob)}
-                        </td>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                font-weight:700;
-                                background:rgba(248,244,238,0.90);
-                            "
-                        >
-                            📞 Contact
-                        </td>
-
-                        <td
-                            style="
-                                padding:5px 8px;
-                                border:1px solid #1a2a3a;
-                                font-weight:700;
-                            "
-                        >
-                            ${student.phone || student.mobile || "N/A"}
-                        </td>
-
-                    </tr>
-
-                </table>
-
-                <!-- ACADEMIC PERFORMANCE -->
-                <div
-                    style="
-                        font-weight:800;
-                        text-align:center;
-                        background:rgba(240,230,211,0.90);
-                        border:2px solid #1a2a3a;
-                        border-bottom:none;
-                        padding:7px;
-                        font-size:14px;
-                        letter-spacing:.5px;
-                    "
-                >
-                    📋 ACADEMIC PERFORMANCE REPORT
-                </div>
-
-                <!-- MAIN TABLE -->
-                <table
-                    style="
-                        width:100%;
-                        border-collapse:collapse;
-                        border:2px solid #1a2a3a;
-                        font-size:${tableFontSize}px;
-                        font-weight:700;
-                        table-layout:fixed;
-                        background:rgba(255,255,255,0.84);
-                    "
-                >
-
-                    <thead>
-
-                        <tr
-                            style="
-                                background:rgba(232,221,208,0.92);
-                                font-weight:800;
-                            "
-                        >
-
-                            <th
-                                rowspan="2"
-                                style="
-                                    padding:2px 6px 10px 6px;
-                                    margin-top:5px;
-                                    border:1px solid #1a2a3a;
-                                    width:${subjectColWidth}%;
-                                    text-align:left;
-                                    vertical-align:top;
-                                    background:#ddd0c0;
-                                    font-size:${tableFontSize + 1}px;
-                                    font-weight:800;
-                                    line-height:1.1;
-                                    height:32px;
-                                    box-sizing:border-box;
-                                "
-                            >
-                                📖 Subject
-                            </th>
-    `;
-
-    // =========================================================
-    // EXAM HEADERS
-    // =========================================================
-    examOrder.forEach(examName => {
-        pdfHTML += `
-            <th
-                colspan="2"
-                style="
-                    padding:6px 2px;
-                    border:1px solid #1a2a3a;
-                    text-align:center;
-                    font-size:${examHeaderFontSize}px;
-                    width:${perColumnGroupWidth}%;
-                    background:${
-                        isHalfYearly(examName) || isAnnual(examName)
-                            ? "rgba(245,230,213,0.94)"
-                            : "rgba(232,221,208,0.94)"
-                    };
-                    word-wrap:break-word;
-                    font-weight:800;
-                "
-            >
-                ${examName}
-            </th>
-        `;
-
-        if (isHalfYearly(examName)) {
-            pdfHTML += `
-                <th
-                    colspan="2"
-                    style="
-                        padding:6px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        font-size:${examHeaderFontSize}px;
-                        width:${perColumnGroupWidth}%;
-                        background:rgba(234,216,189,0.94);
-                        font-weight:800;
-                    "
-                >
-                    Total
-                </th>
-            `;
+        function examOrderIndex(name) {
+            const key = normalizeExamName(name);
+            const index = preferredOrder.indexOf(key);
+            return index === -1 ? 999 : index;
         }
 
-        if (isAnnual(examName)) {
-            pdfHTML += `
-                <th
-                    colspan="2"
-                    style="
-                        padding:6px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        font-size:${examHeaderFontSize}px;
-                        width:${perColumnGroupWidth}%;
-                        background:rgba(234,216,189,0.94);
-                        font-weight:800;
-                    "
-                >
-                    Total
-                </th>
+        const examOrder = [...rawExamNames].sort((a, b) => {
+            const ai = examOrderIndex(a);
+            const bi = examOrderIndex(b);
+            if (ai !== bi) return ai - bi;
+            return rawExamNames.indexOf(a) - rawExamNames.indexOf(b);
+        });
 
-                <th
-                    colspan="2"
-                    style="
-                        padding:6px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        font-size:${examHeaderFontSize}px;
-                        width:${perColumnGroupWidth}%;
-                        background:rgba(217,232,217,0.94);
-                        font-weight:800;
-                    "
-                >
-                    Grand Total
-                </th>
-            `;
-        }
-    });
-
-    if (halfYearlyIndex < 0) {
-        pdfHTML += `
-            <th
-                colspan="2"
-                style="
-                    padding:6px 2px;
-                    border:1px solid #1a2a3a;
-                    text-align:center;
-                    font-size:${examHeaderFontSize}px;
-                    background:rgba(234,216,189,0.94);
-                    font-weight:800;
-                "
-            >
-                Total
-            </th>
-        `;
-    }
-
-    if (annualIndex < 0) {
-        pdfHTML += `
-            <th
-                colspan="2"
-                style="
-                    padding:6px 2px;
-                    border:1px solid #1a2a3a;
-                    text-align:center;
-                    font-size:${examHeaderFontSize}px;
-                    background:rgba(234,216,189,0.94);
-                    font-weight:800;
-                "
-            >
-                Total
-            </th>
-
-            <th
-                colspan="2"
-                style="
-                    padding:6px 2px;
-                    border:1px solid #1a2a3a;
-                    text-align:center;
-                    font-size:${examHeaderFontSize}px;
-                    background:rgba(217,232,217,0.94);
-                    font-weight:800;
-                "
-            >
-                Grand Total
-            </th>
-        `;
-    }
-
-    pdfHTML += `
-                        </tr>
-
-                        <tr
-                            style="
-                                background:rgba(245,239,232,0.94);
-                                font-weight:800;
-                            "
-                        >
-    `;
-
-    // =========================================================
-    // SECOND HEADER ROW
-    // =========================================================
-    examOrder.forEach(examName => {
-        pdfHTML += `
-            <th
-                style="
-                    padding:4px 2px;
-                    border:1px solid #1a2a3a;
-                    text-align:center;
-                    width:${perSmallColumnWidth}%;
-                    font-weight:800;
-                "
-            >
-                M.M
-            </th>
-
-            <th
-                style="
-                    padding:4px 2px;
-                    border:1px solid #1a2a3a;
-                    text-align:center;
-                    width:${perSmallColumnWidth}%;
-                    font-weight:800;
-                "
-            >
-                M.O
-            </th>
-        `;
-
-        if (isHalfYearly(examName)) {
-            pdfHTML += `
-                <th
-                    style="
-                        padding:4px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        background:rgba(245,230,213,0.94);
-                        font-weight:800;
-                    "
-                >
-                    M.M
-                </th>
-
-                <th
-                    style="
-                        padding:4px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        background:rgba(245,230,213,0.94);
-                        font-weight:800;
-                    "
-                >
-                    M.O
-                </th>
-            `;
+        function isHalfYearly(name) {
+            return /half\s*yearly|half-yearly|halfyearly/i.test(String(name || ""));
         }
 
-        if (isAnnual(examName)) {
-            pdfHTML += `
-                <th
-                    style="
-                        padding:4px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        background:rgba(245,230,213,0.94);
-                        font-weight:800;
-                    "
-                >
-                    M.M
-                </th>
-
-                <th
-                    style="
-                        padding:4px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        background:rgba(245,230,213,0.94);
-                        font-weight:800;
-                    "
-                >
-                    M.O
-                </th>
-
-                <th
-                    style="
-                        padding:4px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        background:rgba(217,232,217,0.94);
-                        font-weight:800;
-                    "
-                >
-                    M.M
-                </th>
-
-                <th
-                    style="
-                        padding:4px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        background:rgba(217,232,217,0.94);
-                        font-weight:800;
-                    "
-                >
-                    M.O
-                </th>
-            `;
+        function isAnnual(name) {
+            return (
+                /^annual$/i.test(String(name || "").trim()) ||
+                /^final$/i.test(String(name || "").trim())
+            );
         }
-    });
 
-    if (halfYearlyIndex < 0) {
-        pdfHTML += `
-            <th
-                style="
-                    padding:4px 2px;
-                    border:1px solid #1a2a3a;
-                    text-align:center;
-                    background:rgba(245,230,213,0.94);
-                    font-weight:800;
-                "
-            >
-                M.M
-            </th>
-
-            <th
-                style="
-                    padding:4px 2px;
-                    border:1px solid #1a2a3a;
-                    text-align:center;
-                    background:rgba(245,230,213,0.94);
-                    font-weight:800;
-                "
-            >
-                M.O
-            </th>
-        `;
-    }
-
-    if (annualIndex < 0) {
-        pdfHTML += `
-            <th
-                style="
-                    padding:4px 2px;
-                    border:1px solid #1a2a3a;
-                    text-align:center;
-                    background:rgba(245,230,213,0.94);
-                    font-weight:800;
-                "
-            >
-                M.M
-            </th>
-
-            <th
-                style="
-                    padding:4px 2px;
-                    border:1px solid #1a2a3a;
-                    text-align:center;
-                    background:rgba(245,230,213,0.94);
-                    font-weight:800;
-                "
-            >
-                M.O
-            </th>
-
-            <th
-                style="
-                    padding:4px 2px;
-                    border:1px solid #1a2a3a;
-                    text-align:center;
-                    background:rgba(217,232,217,0.94);
-                    font-weight:800;
-                "
-            >
-                M.M
-            </th>
-
-            <th
-                style="
-                    padding:4px 2px;
-                    border:1px solid #1a2a3a;
-                    text-align:center;
-                    background:rgba(217,232,217,0.94);
-                    font-weight:800;
-                "
-            >
-                M.O
-            </th>
-        `;
-    }
-
-    pdfHTML += `
-                        </tr>
-                    </thead>
-
-                    <tbody>
-    `;
-
-    // =========================================================
-    // SUBJECT ROWS
-    // =========================================================
-    subjects.forEach(subjectKey => {
-        const subjectData = subjectMap[subjectKey];
-        const totals = subjectFinalTotals[subjectKey];
-
-        pdfHTML += `
-            <tr style="font-weight:700;">
-
-                <td
-                    style="
-                        padding:5px 6px;
-                        border:1px solid #1a2a3a;
-                        font-weight:700;
-                        text-align:left;
-                        background:rgba(252,250,247,0.88);
-                    "
-                >
-                    ${subjectData.displayName}
-                </td>
-        `;
-
-        examOrder.forEach(examName => {
+        // =====================================================
+        // BUILD SUBJECT MAP
+        // =====================================================
+        const subjectMap = {};
+        currentStudentResults.forEach(exam => {
+            const examName = String(exam.exam || "Exam").trim();
             const examKey = normalizeExamName(examName);
+            (exam.marks || []).forEach(mark => {
+                const displaySubject = String(mark.subjectName || "N/A").trim();
+                const subjectKey = normalizeSubjectName(displaySubject);
+                if (!subjectMap[subjectKey]) {
+                    subjectMap[subjectKey] = {
+                        displayName: displaySubject,
+                        exams: {}
+                    };
+                }
+                const maxMarks =
+                    mark.maxMarks !== undefined && mark.maxMarks !== null && mark.maxMarks !== ""
+                        ? Number(mark.maxMarks)
+                        : "-";
 
-            const mark =
-                subjectData.exams &&
-                subjectData.exams[examKey]
-                    ? subjectData.exams[examKey]
-                    : null;
+                const isAbsent = String(mark.status || "").toUpperCase() === "ABSENT";
+                const obtainedMarks = isAbsent
+                    ? "AB"
+                    : (mark.obtainedMarks !== undefined && mark.obtainedMarks !== null && mark.obtainedMarks !== ""
+                        ? Number(mark.obtainedMarks)
+                        : "-");
 
-            const max = mark ? mark.max : "-";
-            const obtained = mark ? mark.obtained : "-";
+                subjectMap[subjectKey].exams[examKey] = {
+                    max: Number.isFinite(maxMarks) ? maxMarks : "-",
+                    obtained: isAbsent
+                        ? "AB"
+                        : (Number.isFinite(obtainedMarks) ? obtainedMarks : "-")
+                };
+            });
+        });
 
-            pdfHTML += `
-                <td
-                    style="
-                        padding:4px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        font-weight:700;
-                    "
-                >
-                    ${max}
-                </td>
+        const subjects = Object.keys(subjectMap);
 
-                <td
-                    style="
-                        padding:4px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        font-weight:700;
-                    "
-                >
-                    ${obtained}
-                </td>
-            `;
+        // =====================================================
+        // FIND TERMS
+        // =====================================================
+        const halfYearlyIndex = examOrder.findIndex(isHalfYearly);
+        const annualIndex = examOrder.findIndex(isAnnual);
 
-            if (isHalfYearly(examName)) {
-                pdfHTML += `
-                    <td
-                        style="
-                            padding:4px 2px;
-                            border:1px solid #1a2a3a;
-                            text-align:center;
-                            background:rgba(252,243,230,0.92);
-                            font-weight:800;
-                        "
-                    >
-                        ${totals.term1.max}
-                    </td>
+        let term1Exams = [];
+        let term2Exams = [];
 
-                    <td
-                        style="
-                            padding:4px 2px;
-                            border:1px solid #1a2a3a;
-                            text-align:center;
-                            background:rgba(252,243,230,0.92);
-                            font-weight:800;
-                        "
-                    >
-                        ${totals.term1.obtained}
-                    </td>
-                `;
+        if (halfYearlyIndex >= 0) {
+            term1Exams = examOrder.slice(0, halfYearlyIndex + 1);
+        }
+        if (annualIndex >= 0) {
+            term2Exams = examOrder.slice(
+                halfYearlyIndex >= 0 ? halfYearlyIndex + 1 : 0,
+                annualIndex + 1
+            );
+        }
+        if (term1Exams.length === 0 && term2Exams.length === 0) {
+            const mid = Math.ceil(examOrder.length / 2);
+            term1Exams = examOrder.slice(0, mid);
+            term2Exams = examOrder.slice(mid);
+        }
+
+        // =====================================================
+        // GROUP SUM
+        // =====================================================
+        function groupSum(subjectKey, examNames) {
+            let max = 0;
+            let obtained = 0;
+            let hasMax = false;
+            let hasObtained = false;
+
+            examNames.forEach(examName => {
+                const examKey = normalizeExamName(examName);
+                const subjectData = subjectMap[subjectKey];
+                if (!subjectData || !subjectData.exams) return;
+
+                const mark = subjectData.exams[examKey];
+                if (!mark) return;
+
+                if (typeof mark.max === "number") {
+                    max += mark.max;
+                    hasMax = true;
+                }
+                if (typeof mark.obtained === "number") {
+                    obtained += mark.obtained;
+                    hasObtained = true;
+                }
+            });
+
+            return {
+                max: hasMax ? max : "-",
+                obtained: hasObtained ? obtained : "-"
+            };
+        }
+
+        // =====================================================
+        // FINAL SUBJECT TOTALS
+        // =====================================================
+        const subjectFinalTotals = {};
+        let grandTotalMax = 0;
+        let grandTotalObtained = 0;
+        let hasGrandMax = false;
+        let hasGrandObtained = false;
+
+        subjects.forEach(subjectKey => {
+            const term1Total = groupSum(subjectKey, term1Exams);
+            const term2Total = groupSum(subjectKey, term2Exams);
+
+            let finalMax = 0;
+            let finalObtained = 0;
+            let hasFinalMax = false;
+            let hasFinalObtained = false;
+
+            if (typeof term1Total.max === "number") {
+                finalMax += term1Total.max;
+                hasFinalMax = true;
+            }
+            if (typeof term2Total.max === "number") {
+                finalMax += term2Total.max;
+                hasFinalMax = true;
+            }
+            if (typeof term1Total.obtained === "number") {
+                finalObtained += term1Total.obtained;
+                hasFinalObtained = true;
+            }
+            if (typeof term2Total.obtained === "number") {
+                finalObtained += term2Total.obtained;
+                hasFinalObtained = true;
             }
 
+            subjectFinalTotals[subjectKey] = {
+                term1: term1Total,
+                term2: term2Total,
+                final: {
+                    max: hasFinalMax ? finalMax : "-",
+                    obtained: hasFinalObtained ? finalObtained : "-"
+                }
+            };
+
+            if (hasFinalMax) {
+                grandTotalMax += finalMax;
+                hasGrandMax = true;
+            }
+            if (hasFinalObtained) {
+                grandTotalObtained += finalObtained;
+                hasGrandObtained = true;
+            }
+        });
+
+        const totalMarks = hasGrandMax ? grandTotalMax : 0;
+        const totalMarksObtained = hasGrandObtained ? grandTotalObtained : 0;
+        const overallPercentage = totalMarks > 0 ? (totalMarksObtained / totalMarks) * 100 : 0;
+
+        // =====================================================
+        // GRADE / REMARK / DIVISION
+        // =====================================================
+        function getGrade(p) {
+            if (p >= 90) return "A+";
+            if (p >= 80) return "A";
+            if (p >= 70) return "B";
+            if (p >= 60) return "C";
+            if (p >= 50) return "D";
+            if (p >= 40) return "E";
+            return "F";
+        }
+
+        function getRemark(p) {
+            if (p >= 90) return "Outstanding";
+            if (p >= 80) return "Excellent";
+            if (p >= 70) return "Very Good";
+            if (p >= 60) return "Good";
+            if (p >= 50) return "Average";
+            if (p >= 40) return "Pass";
+            return "Fail";
+        }
+
+        function getDivision(p) {
+            if (p >= 60) return "First Division";
+            if (p >= 45) return "Second Division";
+            if (p >= 33) return "Third Division";
+            return "Fail";
+        }
+
+        const grade = getGrade(overallPercentage);
+        const remark = getRemark(overallPercentage);
+        const latestExam = currentStudentResults[currentStudentResults.length - 1];
+        const overallDivision = latestExam && latestExam.division
+            ? latestExam.division
+            : getDivision(overallPercentage);
+
+        // =========================================================
+        // BACKGROUND WATERMARK LOGO
+        // =========================================================
+        function drawBackgroundLogo() {
+            if (!logo) return;
+            const logoWidth = 220;
+            const logoHeight = 290;
+            const logoX = (pageWidth - logoWidth) / 2;
+            const logoY = (pageHeight - logoHeight) / 2;
+
+            if (typeof doc.saveGraphicsState === "function") {
+                doc.saveGraphicsState();
+            }
+            if (typeof doc.setGState === "function") {
+                doc.setGState(new doc.GState({ opacity: 0.1 }));
+            }
+            doc.addImage(logo, "PNG", logoX, logoY, logoWidth, logoHeight);
+            if (typeof doc.restoreGraphicsState === "function") {
+                doc.restoreGraphicsState();
+            }
+        }
+
+        // =====================================================
+        // HEADER (fully manual — no tophead image)
+        // =====================================================
+        function drawHeader() {
+
+    drawBackgroundLogo();
+
+    const headerTop = 4;
+    const logoSize = 28;
+    const logoX = marginLeft;
+    const logoY = headerTop;
+    const logoCenterX = logoX + logoSize / 2;
+    const logoCenterY = logoY + logoSize / 2;
+
+    // ============================
+    // LOGO (LEFT SIDE, NO CIRCLE)
+    // ============================
+    if (logo) {
+        doc.addImage(
+            logo,
+            "PNG",
+            logoX,
+            logoY,
+            logoSize,
+            logoSize
+        );
+    }
+
+    // ============================
+    // TITLE AREA (RIGHT OF LOGO, CENTERED IN REMAINING SPACE)
+    // ============================
+    const titleAreaX = logoX + logoSize + 3;
+    const titleAreaWidth = (pageWidth - marginRight) - titleAreaX;
+    const titleCenterX = titleAreaX + titleAreaWidth / 2;
+
+    let textY = headerTop + 12;
+
+    // SCHOOL NAME - BIG, DARK RED FILL + BLACK OUTLINE
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(27);
+    doc.setTextColor(178, 24, 24);
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.35);
+
+    doc.text(
+        "SUN SHINE JUNIOR HIGH SCHOOL",
+        titleCenterX,
+        textY,
+        {
+            align: "center",
+            renderingMode: "fillThenStroke"
+        }
+    );
+
+    // ============================
+    // DECORATIVE DIVIDER
+    // ============================
+    textY += 3.5;
+    const dividerHalfWidth = 30;
+    doc.setDrawColor(178, 24, 24);
+    doc.setLineWidth(0.35);
+    doc.line(titleCenterX - dividerHalfWidth, textY, titleCenterX - 5, textY);
+    doc.line(titleCenterX + 5, textY, titleCenterX + dividerHalfWidth, textY);
+
+    function drawDiamond(cx, cy, size) {
+        doc.setFillColor(178, 24, 24);
+        doc.triangle(cx - size, cy, cx, cy - size, cx + size, cy, "F");
+        doc.triangle(cx - size, cy, cx, cy + size, cx + size, cy, "F");
+    }
+    drawDiamond(titleCenterX, textY, 1.6);
+
+    textY += 6;
+
+    // ============================
+    // ICON HELPERS
+    // ============================
+    function drawPinIcon(cx, cy) {
+        doc.setFillColor(178, 24, 24);
+        doc.circle(cx, cy - 0.6, 1.6, "F");
+        doc.triangle(cx - 1.1, cy, cx + 1.1, cy, cx, cy + 2.2, "F");
+        doc.setFillColor(255, 255, 255);
+        doc.circle(cx, cy - 0.6, 0.6, "F");
+    }
+
+    function drawPhoneIcon(cx, cy) {
+        doc.setFillColor(178, 24, 24);
+        doc.circle(cx - 0.9, cy - 0.9, 1.4, "F");
+        doc.circle(cx + 0.9, cy + 0.9, 1.4, "F");
+        doc.setDrawColor(178, 24, 24);
+        doc.setLineWidth(1.1);
+        doc.line(cx - 0.6, cy - 0.6, cx + 0.6, cy + 0.6);
+    }
+
+    function drawGlobeIcon(cx, cy) {
+        doc.setDrawColor(30, 60, 150);
+        doc.setLineWidth(0.35);
+        doc.circle(cx, cy, 1.8, "S");
+        doc.ellipse(cx, cy, 0.8, 1.8, "S");
+        doc.line(cx - 1.8, cy, cx + 1.8, cy);
+    }
+
+    // ============================
+    // ADDRESS LINE (CENTERED)
+    // ============================
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(20, 20, 20);
+
+    const addressText = "20 Futa Road, Mohalla Garhi Nai Aabadi Pilkhuwa Hapur, U.P - 245304";
+    const addrTextWidth = doc.getTextWidth(addressText);
+    const addrIconX = titleCenterX - addrTextWidth / 2 - 4;
+
+    drawPinIcon(addrIconX, textY - 1);
+    doc.text(addressText, titleCenterX + 2, textY, { align: "center" });
+
+    textY += 5.5;
+
+    // ============================
+    // PHONE + WEBSITE LINE (CENTERED, SIDE BY SIDE)
+    // ============================
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+
+    const phoneText = "Mobile :- +91 87917-64372 | 92596-95556";
+    const websiteText = "sunshinejuniorhighschool.com";
+    const gap = 8;
+
+    const phoneWidth = doc.getTextWidth(phoneText);
+    const websiteWidth = doc.getTextWidth(websiteText);
+    const totalLineWidth = phoneWidth + gap + websiteWidth + 10;
+
+    let lineX = titleCenterX - totalLineWidth / 2;
+
+    drawPhoneIcon(lineX, textY - 1);
+    doc.setTextColor(20, 20, 20);
+    doc.text(phoneText, lineX + 4, textY);
+    lineX += 4 + phoneWidth + 4;
+
+    doc.setDrawColor(150, 150, 150);
+    doc.setLineWidth(0.3);
+    doc.line(lineX, textY - 2.5, lineX, textY + 0.8);
+    lineX += gap - 4;
+
+    drawGlobeIcon(lineX, textY - 1);
+    doc.setTextColor(30, 60, 150);
+    doc.text(websiteText, lineX + 4, textY);
+
+    // ============================
+    // BOTTOM BORDER (RED LINE + BLACK BAR)
+    // ============================
+    textY += 4.5;
+
+    doc.setDrawColor(178, 24, 24);
+    doc.setLineWidth(0.6);
+    doc.line(marginLeft, textY, pageWidth - marginRight, textY);
+
+    textY += 2;
+    doc.setFillColor(20, 20, 20);
+    doc.rect(marginLeft, textY, contentWidth, 2.5, "F");
+
+    return textY + 2.5 + 4;
+}
+
+        // =====================================================
+        // FOOTER
+        // =====================================================
+        function drawFooter(pageNumber) {
+            const footerY = pageHeight - 6;
+            doc.setDrawColor(190, 190, 190);
+            doc.setLineWidth(0.3);
+            doc.line(marginLeft, pageHeight - 10, pageWidth - marginRight, pageHeight - 10);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(7);
+            doc.setTextColor(120, 120, 120);
+            doc.text("Sun Shine Junior High School", marginLeft, footerY);
+            doc.text(`Page ${pageNumber}`, pageWidth - marginRight, footerY, { align: "right" });
+        }
+
+        // =====================================================
+        // PAGE BREAK HELPER
+        // =====================================================
+        function ensureSpace(currentYRef, requiredHeight) {
+            if (currentYRef + requiredHeight > pageHeight - marginBottom - 7) {
+                doc.addPage();
+                const pageNumber = doc.internal.getNumberOfPages();
+                drawHeader();
+                drawFooter(pageNumber);
+                return 37;
+            }
+            return currentYRef;
+        }
+
+        // =====================================================
+        // PAGE 1
+        // =====================================================
+        let currentY = drawHeader() + 4;
+
+        // MAIN TITLE
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10.5);
+        doc.setTextColor(30, 45, 60);
+        doc.text("ASSESSMENT SHEET FOR ACADEMIC SESSION 2026-27", pageWidth / 2, currentY, { align: "center" });
+        currentY += 4;
+
+        // SUBTITLE
+        doc.setFont("helvetica", "italic");
+        doc.setFontSize(7.5);
+        doc.setTextColor(70, 70, 70);
+        doc.text('"Empowering Young Minds for a Brighter Future"', pageWidth / 2, currentY, { align: "center" });
+        currentY += 4;
+
+        // STUDENT PROFILE TITLE
+        doc.setFillColor(240, 230, 211);
+        doc.setDrawColor(30, 42, 58);
+        doc.setLineWidth(0.5);
+        doc.rect(marginLeft, currentY, contentWidth, 6, "FD");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(30, 42, 58);
+        doc.text("STUDENT PROFILE", pageWidth / 2, currentY + 4.1, { align: "center" });
+        currentY += 6;
+
+        // STUDENT DETAILS TABLE
+        doc.autoTable({
+            startY: currentY,
+            margin: { left: marginLeft, right: marginRight },
+            theme: "grid",
+            body: [
+                ["Roll No.", safeValue(student.rollNumber || student.studentId), "Student Name", safeValue(student.studentName)],
+                ["Class", safeValue(student.className), "Session", "2026-27"],
+                ["Father Name", safeValue(student.fatherName), "Mother Name", safeValue(student.motherName)],
+                ["D.O.B", pdfFormatDate(student.dob), "Contact", safeValue(student.phone || student.mobile)]
+            ],
+            styles: {
+                font: "helvetica",
+                fontSize: 7.8,
+                fontStyle: "bold",
+                textColor: [35, 35, 35],
+                cellPadding: 1.25,
+                valign: "middle"
+            },
+            columnStyles: {
+                0: { cellWidth: 22, fillColor: [248, 244, 238] },
+                1: { cellWidth: 55 },
+                2: { cellWidth: 22, fillColor: [248, 244, 238] },
+                3: { cellWidth: contentWidth - 22 - 55 - 22 }
+            }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 2;
+
+        // ACADEMIC PERFORMANCE TITLE
+        doc.setFillColor(240, 230, 211);
+        doc.setDrawColor(30, 42, 58);
+        doc.rect(marginLeft, currentY, contentWidth, 6, "FD");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.setTextColor(30, 42, 58);
+        doc.text("ACADEMIC PERFORMANCE REPORT", pageWidth / 2, currentY + 4.1, { align: "center" });
+        currentY += 6;
+
+        // ACADEMIC TABLE HEADERS
+        const academicHeadTop = [{ content: "Subject", rowSpan: 2 }];
+        const academicHeadBottom = [];
+
+        examOrder.forEach(examName => {
+            academicHeadTop.push({ content: examName, colSpan: 2 });
+            academicHeadBottom.push("M.M", "M.O");
+
+            if (isHalfYearly(examName)) {
+                academicHeadTop.push({ content: "Term 1 Total", colSpan: 2 });
+                academicHeadBottom.push("M.M", "M.O");
+            }
             if (isAnnual(examName)) {
-                pdfHTML += `
-                    <td
-                        style="
-                            padding:4px 2px;
-                            border:1px solid #1a2a3a;
-                            text-align:center;
-                            background:rgba(252,243,230,0.92);
-                            font-weight:800;
-                        "
-                    >
-                        ${totals.term2.max}
-                    </td>
-
-                    <td
-                        style="
-                            padding:4px 2px;
-                            border:1px solid #1a2a3a;
-                            text-align:center;
-                            background:rgba(252,243,230,0.92);
-                            font-weight:800;
-                        "
-                    >
-                        ${totals.term2.obtained}
-                    </td>
-
-                    <td
-                        style="
-                            padding:4px 2px;
-                            border:1px solid #1a2a3a;
-                            text-align:center;
-                            background:rgba(234,244,234,0.92);
-                            font-weight:900;
-                        "
-                    >
-                        ${totals.final.max}
-                    </td>
-
-                    <td
-                        style="
-                            padding:4px 2px;
-                            border:1px solid #1a2a3a;
-                            text-align:center;
-                            background:rgba(234,244,234,0.92);
-                            font-weight:900;
-                        "
-                    >
-                        ${totals.final.obtained}
-                    </td>
-                `;
+                academicHeadTop.push({ content: "Term 2 Total", colSpan: 2 });
+                academicHeadBottom.push("M.M", "M.O");
+                academicHeadTop.push({ content: "Grand Total", colSpan: 2 });
+                academicHeadBottom.push("M.M", "M.O");
             }
         });
 
         if (halfYearlyIndex < 0) {
-            pdfHTML += `
-                <td
-                    style="
-                        padding:4px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        background:rgba(252,243,230,0.92);
-                        font-weight:800;
-                    "
-                >
-                    ${totals.term1.max}
-                </td>
-
-                <td
-                    style="
-                        padding:4px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        background:rgba(252,243,230,0.92);
-                        font-weight:800;
-                    "
-                >
-                    ${totals.term1.obtained}
-                </td>
-            `;
+            academicHeadTop.push({ content: "Term 1 Total", colSpan: 2 });
+            academicHeadBottom.push("M.M", "M.O");
         }
-
         if (annualIndex < 0) {
-            pdfHTML += `
-                <td
-                    style="
-                        padding:4px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        background:rgba(252,243,230,0.92);
-                        font-weight:800;
-                    "
-                >
-                    ${totals.term2.max}
-                </td>
-
-                <td
-                    style="
-                        padding:4px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        background:rgba(252,243,230,0.92);
-                        font-weight:800;
-                    "
-                >
-                    ${totals.term2.obtained}
-                </td>
-
-                <td
-                    style="
-                        padding:4px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        background:rgba(234,244,234,0.92);
-                        font-weight:900;
-                    "
-                >
-                    ${totals.final.max}
-                </td>
-
-                <td
-                    style="
-                        padding:4px 2px;
-                        border:1px solid #1a2a3a;
-                        text-align:center;
-                        background:rgba(234,244,234,0.92);
-                        font-weight:900;
-                    "
-                >
-                    ${totals.final.obtained}
-                </td>
-            `;
+            academicHeadTop.push({ content: "Term 2 Total", colSpan: 2 });
+            academicHeadBottom.push("M.M", "M.O");
+            academicHeadTop.push({ content: "Grand Total", colSpan: 2 });
+            academicHeadBottom.push("M.M", "M.O");
         }
 
-        pdfHTML += `
-            </tr>
-        `;
-    });
-
-    pdfHTML += `
-                    </tbody>
-                </table>
-
-                <!-- FINAL RESULT SUMMARY -->
-                <div
-                    style="
-                        margin-top:12px;
-                        border:2px solid #1a2a3a;
-                        background:rgba(255,255,255,0.86);
-                        font-weight:700;
-                    "
-                >
-
-                    <div
-                        style="
-                            text-align:center;
-                            background:rgba(240,230,211,0.94);
-                            padding:7px;
-                            font-size:13px;
-                            font-weight:900;
-                            border-bottom:1px solid #1a2a3a;
-                        "
-                    >
-                        📊 FINAL RESULT SUMMARY
-                    </div>
-
-                    <table
-                        style="
-                            width:100%;
-                            border-collapse:collapse;
-                            font-size:11px;
-                            font-weight:700;
-                        "
-                    >
-
-                        <tr>
-
-                            <td
-                                style="
-                                    width:25%;
-                                    padding:8px;
-                                    border:1px solid #1a2a3a;
-                                    background:rgba(248,244,238,0.90);
-                                    font-weight:800;
-                                    text-align:center;
-                                "
-                            >
-                                Total Marks
-                            </td>
-
-                            <td
-                                style="
-                                    width:25%;
-                                    padding:8px;
-                                    border:1px solid #1a2a3a;
-                                    font-weight:900;
-                                    text-align:center;
-                                "
-                            >
-                                ${totalMarks}
-                            </td>
-
-                            <td
-                                style="
-                                    width:25%;
-                                    padding:8px;
-                                    border:1px solid #1a2a3a;
-                                    background:rgba(248,244,238,0.90);
-                                    font-weight:800;
-                                    text-align:center;
-                                "
-                            >
-                                Total Marks Obtained
-                            </td>
-
-                            <td
-                                style="
-                                    width:25%;
-                                    padding:8px;
-                                    border:1px solid #1a2a3a;
-                                    font-weight:900;
-                                    text-align:center;
-                                "
-                            >
-                                ${totalMarksObtained}
-                            </td>
-
-                        </tr>
-
-                        <tr>
-
-                            <td
-                                style="
-                                    padding:8px;
-                                    border:1px solid #1a2a3a;
-                                    background:rgba(248,244,238,0.90);
-                                    font-weight:800;
-                                    text-align:center;
-                                "
-                            >
-                                Percentage
-                            </td>
-
-                            <td
-                                style="
-                                    padding:8px;
-                                    border:1px solid #1a2a3a;
-                                    font-weight:900;
-                                    text-align:center;
-                                "
-                            >
-                                ${overallPercentage.toFixed(2)}%
-                            </td>
-
-                            <td
-                                style="
-                                    padding:8px;
-                                    border:1px solid #1a2a3a;
-                                    background:rgba(248,244,238,0.90);
-                                    font-weight:800;
-                                    text-align:center;
-                                "
-                            >
-                                Grade
-                            </td>
-
-                            <td
-                                style="
-                                    padding:8px;
-                                    border:1px solid #1a2a3a;
-                                    font-size:15px;
-                                    font-weight:900;
-                                    text-align:center;
-                                "
-                            >
-                                ${grade}
-                            </td>
-
-                        </tr>
-
-                        <tr>
-
-                            <td
-                                style="
-                                    padding:8px;
-                                    border:1px solid #1a2a3a;
-                                    background:rgba(248,244,238,0.90);
-                                    font-weight:800;
-                                    text-align:center;
-                                "
-                            >
-                                Performance
-                            </td>
-
-                            <td
-                                style="
-                                    padding:8px;
-                                    border:1px solid #1a2a3a;
-                                    font-weight:800;
-                                    text-align:center;
-                                "
-                            >
-                                ${remark}
-                            </td>
-
-                            <td
-                                style="
-                                    padding:8px;
-                                    border:1px solid #1a2a3a;
-                                    background:rgba(248,244,238,0.90);
-                                    font-weight:800;
-                                    text-align:center;
-                                "
-                            >
-                                Division
-                            </td>
-
-                            <td
-                                style="
-                                    padding:8px;
-                                    border:1px solid #1a2a3a;
-                                    font-weight:900;
-                                    text-align:center;
-                                "
-                            >
-                                ${overallDivision}
-                            </td>
-
-                        </tr>
-
-                    </table>
-
-                </div>
-
-                <!-- GRADE CHART -->
-                <div style="margin-top:12px;font-weight:700;">
-
-                    <div
-                        style="
-                            background:rgba(240,230,211,0.94);
-                            border:2px solid #1a2a3a;
-                            border-bottom:none;
-                            text-align:center;
-                            font-weight:800;
-                            padding:6px;
-                            font-size:12px;
-                        "
-                    >
-                        📊 GRADE CHART
-                    </div>
-
-                    <table
-                        style="
-                            width:100%;
-                            border-collapse:collapse;
-                            border:2px solid #1a2a3a;
-                            font-size:10px;
-                            font-weight:700;
-                            background:rgba(255,255,255,0.84);
-                        "
-                    >
-
-                        <thead>
-
-                            <tr
-                                style="
-                                    background:rgba(232,221,208,0.94);
-                                    font-weight:800;
-                                "
-                            >
-                                <th style="padding:4px;border:1px solid #1a2a3a;font-weight:800;">
-                                    Percentage
-                                </th>
-
-                                <th style="padding:4px;border:1px solid #1a2a3a;font-weight:800;">
-                                    Grade
-                                </th>
-
-                                <th style="padding:4px;border:1px solid #1a2a3a;font-weight:800;">
-                                    Remark
-                                </th>
-
-                                <th style="padding:4px;border:1px solid #1a2a3a;font-weight:800;">
-                                    Student's Percentage
-                                </th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            <tr>
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;font-weight:700;">
-                                    90% – 100%
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;text-align:center;font-weight:800;">
-                                    A+
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;font-weight:700;">
-                                    Outstanding
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;text-align:center;font-weight:800;">
-                                    ${
-                                        grade === "A+"
-                                            ? "✓ " +
-                                              overallPercentage.toFixed(2) +
-                                              "%"
-                                            : ""
-                                    }
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;font-weight:700;">
-                                    80% – 89%
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;text-align:center;font-weight:800;">
-                                    A
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;font-weight:700;">
-                                    Excellent
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;text-align:center;font-weight:800;">
-                                    ${
-                                        grade === "A"
-                                            ? "✓ " +
-                                              overallPercentage.toFixed(2) +
-                                              "%"
-                                            : ""
-                                    }
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;font-weight:700;">
-                                    70% – 79%
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;text-align:center;font-weight:800;">
-                                    B
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;font-weight:700;">
-                                    Very Good
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;text-align:center;font-weight:800;">
-                                    ${
-                                        grade === "B"
-                                            ? "✓ " +
-                                              overallPercentage.toFixed(2) +
-                                              "%"
-                                            : ""
-                                    }
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;font-weight:700;">
-                                    60% – 69%
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;text-align:center;font-weight:800;">
-                                    C
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;font-weight:700;">
-                                    Good
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;text-align:center;font-weight:800;">
-                                    ${
-                                        grade === "C"
-                                            ? "✓ " +
-                                              overallPercentage.toFixed(2) +
-                                              "%"
-                                            : ""
-                                    }
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;font-weight:700;">
-                                    50% – 59%
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;text-align:center;font-weight:800;">
-                                    D
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;font-weight:700;">
-                                    Average
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;text-align:center;font-weight:800;">
-                                    ${
-                                        grade === "D"
-                                            ? "✓ " +
-                                              overallPercentage.toFixed(2) +
-                                              "%"
-                                            : ""
-                                    }
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;font-weight:700;">
-                                    40% – 49%
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;text-align:center;font-weight:800;">
-                                    E
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;font-weight:700;">
-                                    Pass
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;text-align:center;font-weight:800;">
-                                    ${
-                                        grade === "E"
-                                            ? "✓ " +
-                                              overallPercentage.toFixed(2) +
-                                              "%"
-                                            : ""
-                                    }
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;font-weight:700;">
-                                    Below 40%
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;text-align:center;font-weight:800;">
-                                    F
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;font-weight:700;">
-                                    Fail
-                                </td>
-
-                                <td style="padding:3px 6px;border:1px solid #1a2a3a;text-align:center;font-weight:800;">
-                                    ${
-                                        grade === "F"
-                                            ? "✓ " +
-                                              overallPercentage.toFixed(2) +
-                                              "%"
-                                            : ""
-                                    }
-                                </td>
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-                <!-- STAMPS + CLASS TEACHER SIGNATURE -->
-                <div
-                    style="
-                        margin-top:12px;
-                        display:grid;
-                        grid-template-columns:1fr 1fr 1fr;
-                        gap:18px;
-                        border-top:2px solid #9b6500;
-                        padding-top:12px;
-                        page-break-inside:avoid;
-                        break-inside:avoid;
-                        background:rgba(255,255,255,0.45);
-                        font-weight:700;
-                    "
-                >
-
-                    <!-- LEFT STAMP -->
-                    <div
-                        style="
-                            text-align:center;
-                            min-height:120px;
-                            display:flex;
-                            flex-direction:column;
-                            align-items:center;
-                            justify-content:flex-end;
-                            font-weight:700;
-                        "
-                    >
-
-                        <img
-                            src="./images/stamp2.png"
-                            alt="Official Stamp 1"
-                            style="
-                                width:95px;
-                                height:95px;
-                                object-fit:contain;
-                                display:block;
-                                margin-bottom:4px;
-                            "
-                            onerror="this.style.display='none'"
-                        >
-
-                        <div
-                            style="
-                                font-size:10px;
-                                color:#333;
-                                font-weight:700;
-                                margin-top:2px;
-                            "
-                        >
-                            Authorized Signature / Stamp
-                        </div>
-
-                    </div>
-
-                    <!-- CLASS TEACHER SIGNATURE -->
-                    <div
-                        style="
-                            text-align:center;
-                            min-height:120px;
-                            display:flex;
-                            flex-direction:column;
-                            align-items:center;
-                            justify-content:flex-end;
-                            padding-bottom:2px;
-                            font-weight:700;
-                        "
-                    >
-
-                        <div
-                            style="
-                                width:170px;
-                                border-bottom:1.5px solid #222;
-                                height:48px;
-                                margin-bottom:6px;
-                            "
-                        ></div>
-
-                        <div
-                            style="
-                                font-size:10px;
-                                color:#333;
-                                font-weight:700;
-                                line-height:1.3;
-                            "
-                        >
-                            Class Teacher Signature
-                        </div>
-
-                    </div>
-
-                    <!-- RIGHT STAMP -->
-                    <div
-                        style="
-                            text-align:center;
-                            min-height:120px;
-                            display:flex;
-                            flex-direction:column;
-                            align-items:center;
-                            justify-content:flex-end;
-                            font-weight:700;
-                        "
-                    >
-
-                        <img
-                            src="./images/stamp1.png"
-                            alt="Official Stamp 2"
-                            style="
-                                width:95px;
-                                height:95px;
-                                object-fit:contain;
-                                display:block;
-                                margin-bottom:4px;
-                            "
-                            onerror="this.style.display='none'"
-                        >
-
-                        <div
-                            style="
-                                font-size:10px;
-                                color:#333;
-                                font-weight:700;
-                                margin-top:2px;
-                            "
-                        >
-                            Principal / School Stamp
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- FOOTER -->
-                <div
-                    style="
-                        text-align:center;
-                        font-size:9px;
-                        color:#555;
-                        font-weight:700;
-                        margin-top:12px;
-                        padding-top:8px;
-                        border-top:2px solid #c9a227;
-                        display:flex;
-                        justify-content:space-between;
-                        align-items:center;
-                        flex-wrap:wrap;
-                        background:rgba(255,255,255,0.60);
-                    "
-                >
-
-                    <span>
-                        ✨ "Education is the most powerful weapon."
-                    </span>
-
-                    <span>
-                        📅 Generated on ${new Date().toLocaleString()}
-                    </span>
-
-                    <span>
-                        🏫 Sun Shine Junior High School
-                    </span>
-
-                </div>
-
-                <div
-                    style="
-                        text-align:center;
-                        font-size:7px;
-                        color:#555;
-                        font-weight:700;
-                        margin-top:4px;
-                        letter-spacing:2px;
-                    "
-                >
-                    · VERIFIED · AUTHENTIC · OFFICIAL DOCUMENT ·
-                </div>
-
-            </div>
-        </div>
-    `;
-
-    // =========================================================
-    // FORCE ALL 600 WEIGHTS TO 700
-    // =========================================================
-    // This makes sure no previously defined 600-weight text
-    // remains lighter than the rest of the PDF.
-    pdfHTML = pdfHTML.replace(
-        /font-weight:\s*600/g,
-        "font-weight:700"
-    );
-
-    // =========================================================
-    // CREATE PDF CAPTURE AREA
-    // =========================================================
-    const overlay = document.createElement("div");
-
-    overlay.id = "pdfCaptureOverlay";
-
-    overlay.style.position = "fixed";
-    overlay.style.left = "0";
-    overlay.style.top = "0";
-    overlay.style.width = "100%";
-    overlay.style.height = "100%";
-    overlay.style.background = "#ffffff";
-    overlay.style.zIndex = "99999";
-    overlay.style.display = "flex";
-    overlay.style.justifyContent = "center";
-    overlay.style.alignItems = "flex-start";
-    overlay.style.overflow = "auto";
-    overlay.style.padding = "20px 0";
-    overlay.style.boxSizing = "border-box";
-
-    const tempContainer = document.createElement("div");
-
-    tempContainer.innerHTML = pdfHTML;
-
-    tempContainer.style.width = "1000px";
-    tempContainer.style.minWidth = "1000px";
-    tempContainer.style.fontWeight = "700";
-
-    overlay.appendChild(tempContainer);
-
-    document.body.appendChild(overlay);
-
-    // =========================================================
-    // WAIT FOR IMAGES
-    // =========================================================
-    function waitForImages(container) {
-        const images = Array.from(
-            container.querySelectorAll("img")
-        );
-
-        return Promise.all(
-            images.map(img => {
-                if (img.complete && img.naturalWidth > 0) {
-                    return Promise.resolve();
+        // ACADEMIC BODY
+        const academicBody = [];
+        subjects.forEach(subjectKey => {
+            const subjectData = subjectMap[subjectKey];
+            const totals = subjectFinalTotals[subjectKey];
+            const row = [subjectData.displayName];
+
+            examOrder.forEach(examName => {
+                const examKey = normalizeExamName(examName);
+                const mark = subjectData.exams && subjectData.exams[examKey] ? subjectData.exams[examKey] : null;
+
+                row.push(mark ? mark.max : "-", mark ? mark.obtained : "-");
+
+                if (isHalfYearly(examName)) {
+                    row.push(totals.term1.max, totals.term1.obtained);
                 }
+                if (isAnnual(examName)) {
+                    row.push(totals.term2.max, totals.term2.obtained, totals.final.max, totals.final.obtained);
+                }
+            });
 
-                return new Promise(resolve => {
-                    const done = () => resolve();
+            if (halfYearlyIndex < 0) {
+                row.push(totals.term1.max, totals.term1.obtained);
+            }
+            if (annualIndex < 0) {
+                row.push(totals.term2.max, totals.term2.obtained, totals.final.max, totals.final.obtained);
+            }
 
-                    img.addEventListener(
-                        "load",
-                        done,
-                        { once: true }
-                    );
+            academicBody.push(row);
+        });
 
-                    img.addEventListener(
-                        "error",
-                        done,
-                        { once: true }
-                    );
-                });
-            })
-        );
-    }
+        // ACADEMIC COLUMN WIDTHS
+        const totalColumns = academicBody.length > 0 ? academicBody[0].length : 1;
+        const subjectWidth = 27;
+        const smallWidth = (contentWidth - subjectWidth) / Math.max(totalColumns - 1, 1);
 
-    // =========================================================
-    // PDF BUTTON
-    // =========================================================
-    const pdfBtn = document.querySelector(".pdf-btn");
-
-    const originalText = pdfBtn
-        ? pdfBtn.textContent
-        : "📄 Download PDF";
-
-    if (pdfBtn) {
-        pdfBtn.textContent = "⏳ Generating PDF...";
-        pdfBtn.disabled = true;
-    }
-
-    // =========================================================
-    // CLEANUP
-    // =========================================================
-    function cleanup() {
-        if (overlay.parentNode) {
-            document.body.removeChild(overlay);
+        const academicColumnStyles = {
+            0: { cellWidth: subjectWidth, halign: "left", fontStyle: "bold" }
+        };
+        for (let i = 1; i < totalColumns; i++) {
+            academicColumnStyles[i] = { cellWidth: Math.max(5.2, smallWidth), halign: "center" };
         }
+
+        // ACADEMIC TABLE
+        doc.autoTable({
+            startY: currentY,
+            margin: { left: marginLeft, right: marginRight, top: 40, bottom: 11 },
+            head: [academicHeadTop, academicHeadBottom],
+            body: academicBody,
+            theme: "grid",
+            styles: {
+                font: "helvetica",
+                fontSize: totalColumns > 14 ? 5.7 : totalColumns > 10 ? 6.3 : 7.2,
+                fontStyle: "bold",
+                textColor: [30, 30, 30],
+                cellPadding: totalColumns > 14 ? 1.35 : 1.7,
+                valign: "middle",
+                halign: "center",
+                lineColor: [30, 42, 58],
+                lineWidth: 0.25
+            },
+            headStyles: {
+                fillColor: [232, 221, 208],
+                textColor: [20, 30, 40],
+                fontStyle: "bold",
+                halign: "center",
+                valign: "middle",
+                lineColor: [30, 42, 58],
+                lineWidth: 0.3
+            },
+            alternateRowStyles: { fillColor: [252, 250, 247] },
+            columnStyles: academicColumnStyles,
+            didParseCell: function (data) {
+                if (data.section === "body" && data.column.index === 0) {
+                    data.cell.styles.fillColor = [252, 250, 247];
+                }
+            },
+            didDrawPage: function () {
+                const pageNumber = doc.internal.getNumberOfPages();
+                drawHeader();
+                drawFooter(pageNumber);
+            }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 2;
+
+        // FINAL RESULT SUMMARY
+        currentY = ensureSpace(currentY, 30);
+        doc.setFillColor(240, 230, 211);
+        doc.setDrawColor(30, 42, 58);
+        doc.rect(marginLeft, currentY, contentWidth, 6, "FD");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.setTextColor(30, 42, 58);
+        doc.text("FINAL RESULT SUMMARY", pageWidth / 2, currentY + 4.1, { align: "center" });
+        currentY += 6;
+
+        doc.autoTable({
+            startY: currentY,
+            margin: { left: marginLeft, right: marginRight },
+            theme: "grid",
+            body: [
+                ["Total Marks", totalMarks, "Total Marks Obtained", totalMarksObtained],
+                ["Percentage", `${overallPercentage.toFixed(2)}%`, "Grade", grade],
+                ["Performance", remark, "Division", overallDivision]
+            ],
+            styles: {
+                font: "helvetica",
+                fontSize: 8.5,
+                fontStyle: "bold",
+                textColor: [30, 30, 30],
+                cellPadding: 1.6,
+                halign: "center",
+                valign: "middle"
+            },
+            columnStyles: {
+                0: { fillColor: [248, 244, 238], cellWidth: contentWidth * 0.21 },
+                1: { cellWidth: contentWidth * 0.29 },
+                2: { fillColor: [248, 244, 238], cellWidth: contentWidth * 0.21 },
+                3: { cellWidth: contentWidth * 0.29 }
+            }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 2;
+
+        // GRADE CHART
+        currentY = ensureSpace(currentY, 48);
+        doc.setFillColor(240, 230, 211);
+        doc.setDrawColor(30, 42, 58);
+        doc.rect(marginLeft, currentY, contentWidth, 5.5, "FD");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8.5);
+        doc.setTextColor(30, 42, 58);
+        doc.text("GRADE CHART", pageWidth / 2, currentY + 3.8, { align: "center" });
+        currentY += 5.5;
+
+        const gradeRows = [
+            ["90% – 100%", "A+", "Outstanding", grade === "A+" ? `${overallPercentage.toFixed(2)}%` : ""],
+            ["80% – 89%", "A", "Excellent", grade === "A" ? `${overallPercentage.toFixed(2)}%` : ""],
+            ["70% – 79%", "B", "Very Good", grade === "B" ? `${overallPercentage.toFixed(2)}%` : ""],
+            ["60% – 69%", "C", "Good", grade === "C" ? `${overallPercentage.toFixed(2)}%` : ""],
+            ["50% – 59%", "D", "Average", grade === "D" ? `${overallPercentage.toFixed(2)}%` : ""],
+            ["40% – 49%", "E", "Pass", grade === "E" ? `${overallPercentage.toFixed(2)}%` : ""],
+            ["Below 40%", "F", "Fail", grade === "F" ? `${overallPercentage.toFixed(2)}%` : ""]
+        ];
+
+        doc.autoTable({
+            startY: currentY,
+            margin: { left: marginLeft, right: marginRight },
+            theme: "grid",
+            head: [["Percentage", "Grade", "Remark", "Student's Percentage"]],
+            body: gradeRows,
+            styles: {
+                font: "helvetica",
+                fontSize: 7,
+                fontStyle: "bold",
+                cellPadding: 1.05,
+                halign: "center",
+                valign: "middle",
+                textColor: [40, 40, 40]
+            },
+            headStyles: {
+                fillColor: [232, 221, 208],
+                textColor: [20, 30, 40],
+                fontStyle: "bold",
+                cellPadding: 1.2
+            },
+            alternateRowStyles: { fillColor: [252, 250, 247] }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 2;
+
+        // SIGNATURE / STAMP SECTION
+        currentY = ensureSpace(currentY, 32);
+        doc.setDrawColor(180, 180, 180);
+        doc.setLineWidth(0.35);
+        doc.line(marginLeft, currentY, pageWidth - marginRight, currentY);
+        currentY += 3;
+
+        const stampWidth = 26;
+        const stampHeight = 20;
+        const leftStampX = marginLeft + 8;
+        const rightStampX = pageWidth - marginRight - stampWidth - 8;
+        const stampY = currentY;
+
+        if (leftStamp) {
+            doc.addImage(leftStamp, "PNG", leftStampX, stampY, stampWidth, stampHeight);
+        }
+        if (rightStamp) {
+            doc.addImage(rightStamp, "PNG", rightStampX, stampY, stampWidth, stampHeight);
+        }
+
+        const signatureLineY = stampY + stampHeight + 4;
+        doc.setDrawColor(50, 50, 50);
+        doc.setLineWidth(0.35);
+
+        doc.line(leftStampX - 4, signatureLineY, leftStampX + stampWidth + 4, signatureLineY);
+        const teacherCenter = pageWidth / 2;
+        doc.line(teacherCenter - 24, signatureLineY, teacherCenter + 24, signatureLineY);
+        doc.line(rightStampX - 4, signatureLineY, rightStampX + stampWidth + 4, signatureLineY);
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(7);
+        doc.setTextColor(45, 45, 45);
+        doc.text("Director Signature / Stamp", leftStampX + stampWidth / 2, signatureLineY + 4, { align: "center" });
+        doc.text("Class Teacher Signature", teacherCenter, signatureLineY + 4, { align: "center" });
+        doc.text("Principal Signature / Stamp", rightStampX + stampWidth / 2, signatureLineY + 4, { align: "center" });
+
+        // FOOTER ON ALL PAGES
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let page = 1; page <= totalPages; page++) {
+            doc.setPage(page);
+            drawFooter(page);
+        }
+
+        // SAVE PDF
+        const studentName = cleanFileName(student.studentName || "Student");
+        const className = cleanFileName(student.className || "Class");
+        const fileName = `Result_${studentName}_${className}.pdf`;
+        doc.save(fileName);
 
         if (pdfBtn) {
-            pdfBtn.textContent = originalText;
             pdfBtn.disabled = false;
+            pdfBtn.textContent = originalButtonText || "📄 Download PDF";
+        }
+
+    } catch (error) {
+        console.error("Result PDF generation error:", error);
+        alert("Could not generate Result PDF.\n\n" + error.message);
+        if (pdfBtn) {
+            pdfBtn.disabled = false;
+            pdfBtn.textContent = originalButtonText || "📄 Download PDF";
         }
     }
-
-    // =========================================================
-    // GENERATE PDF
-    // =========================================================
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-
-            waitForImages(tempContainer)
-                .then(() => {
-
-                    return new Promise(resolve => {
-                        setTimeout(resolve, 300);
-                    });
-
-                })
-                .then(() => {
-
-                    const contentWidthPx = tempContainer.scrollWidth;
-                    const contentHeightPx = tempContainer.scrollHeight;
-
-                    html2pdf()
-                        .from(tempContainer)
-                        .set({
-
-                            margin: 0,
-
-                            filename:
-                                `Result_${student.studentName || "student"}_${student.className || "class"}.pdf`,
-
-                            image: {
-                                type: "jpeg",
-                                quality: 0.98
-                            },
-
-                            html2canvas: {
-
-                                scale: 2,
-
-                                useCORS: true,
-
-                                allowTaint: true,
-
-                                logging: false,
-
-                                backgroundColor: "#ffffff",
-
-                                scrollX: 0,
-
-                                scrollY: 0,
-
-                                x: 0,
-
-                                y: 0,
-
-                                windowWidth: 1000,
-
-                                windowHeight:
-                                    tempContainer.scrollHeight
-                            },
-
-                            jsPDF: {
-
-                                unit: "px",
-
-                                format: [
-                                    contentWidthPx,
-                                    contentHeightPx
-                                ],
-
-                                orientation:
-                                    contentWidthPx >= contentHeightPx
-                                        ? "landscape"
-                                        : "portrait",
-
-                                compress: true
-                            },
-
-                            pagebreak: {
-
-                                mode: [
-                                    "css",
-                                    "legacy"
-                                ],
-
-                                avoid: [
-                                    ".stamp-section",
-                                    "tr"
-                                ]
-
-                            }
-
-                        })
-
-                        .save()
-
-                        .then(() => {
-                            cleanup();
-                        })
-
-                        .catch(error => {
-
-                            console.error(
-                                "PDF generation error:",
-                                error
-                            );
-
-                            alert(
-                                "Could not generate PDF. Please try again."
-                            );
-
-                            cleanup();
-                        });
-
-                });
-
-        });
-    });
 }
-// ======================== EDIT MODAL ========================
-function openEditModal(examIndex) {
-    const exam = currentStudentResults[examIndex];
-    if (!exam) { alert("❌ Exam data not found!"); return; }
-    window.editingExam = exam;
-    document.getElementById("editModalTitle").innerHTML = `<i class="fas fa-edit"></i> Edit Marks — ${escapeHtml(exam.exam)}`;
+        // ======================== EDIT MODAL ========================
+        function openEditModal(examIndex) {
+            const exam = currentStudentResults[examIndex];
+            if (!exam) { alert("❌ Exam data not found!"); return; }
+            window.editingExam = exam;
+            document.getElementById("editModalTitle").innerHTML = `<i class="fas fa-edit"></i> Edit Marks — ${escapeHtml(exam.exam)}`;
 
-    // Pre-fill division dropdown (manual value if set, else a suggestion based on %)
-    const divisionSelect = document.getElementById("editDivision");
-    const currentDivision = exam.division || getSuggestedDivision(exam.percentage || 0);
-    divisionSelect.value = ["Ist Division", "IInd Division", "IIIrd Division", "Fail"].includes(currentDivision)
-        ? currentDivision
-        : "";
+            // Pre-fill division dropdown (manual value if set, else a suggestion based on %)
+            const divisionSelect = document.getElementById("editDivision");
+            const currentDivision = exam.division || getSuggestedDivision(exam.percentage || 0);
+            divisionSelect.value = ["Ist Division", "IInd Division", "IIIrd Division", "Fail"].includes(currentDivision)
+                ? currentDivision
+                : "";
 
-    const rowsContainer = document.getElementById("editRows");
-    const subjects = (exam.marks && exam.marks.length) ? exam.marks : [{ subjectName: "", maxMarks: 0, obtainedMarks: 0 }];
-    rowsContainer.innerHTML = subjects.map((mark, i) => `
+            const rowsContainer = document.getElementById("editRows");
+            const subjects = (exam.marks && exam.marks.length) ? exam.marks : [{ subjectName: "", maxMarks: 0, obtainedMarks: 0 }];
+            rowsContainer.innerHTML = subjects.map((mark, i) => `
         <div class="edit-row">
             <label><i class="fas fa-book" style="color:#f58a2e;margin-right:0.3rem;"></i> ${escapeHtml(mark.subjectName || "Subject " + (i + 1))}</label>
             <input type="number" min="0" id="editMax_${i}" value="${mark.maxMarks ?? 0}" placeholder="Max">
@@ -3671,84 +2413,85 @@ function openEditModal(examIndex) {
             <span style="font-size:0.7rem;color:#b09a7e;">${i + 1}</span>
         </div>
     `).join("");
-    window.editingExam._editSubjects = subjects.map(m => m.subjectName || "");
-    window.editingExam._examId = exam._id || exam.id;
-    document.getElementById("editModal").classList.add("show");
-}
-
-function closeEditModal() {
-    document.getElementById("editModal").classList.remove("show");
-    window.editingExam = null;
-}
-
-async function saveMarks() {
-    const exam = window.editingExam;
-    if (!exam) { alert("❌ No exam data found!"); return; }
-    const subjectNames = exam._editSubjects || [];
-    const marks = subjectNames.map((subjectName, i) => ({
-        subjectName: subjectName,
-        maxMarks: Number(document.getElementById(`editMax_${i}`).value) || 0,
-        obtainedMarks: Number(document.getElementById(`editObtained_${i}`).value) || 0
-    }));
-    const division = document.getElementById("editDivision").value || "";
-    const saveBtn = document.getElementById("saveMarksBtn");
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-    try {
-        const updateData = {
-            exam: exam.exam,
-            className: exam.className,
-            studentMongoId: exam.studentMongoId,
-            studentId: exam.studentId || "",
-            studentName: exam.studentName || "",
-            rollNumber: exam.rollNumber || "",
-            admissionNumber: exam.admissionNumber || "",
-            fatherName: exam.fatherName || "",
-            motherName: exam.motherName || "",
-            marks: marks,
-            division: division
-        };
-        const response = await fetch(`${API_URL}/${exam._examId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updateData)
-        });
-        const data = await response.json();
-        if (!data.success) {
-            alert("❌ " + (data.message || "Unable to update marks."));
-            return;
+            window.editingExam._editSubjects = subjects.map(m => m.subjectName || "");
+            window.editingExam._examId = exam._id || exam.id;
+            document.getElementById("editModal").classList.add("show");
         }
-        alert("✅ Marks & Division updated successfully!");
-        const studentMongoId = exam.studentMongoId;
-        closeEditModal();
-        await loadData(true);
-        setTimeout(() => showResult(studentMongoId), 100);
-    } catch (error) {
-        console.error("❌ Save error:", error);
-        alert("❌ Unable to update marks: " + error.message);
-    } finally {
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
-    }
-}
 
-// ======================== KEYBOARD ESC ========================
-document.addEventListener("keydown", function(e) {
-    if (e.key === "Escape") closeEditModal();
-});
+        function closeEditModal() {
+            document.getElementById("editModal").classList.remove("show");
+            window.editingExam = null;
+        }
 
-// ======================== ESCAPE HTML ========================
-function escapeHtml(value) {
-    return String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+        async function saveMarks() {
+            const exam = window.editingExam;
+            if (!exam) { alert("❌ No exam data found!"); return; }
+            const subjectNames = exam._editSubjects || [];
+            const marks = subjectNames.map((subjectName, i) => ({
+                subjectName: subjectName,
+                maxMarks: Number(document.getElementById(`editMax_${i}`).value) || 0,
+                obtainedMarks: Number(document.getElementById(`editObtained_${i}`).value) || 0
+            }));
+            const division = document.getElementById("editDivision").value || "";
+            const saveBtn = document.getElementById("saveMarksBtn");
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            try {
+                const updateData = {
+                    exam: exam.exam,
+                    className: exam.className,
+                    studentMongoId: exam.studentMongoId,
+                    studentId: exam.studentId || "",
+                    studentName: exam.studentName || "",
+                    rollNumber: exam.rollNumber || "",
+                    admissionNumber: exam.admissionNumber || "",
+                    fatherName: exam.fatherName || "",
+                    motherName: exam.motherName || "",
+                    marks: marks,
+                    division: division
+                };
+                const response = await fetch(`${API_URL}/${exam._examId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updateData)
+                });
+                const data = await response.json();
+                if (!data.success) {
+                    alert("❌ " + (data.message || "Unable to update marks."));
+                    return;
+                }
+                alert("✅ Marks & Division updated successfully!");
+                const studentMongoId = exam.studentMongoId;
+                closeEditModal();
+                await loadData(true);
+                setTimeout(() => showResult(studentMongoId), 100);
+            } catch (error) {
+                console.error("❌ Save error:", error);
+                alert("❌ Unable to update marks: " + error.message);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+            }
+        }
 
-// ======================== START ========================
-loadData();
-</script>
+        // ======================== KEYBOARD ESC ========================
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") closeEditModal();
+        });
+
+        // ======================== ESCAPE HTML ========================
+        function escapeHtml(value) {
+            return String(value || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // ======================== START ========================
+        loadData();
+    </script>
 </body>
+
 </html>

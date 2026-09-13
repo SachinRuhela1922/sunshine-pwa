@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sunshine · Teacher Panel</title>
+  <title>  · Teacher Panel</title>
   <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -494,31 +494,17 @@
     const container = document.getElementById('dynamicTeacherPanel');
 
     // ---- Helper: Get class page URL ----
-    function getClassPageUrl(className) {
-      if (!className) return '#';
+    // ---- Helper: Get class page URL ----
+// SAME URL SYSTEM AS admin.html
+function getClassPageUrl(className) {
+  if (!className) return '#';
 
-      // Handle special cases
-      const classMap = {
-        'Nursery': 'class-nursery.html',
-        'LKG': 'class-lkg.html',
-        'UKG': 'class-ukg.html'
-      };
+  const encodedName = encodeURIComponent(
+    String(className).trim()
+  );
 
-      // Check if it's a special case
-      if (classMap[className]) {
-        return classMap[className];
-      }
-
-      // For numeric classes (1-12)
-      const num = parseInt(className);
-      if (!isNaN(num) && num >= 1 && num <= 12) {
-        return `class-${num}.html`;
-      }
-
-      // Fallback: use as is
-      return `class-${className.toLowerCase()}.html`;
-    }
-
+  return `class.html?class=${encodedName}`;
+}
     // ---- Helper: Get display name for class ----
     function getClassDisplayName(className) {
       if (!className) return 'N/A';
@@ -538,6 +524,9 @@
         { label: 'Teacher ID', key: 'teacherId', icon: 'fa-id-badge' },
         { label: 'Employee ID', key: 'employeeId', icon: 'fa-user-tie' },
         { label: 'Name', key: 'name', icon: 'fa-user' },
+        { label: "Father's Name", key: 'fatherName', icon: 'fa-person' },
+        { label: "Department", key: 'department', icon: 'fa-building' },
+        { label: "Mother's Name", key: 'motherName', icon: 'fa-person-dress' },
         { label: 'Email', key: 'email', icon: 'fa-envelope' },
         { label: 'Phone', key: 'phone', icon: 'fa-phone' },
         { label: 'Gender', key: 'gender', icon: 'fa-venus-mars' },
@@ -633,6 +622,9 @@
       <span id="teacherId"></span>
       <span id="employeeId"></span>
       <span id="teacherName"></span>
+      <span id="teacherFatherName"></span>
+      <span id="teacherDepartment"></span>
+      <span id="teacherMotherName"></span>
       <span id="teacherEmail"></span>
       <span id="teacherPhone"></span>
       <span id="teacherGender"></span>
@@ -656,6 +648,9 @@
         document.getElementById("teacherId").textContent = teacherDataOrig.teacherId || "-";
         document.getElementById("employeeId").textContent = teacherDataOrig.employeeId || "-";
         document.getElementById("teacherName").textContent = teacherDataOrig.name || "-";
+        document.getElementById("teacherFatherName").textContent = teacherDataOrig.fatherName || "-";
+        document.getElementById("teacherDepartment").textContent = teacherDataOrig.department || "-";
+        document.getElementById("teacherMotherName").textContent = teacherDataOrig.motherName || "-";
         document.getElementById("teacherEmail").textContent = teacherDataOrig.email || "-";
         document.getElementById("teacherPhone").textContent = teacherDataOrig.phone || "-";
         document.getElementById("teacherGender").textContent = teacherDataOrig.gender || "-";
