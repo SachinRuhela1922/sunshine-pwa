@@ -747,7 +747,7 @@
     <input
       type="text"
       id="searchInput"
-      placeholder="Search by name, father, mother, admission no...">
+      placeholder="Search by name, roll no, father, mother, admission no...">
 
     <div class="search-divider"></div>
 
@@ -1132,6 +1132,14 @@ searchInput.addEventListener(
 
               student.studentName,
 
+              student.rollNumber,
+
+              student.rollNo,
+
+              student.academic?.rollNumber,
+
+              student.academic?.rollNo,
+
               student.father?.name,
 
               student.fatherName,
@@ -1254,6 +1262,8 @@ function renderTable(students) {
 
             <th>Student Name</th>
 
+            <th>Roll No</th>
+
             <th>Father Name</th>
 
             <th>Mother Name</th>
@@ -1308,6 +1318,14 @@ function renderTable(students) {
 
       const name =
         student.studentName || "-";
+
+
+      const rollNo =
+        student.rollNumber ||
+        student.rollNo ||
+        student.academic?.rollNumber ||
+        student.academic?.rollNo ||
+        "-";
 
 
       const fatherName =
@@ -1385,6 +1403,11 @@ function renderTable(students) {
 
             </span>
 
+          </td>
+
+
+          <td>
+            ${escapeHtml(rollNo)}
           </td>
 
 
@@ -1640,6 +1663,7 @@ exportPdfBtn.addEventListener("click", function () {
         return [
             index + 1,
             student.studentName || "-",
+            student.rollNumber || student.rollNo || student.academic?.rollNumber || student.academic?.rollNo || "-",
             student.father?.name || student.fatherName || "-",
             student.mother?.name || student.motherName || "-",
             formatDOB(student.dob),
@@ -1656,17 +1680,17 @@ exportPdfBtn.addEventListener("click", function () {
     }
 
     const headers = [[
-        "#", "Student", "Father", "Mother", "DOB", "Caste",
+        "#", "Student", "Roll No", "Father", "Mother", "DOB", "Caste",
         "S.R Number", "Mobile", "PEN No", "Aadhaar",
         "Category", "Father Occ.", "Admission No", "Address"
     ]];
 
     const columnStyles = {
-        0: { cellWidth: 18 }, 1: { cellWidth: 65 }, 2: { cellWidth: 65 },
-        3: { cellWidth: 65 }, 4: { cellWidth: 45 }, 5: { cellWidth: 52 },
-        6: { cellWidth: 55 }, 7: { cellWidth: 52 }, 8: { cellWidth: 45 },
-        9: { cellWidth: 58 }, 10: { cellWidth: 48 }, 11: { cellWidth: 55 },
-        12: { cellWidth: 55 }, 13: { cellWidth: 110 }
+        0: { cellWidth: 18 }, 1: { cellWidth: 65 }, 2: { cellWidth: 35 },
+        3: { cellWidth: 65 }, 4: { cellWidth: 65 }, 5: { cellWidth: 45 },
+        6: { cellWidth: 52 }, 7: { cellWidth: 55 }, 8: { cellWidth: 52 },
+        9: { cellWidth: 45 }, 10: { cellWidth: 58 }, 11: { cellWidth: 48 },
+        12: { cellWidth: 55 }, 13: { cellWidth: 55 }, 14: { cellWidth: 88 }
     };
 
     // Ab saare rows ek hi baar me — koi manual slicing nahi
