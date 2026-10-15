@@ -9,6 +9,10 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+    <!-- jsPDF + AutoTable (for Result PDF export) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -25,7 +29,7 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1500px;
             margin: auto;
         }
 
@@ -122,6 +126,17 @@
         .btn-success:hover {
             transform: scale(1.02);
             box-shadow: 0 6px 20px rgba(43, 122, 58, 0.3);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #2e6bf5, #6fa2f9);
+            color: white;
+            box-shadow: 0 4px 12px rgba(46, 107, 245, 0.2);
+        }
+
+        .btn-info:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(46, 107, 245, 0.3);
         }
 
         /* ===== CLASS BANNER ===== */
@@ -260,7 +275,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 3200px;
+            min-width: 1600px;
         }
 
         th {
@@ -293,6 +308,11 @@
             color: #2d1f0c;
         }
 
+        td.address-cell {
+            white-space: normal;
+            max-width: 220px;
+        }
+
         tr:hover td {
             background: #fcfaf7;
         }
@@ -302,11 +322,9 @@
             gap: 0.4rem;
         }
 
-        .btn-edit {
-            background: #fff3e0;
-            color: #e67e22;
+        .btn-edit, .btn-delete, .btn-result {
             border: none;
-            padding: 0.25rem 0.8rem;
+            padding: 0.25rem 0.7rem;
             border-radius: 30px;
             font-weight: 600;
             font-size: 0.7rem;
@@ -315,6 +333,11 @@
             display: inline-flex;
             align-items: center;
             gap: 0.3rem;
+        }
+
+        .btn-edit {
+            background: #fff3e0;
+            color: #e67e22;
         }
 
         .btn-edit:hover {
@@ -323,23 +346,9 @@
             transform: scale(1.05);
         }
 
-        .btn-edit i {
-            font-size: 0.65rem;
-        }
-
         .btn-delete {
             background: #fce4e0;
             color: #b53b2e;
-            border: none;
-            padding: 0.25rem 0.8rem;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
         }
 
         .btn-delete:hover {
@@ -348,8 +357,15 @@
             transform: scale(1.05);
         }
 
-        .btn-delete i {
-            font-size: 0.65rem;
+        .btn-result {
+            background: #e5f0ff;
+            color: #2e6bf5;
+        }
+
+        .btn-result:hover {
+            background: #2e6bf5;
+            color: white;
+            transform: scale(1.05);
         }
 
         .empty {
@@ -402,7 +418,7 @@
         .modal-box {
             background: white;
             width: 100%;
-            max-width: 1000px;
+            max-width: 1100px;
             max-height: 90vh;
             overflow-y: auto;
             border-radius: 28px;
@@ -474,9 +490,16 @@
             margin-bottom: 0.8rem;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 0.5rem;
             padding-bottom: 0.4rem;
             border-bottom: 2px solid #fcf3e8;
+        }
+
+        .form-section .section-title span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .form-section .section-title i {
@@ -550,10 +573,6 @@
             font-weight: 400;
         }
 
-        .field select option {
-            padding: 0.3rem;
-        }
-
         .btn-submit {
             width: 100%;
             background: linear-gradient(135deg, #2b7a3a, #3a9e4a);
@@ -585,9 +604,91 @@
             box-shadow: none;
         }
 
-        .btn-submit:disabled:hover {
-            transform: none;
-            box-shadow: none;
+        /* ===== MARKS TABLE (subject-wise, per term) ===== */
+        .btn-add-subject {
+            background: #fcf3e8;
+            color: #f58a2e;
+            border: 1px dashed #f5b878;
+            padding: 0.25rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.72rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .btn-add-subject:hover {
+            background: #f58a2e;
+            color: white;
+        }
+
+        .marks-table-wrapper {
+            overflow-x: auto;
+            border: 1px solid #f0e2d2;
+            border-radius: 14px;
+        }
+
+        table.marks-table {
+            width: 100%;
+            min-width: 980px;
+            border-collapse: collapse;
+        }
+
+        table.marks-table th {
+            position: static;
+            background: #fcf3e8;
+            font-size: 0.65rem;
+            padding: 0.5rem 0.5rem;
+            border-bottom: 2px solid #f0e2d2;
+        }
+
+        table.marks-table td {
+            padding: 0.35rem 0.4rem;
+            white-space: nowrap;
+        }
+
+        table.marks-table td input {
+            width: 100%;
+            padding: 0.35rem 0.5rem;
+            border: 1.5px solid #f0e2d2;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            background: #fcfaf7;
+        }
+
+        table.marks-table td input.subject-input {
+            min-width: 130px;
+            font-weight: 600;
+        }
+
+        table.marks-table td input.mark-input {
+            width: 55px;
+            text-align: center;
+        }
+
+        .btn-remove-subject {
+            background: #fce4e0;
+            color: #b53b2e;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .btn-remove-subject:hover {
+            background: #b53b2e;
+            color: white;
+        }
+
+        .no-subjects-hint {
+            padding: 1rem;
+            text-align: center;
+            color: #b09a7e;
+            font-size: 0.8rem;
         }
 
         /* ===== FOOTER ===== */
@@ -608,17 +709,13 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 820px) {
-            body {
-                padding: 1rem;
-            }
+            body { padding: 1rem; }
             .page-header {
                 padding: 1rem 1.2rem;
                 flex-direction: column;
                 align-items: flex-start;
             }
-            .page-header h1 {
-                font-size: 1.2rem;
-            }
+            .page-header h1 { font-size: 1.2rem; }
             .class-banner {
                 padding: 1rem 1.2rem;
                 flex-direction: column;
@@ -628,29 +725,14 @@
                 flex-direction: column;
                 text-align: center;
             }
-            .class-banner .class-icon {
-                width: 44px;
-                height: 44px;
-                font-size: 1.3rem;
-            }
-            .class-banner .class-details h2 {
-                font-size: 1rem;
-            }
             .toolbar {
                 flex-direction: column;
                 align-items: stretch;
                 padding: 1rem;
             }
-            .toolbar .search-group {
-                width: 100%;
-            }
-            .form-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .modal-box {
-                padding: 1.2rem;
-                margin: 0.5rem;
-            }
+            .toolbar .search-group { width: 100%; }
+            .form-grid { grid-template-columns: 1fr 1fr; }
+            .modal-box { padding: 1.2rem; margin: 0.5rem; }
         }
 
         @media (max-width: 480px) {
@@ -658,23 +740,14 @@
                 font-size: 0.7rem;
                 padding: 0.3rem 0.7rem;
             }
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            .field.full {
-                grid-column: 1;
-            }
+            .form-grid { grid-template-columns: 1fr; }
+            .field.full { grid-column: 1; }
             .modal-header {
                 flex-direction: column;
                 gap: 0.5rem;
                 text-align: center;
             }
-            .modal-header h2 {
-                font-size: 1.1rem;
-            }
-            .table-wrapper table {
-                min-width: 2800px;
-            }
+            .modal-header h2 { font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -692,7 +765,7 @@
             </h1>
             <div class="header-sub">
                 <i class="fas fa-edit"></i>
-                Manage students, fees, marks and results
+                Manage students, subject-wise marks and results
             </div>
         </div>
         <div class="actions">
@@ -701,6 +774,12 @@
             </button>
             <button class="btn-action btn-success" onclick="exportCSV()">
                 <i class="fas fa-file-csv"></i> Export CSV
+            </button>
+            <button class="btn-action btn-info" onclick="downloadAllResultsPDF()" title="Downloads every student's result card (marks) as one PDF">
+                <i class="fas fa-file-pdf"></i> All Results PDF
+            </button>
+            <button class="btn-action btn-info" onclick="downloadAllStudentsDataPDF()" title="Downloads every student's data (profile fields) as one PDF">
+                <i class="fas fa-file-download"></i> All Students Data PDF
             </button>
             <button class="btn-action btn-primary" onclick="openAddModal()">
                 <i class="fas fa-plus-circle"></i> Add Student
@@ -732,9 +811,19 @@
                 type="text"
                 class="search"
                 id="searchInput"
-                placeholder="Search by name, phone, roll, admission, PEN, Aadhar, email..."
+                placeholder="Search by name, mobile, S.R number, admission, PEN, Aadhaar..."
                 oninput="renderStudents()"
+                onkeydown="if(event.key==='Enter'){event.preventDefault(); renderStudents();}"
             >
+            <button type="button" class="btn-action btn-primary" onclick="renderStudents()" title="Search">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
+        <div class="search-group" style="flex: 0 0 200px; min-width: 160px;">
+            <i class="fas fa-school"></i>
+            <select class="search" id="classFilter" onchange="renderStudents()">
+                <option value="">All Classes</option>
+            </select>
         </div>
         <span class="count-badge">
             <i class="fas fa-users"></i>
@@ -749,43 +838,25 @@
                 <thead>
                     <tr>
                         <th><i class="fas fa-hashtag"></i>#</th>
-                        <th><i class="fas fa-user"></i>Name</th>
+                        <th><i class="fas fa-user"></i>Student Name</th>
+                        <th><i class="fas fa-school"></i>Class</th>
                         <th><i class="fas fa-user-tie"></i>Father Name</th>
                         <th><i class="fas fa-user"></i>Mother Name</th>
-                        <th><i class="fas fa-phone"></i>Phone</th>
-                        <th><i class="fas fa-phone-alt"></i>Alt. Phone</th>
-                        <th><i class="fas fa-sort-numeric-up"></i>Roll No</th>
-                        <th><i class="fas fa-id-card"></i>Admission No</th>
-                        <th><i class="fas fa-file-invoice"></i>PEN No</th>
-                        <th><i class="fas fa-id-card"></i>Aadhar No</th>
-                        <th><i class="fas fa-envelope"></i>Email</th>
                         <th><i class="fas fa-calendar"></i>DOB</th>
-                        <th><i class="fas fa-venus-mars"></i>Gender</th>
+                        <th><i class="fas fa-layer-group"></i>Caste</th>
+                        <th><i class="fas fa-sort-numeric-up"></i>S.R Number</th>
+                        <th><i class="fas fa-phone"></i>Mobile</th>
+                        <th><i class="fas fa-file-invoice"></i>PEN No</th>
+                        <th><i class="fas fa-id-card"></i>Aadhaar</th>
+                        <th><i class="fas fa-tag"></i>Category</th>
+                        
+                        <th><i class="fas fa-id-card"></i>Admission No</th>
                         <th><i class="fas fa-home"></i>Address</th>
-                        <th><i class="fas fa-money-bill"></i>Monthly Fee</th>
-                        <th><i class="fas fa-file-invoice"></i>Registration Fee</th>
-                        <th><i class="fas fa-bus"></i>Conveyance Fee</th>
-                        <th><i class="fas fa-book"></i>Book Fee</th>
-                        <th><i class="fas fa-pencil"></i>Stationary Fee</th>
-                        <th><i class="fas fa-pen-to-square"></i>Exam Fee</th>
-                        <th><i class="fas fa-file"></i>Unit Test 1</th>
-                        <th><i class="fas fa-file"></i>Unit Test 2</th>
-                        <th><i class="fas fa-flag"></i>Half Yearly</th>
-                        <th><i class="fas fa-trophy"></i>Annual Exam</th>
-                        <th><i class="fas fa-calculator"></i>Total Marks</th>
-                        <th><i class="fas fa-percent"></i>Percentage</th>
-                        <th><i class="fas fa-check-circle"></i>Result</th>
-                        <th><i class="fas fa-star"></i>Grade</th>
-                        <th><i class="fas fa-comment"></i>Remarks</th>
-                        <th><i class="fas fa-chart-line"></i>Attendance %</th>
-                        <th><i class="fas fa-graduation-cap"></i>Scholarship</th>
-                        <th><i class="fas fa-truck"></i>Transport</th>
-                        <th><i class="fas fa-tools"></i>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="studentTable">
                     <tr>
-                        <td colspan="33" class="loading">
+                        <td colspan="15" class="loading">
                             <i class="fas fa-circle-notch"></i> Loading students...
                         </td>
                     </tr>
@@ -803,7 +874,7 @@
 </div>
 
 
-<!-- ===== MODAL ===== -->
+<!-- ===== ADD / EDIT STUDENT MODAL ===== -->
 <div class="modal" id="studentModal">
     <div class="modal-box">
         <div class="modal-header">
@@ -818,9 +889,7 @@
         <form id="studentForm">
             <!-- BASIC DETAILS -->
             <div class="form-section">
-                <div class="section-title">
-                    <i class="fas fa-id-card"></i> Basic Details
-                </div>
+                <div class="section-title"><span><i class="fas fa-id-card"></i> Basic Details</span></div>
                 <div class="form-grid">
                     <div class="field">
                         <label><i class="fas fa-user"></i> Student Name</label>
@@ -835,12 +904,52 @@
                         <input type="text" id="motherName">
                     </div>
                     <div class="field">
-                        <label><i class="fas fa-phone"></i> Phone Number</label>
+                        <label><i class="fas fa-briefcase"></i> Father Occupation</label>
+                        <input type="text" id="fatherOccupation">
+                    </div>
+                    <div class="field">
+                        <label><i class="fas fa-calendar"></i> Date of Birth</label>
+                        <input type="date" id="dob">
+                    </div>
+                    <div class="field">
+                        <label><i class="fas fa-layer-group"></i> Caste</label>
+                        <input type="text" id="caste">
+                    </div>
+                    <div class="field">
+                        <label><i class="fas fa-tag"></i> Category</label>
+                        <select id="category">
+                            <option value="">Select</option>
+                            <option>General</option>
+                            <option>OBC</option>
+                            <option>SC</option>
+                            <option>ST</option>
+                            <option>EWS</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label><i class="fas fa-school"></i> Class</label>
+                        <input type="text" id="studentClass" placeholder="e.g. 6th, 10th">
+                    </div>
+                    <div class="field">
+                        <label><i class="fas fa-venus-mars"></i> Gender</label>
+                        <select id="gender">
+                            <option value="">Select</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label><i class="fas fa-phone"></i> Mobile Number</label>
                         <input type="tel" id="phone">
                     </div>
                     <div class="field">
                         <label><i class="fas fa-phone-alt"></i> Alternate Phone</label>
                         <input type="tel" id="alternatePhone">
+                    </div>
+                    <div class="field">
+                        <label><i class="fas fa-sort-numeric-up"></i> S.R Number</label>
+                        <input type="text" id="srNumber" placeholder="School Register Number">
                     </div>
                     <div class="field">
                         <label><i class="fas fa-sort-numeric-up"></i> Roll Number</label>
@@ -855,25 +964,12 @@
                         <input type="text" id="penNumber" placeholder="Permanent Education Number">
                     </div>
                     <div class="field">
-                        <label><i class="fas fa-id-card"></i> Aadhar Number</label>
-                        <input type="text" id="aadharNumber" placeholder="12-digit Aadhar" maxlength="12" pattern="[0-9]{12}">
+                        <label><i class="fas fa-id-card"></i> Aadhaar Number</label>
+                        <input type="text" id="aadharNumber" placeholder="12-digit Aadhaar" maxlength="12" pattern="[0-9]{12}">
                     </div>
                     <div class="field">
                         <label><i class="fas fa-envelope"></i> Email</label>
                         <input type="email" id="email" placeholder="student@example.com">
-                    </div>
-                    <div class="field">
-                        <label><i class="fas fa-calendar"></i> Date of Birth</label>
-                        <input type="date" id="dob">
-                    </div>
-                    <div class="field">
-                        <label><i class="fas fa-venus-mars"></i> Gender</label>
-                        <select id="gender">
-                            <option value="">Select</option>
-                            <option>Male</option>
-                            <option>Female</option>
-                            <option>Other</option>
-                        </select>
                     </div>
                     <div class="field full">
                         <label><i class="fas fa-home"></i> Address</label>
@@ -884,9 +980,7 @@
 
             <!-- FEE DETAILS -->
             <div class="form-section">
-                <div class="section-title">
-                    <i class="fas fa-coins"></i> Fee Details
-                </div>
+                <div class="section-title"><span><i class="fas fa-coins"></i> Fee Details</span></div>
                 <div class="form-grid">
                     <div class="field">
                         <label><i class="fas fa-money-bill"></i> Monthly Fee</label>
@@ -915,36 +1009,49 @@
                 </div>
             </div>
 
-            <!-- ACADEMIC -->
+            <!-- SUBJECT-WISE MARKS (all terms) -->
             <div class="form-section">
                 <div class="section-title">
-                    <i class="fas fa-graduation-cap"></i> Academic Details
+                    <span><i class="fas fa-graduation-cap"></i> Subject-wise Marks (all terms)</span>
+                    <button type="button" class="btn-add-subject" onclick="addSubjectRow()">
+                        <i class="fas fa-plus"></i> Add Subject
+                    </button>
                 </div>
+                <div class="marks-table-wrapper">
+                    <table class="marks-table">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th colspan="2">Unit Test 1</th>
+                                <th colspan="2">Unit Test 2</th>
+                                <th colspan="2">Half Yearly</th>
+                                <th colspan="2">Unit Test 3</th>
+                                <th colspan="2">Unit Test 4</th>
+                                <th colspan="2">Annual Exam</th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th>Max</th><th>Obt.</th>
+                                <th>Max</th><th>Obt.</th>
+                                <th>Max</th><th>Obt.</th>
+                                <th>Max</th><th>Obt.</th>
+                                <th>Max</th><th>Obt.</th>
+                                <th>Max</th><th>Obt.</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="subjectRows">
+                            <!-- rows injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- RESULT SUMMARY -->
+            <div class="form-section">
+                <div class="section-title"><span><i class="fas fa-check-circle"></i> Result Summary</span></div>
                 <div class="form-grid">
-                    <div class="field">
-                        <label><i class="fas fa-file"></i> Unit Test 1</label>
-                        <input type="number" id="unitTest1" min="0">
-                    </div>
-                    <div class="field">
-                        <label><i class="fas fa-file"></i> Unit Test 2</label>
-                        <input type="number" id="unitTest2" min="0">
-                    </div>
-                    <div class="field">
-                        <label><i class="fas fa-flag"></i> Half Yearly</label>
-                        <input type="number" id="halfYearly" min="0">
-                    </div>
-                    <div class="field">
-                        <label><i class="fas fa-trophy"></i> Annual Exam</label>
-                        <input type="number" id="annualExam" min="0">
-                    </div>
-                    <div class="field">
-                        <label><i class="fas fa-calculator"></i> Total Marks</label>
-                        <input type="number" id="totalMarks" min="0">
-                    </div>
-                    <div class="field">
-                        <label><i class="fas fa-percent"></i> Percentage</label>
-                        <input type="number" id="percentage" min="0" step="0.01">
-                    </div>
                     <div class="field">
                         <label><i class="fas fa-check-circle"></i> Result</label>
                         <select id="result">
@@ -965,19 +1072,6 @@
                             <option>E</option><option>F</option>
                         </select>
                     </div>
-                    <div class="field full">
-                        <label><i class="fas fa-comment"></i> Remarks</label>
-                        <textarea id="remarks" placeholder="Teacher remarks..."></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- OTHER -->
-            <div class="form-section">
-                <div class="section-title">
-                    <i class="fas fa-ellipsis-h"></i> Other Details
-                </div>
-                <div class="form-grid">
                     <div class="field">
                         <label><i class="fas fa-chart-line"></i> Attendance %</label>
                         <input type="number" id="attendance" min="0" max="100" step="0.01">
@@ -994,6 +1088,10 @@
                             <option>No</option>
                         </select>
                     </div>
+                    <div class="field full">
+                        <label><i class="fas fa-comment"></i> Remarks</label>
+                        <textarea id="remarks" placeholder="Teacher remarks..."></textarea>
+                    </div>
                 </div>
             </div>
 
@@ -1007,55 +1105,46 @@
 
 <script>
 
-// ==========================================
-// ALL LOGIC REMAINS EXACTLY THE SAME
-// ==========================================
-
-const API_URL = "https://sunshine-swp6.onrender.com";
+const API_URL = "https://sunshine-swp6.onrender.com"; // Change this to your server URL if needed
 
 const params = new URLSearchParams(window.location.search);
-
 const classId = params.get("classId");
 
 let students = [];
-
 let editingStudentId = null;
-
 let currentClassName = "Extra Class";
 
+// Fixed term keys - MUST match server.js / ExtraClass.js
+const TERM_KEYS = ["unit1", "unit2", "halfYearly", "unit3", "unit4", "annual"];
+const TERM_LABELS = {
+    unit1: "Unit Test 1",
+    unit2: "Unit Test 2",
+    halfYearly: "Half Yearly",
+    unit3: "Unit Test 3",
+    unit4: "Unit Test 4",
+    annual: "Annual Exam"
+};
 
+// Working copy of marks while the Add/Edit modal is open.
+// Shape: [{ subject: "Maths", unit1: {max, obt}, unit2: {max, obt}, ... }, ...]
+let currentSubjectRows = [];
+
+// The 13 columns that appear on the table, CSV export and result PDF
 const STUDENT_COLUMNS = [
-    { key: "name",             label: "Name" },
+    { key: "name",             label: "Student Name" },
+    { key: "studentClass",     label: "Class" },
     { key: "fatherName",       label: "Father Name" },
     { key: "motherName",       label: "Mother Name" },
-    { key: "phone",            label: "Phone" },
-    { key: "alternatePhone",   label: "Alt. Phone" },
-    { key: "rollNumber",       label: "Roll No" },
-    { key: "admissionNumber",  label: "Admission No" },
-    { key: "penNumber",        label: "PEN No" },
-    { key: "aadharNumber",     label: "Aadhar No" },
-    { key: "email",            label: "Email" },
     { key: "dob",              label: "DOB" },
-    { key: "gender",           label: "Gender" },
-    { key: "address",          label: "Address" },
-    { key: "monthlyFee",       label: "Monthly Fee" },
-    { key: "registrationFee",  label: "Registration Fee" },
-    { key: "conveyanceFee",    label: "Conveyance Fee" },
-    { key: "bookFee",          label: "Book Fee" },
-    { key: "stationaryFee",    label: "Stationary Fee" },
-    { key: "examFee",          label: "Exam Fee" },
-    { key: "unitTest1",        label: "Unit Test 1" },
-    { key: "unitTest2",        label: "Unit Test 2" },
-    { key: "halfYearly",       label: "Half Yearly" },
-    { key: "annualExam",       label: "Annual Exam" },
-    { key: "totalMarks",       label: "Total Marks" },
-    { key: "percentage",       label: "Percentage" },
-    { key: "result",           label: "Result" },
-    { key: "grade",            label: "Grade" },
-    { key: "remarks",          label: "Remarks" },
-    { key: "attendance",       label: "Attendance %" },
-    { key: "scholarship",      label: "Scholarship" },
-    { key: "transport",        label: "Transport" }
+    { key: "caste",            label: "Caste" },
+    { key: "srNumber",         label: "S.R Number" },
+    { key: "phone",            label: "Mobile" },
+    { key: "penNumber",        label: "PEN No" },
+    { key: "aadharNumber",     label: "Aadhaar" },
+    { key: "category",         label: "Category" },
+    
+    { key: "admissionNumber",  label: "Admission No" },
+    { key: "address",          label: "Address" }
 ];
 
 
@@ -1074,21 +1163,19 @@ async function loadClass() {
             return;
         }
 
-        const extraClass = data.extraClass || data.class || data.data;
+        const extraClass = data.class || data.extraClass || data.data;
 
-        currentClassName = extraClass.name || extraClass.className || "Extra Class";
-
+        currentClassName = extraClass.className || extraClass.name || "Extra Class";
         document.getElementById("className").textContent = currentClassName;
 
         students = extraClass.students || [];
-
         renderStudents();
 
     } catch (error) {
         console.error(error);
         document.getElementById("studentTable").innerHTML = `
             <tr>
-                <td colspan="33" class="empty">
+                <td colspan="15" class="empty">
                     <i class="fas fa-exclamation-triangle"></i>
                     Unable to load students.
                 </td>
@@ -1098,29 +1185,74 @@ async function loadClass() {
 }
 
 
+// Formats a stored DOB into DD/MM/YYYY (month as a number), e.g. 10/09/2005.
+// Works for "YYYY-MM-DD" (date input), full ISO strings, "DD-MM-YYYY",
+// "DD/MM/YYYY" and any other date string the browser can parse.
+function formatDOB(value) {
+    if (!value) return "-";
+    const s = String(value).trim();
+    const pad = n => String(n).padStart(2, "0");
+
+    let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (m) return `${pad(m[3])}/${pad(m[2])}/${m[1]}`;
+
+    m = s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/);
+    if (m) return `${pad(m[1])}/${pad(m[2])}/${m[3]}`;
+
+    const parsed = new Date(s);
+    if (!isNaN(parsed.getTime())) {
+        return `${pad(parsed.getDate())}/${pad(parsed.getMonth() + 1)}/${parsed.getFullYear()}`;
+    }
+    return s;
+}
+
+// Keeps the "Class" filter dropdown in sync with whatever classes are
+// actually present among the loaded students.
+function populateClassFilter() {
+    const select = document.getElementById("classFilter");
+    const previous = select.value;
+
+    const classes = Array.from(new Set(
+        students.map(s => (s.studentClass || "").trim()).filter(Boolean)
+    )).sort();
+
+    select.innerHTML = `<option value="">All Classes</option>` +
+        classes.map(c => `<option value="${escapeAttr(c)}">${escapeHTML(c)}</option>`).join("");
+
+    if (classes.includes(previous)) {
+        select.value = previous;
+    }
+}
+
 function renderStudents() {
     const table = document.getElementById("studentTable");
     const search = document.getElementById("searchInput").value.toLowerCase().trim();
+    const classFilterValue = document.getElementById("classFilter").value;
+
+    populateClassFilter();
+    document.getElementById("classFilter").value = classFilterValue;
 
     const filtered = students.filter(student => {
-        return (
+        const matchesSearch = (
             (student.name || "").toLowerCase().includes(search) ||
             (student.phone || "").toLowerCase().includes(search) ||
-            (student.rollNumber || "").toLowerCase().includes(search) ||
+            (student.srNumber || "").toLowerCase().includes(search) ||
             (student.admissionNumber || "").toLowerCase().includes(search) ||
             (student.penNumber || "").toLowerCase().includes(search) ||
             (student.aadharNumber || "").toLowerCase().includes(search) ||
-            (student.email || "").toLowerCase().includes(search)
+            (student.studentClass || "").toLowerCase().includes(search)
         );
+        const matchesClass = !classFilterValue || (student.studentClass || "") === classFilterValue;
+        return matchesSearch && matchesClass;
     });
 
     document.getElementById("studentCount").textContent = students.length;
-    document.getElementById("studentCountLabel").textContent = students.length;
+    document.getElementById("studentCountLabel").textContent = filtered.length;
 
     if (filtered.length === 0) {
         table.innerHTML = `
             <tr>
-                <td colspan="33" class="empty">
+                <td colspan="15" class="empty">
                     <i class="fas fa-users-slash"></i>
                     No students found.
                 </td>
@@ -1129,30 +1261,32 @@ function renderStudents() {
         return;
     }
 
-    table.innerHTML = filtered.map((student, index) => {
+    table.innerHTML = filtered.map((student) => {
         const realIndex = students.indexOf(student);
         const cells = STUDENT_COLUMNS.map(col => {
-            const value = student[col.key];
-            return `<td>${escapeHTML(value || "-")}</td>`;
+            const cls = col.key === "address" ? ' class="address-cell"' : "";
+            const value = col.key === "dob" ? formatDOB(student.dob) : (student[col.key] || "-");
+            const style = col.key === "name" ? ' style="color:#f58a2e; font-weight:700;"' : "";
+            return `<td${cls}${style}>${escapeHTML(value)}</td>`;
         }).join("");
 
         return `
-            <tr>
+            <tr class="student-row" data-index="${realIndex}" title="View profile" style="cursor:pointer;">
                 <td>${realIndex + 1}</td>
                 ${cells}
-                <td>
-                    <div class="actions">
-                        <button class="btn-edit" onclick="editStudent(${realIndex})">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="btn-delete" onclick="deleteStudent(${realIndex})">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    </div>
-                </td>
             </tr>
         `;
     }).join("");
+
+    // Bind clicks after the rows exist in the DOM - more reliable than
+    // relying on inline onclick strings, and keeps names/special
+    // characters from ever breaking an attribute.
+    table.querySelectorAll(".student-row").forEach(row => {
+        row.addEventListener("click", function () {
+            const idx = Number(this.getAttribute("data-index"));
+            viewStudent(idx);
+        });
+    });
 }
 
 
@@ -1164,7 +1298,7 @@ function exportCSV() {
 
     const header = ["#", ...STUDENT_COLUMNS.map(col => col.label)];
     const rows = students.map((student, index) => {
-        const row = STUDENT_COLUMNS.map(col => csvCell(student[col.key]));
+        const row = STUDENT_COLUMNS.map(col => csvCell(col.key === "dob" ? formatDOB(student.dob) : student[col.key]));
         return [index + 1, ...row].join(",");
     });
 
@@ -1189,10 +1323,132 @@ function csvCell(value) {
 }
 
 
+// ==========================================
+// SUBJECT-WISE MARKS TABLE (inside modal)
+// ==========================================
+
+function buildSubjectRowsFromStudent(student) {
+    const marks = (student && student.marks) || {};
+    const subjectOrder = [];
+    const bySubject = {};
+
+    TERM_KEYS.forEach(term => {
+        const rows = Array.isArray(marks[term]) ? marks[term] : [];
+        rows.forEach(row => {
+            const subject = (row.subject || "").trim();
+            if (!subject) return;
+            if (!bySubject[subject]) {
+                bySubject[subject] = { subject };
+                TERM_KEYS.forEach(t => bySubject[subject][t] = { max: "", obt: "" });
+                subjectOrder.push(subject);
+            }
+            bySubject[subject][term] = {
+                max: row.maxMarks ?? "",
+                obt: row.obtainedMarks ?? ""
+            };
+        });
+    });
+
+    return subjectOrder.map(s => bySubject[s]);
+}
+
+function addSubjectRow() {
+    const row = { subject: "" };
+    TERM_KEYS.forEach(t => row[t] = { max: "", obt: "" });
+    currentSubjectRows.push(row);
+    renderSubjectRows();
+}
+
+function removeSubjectRow(index) {
+    currentSubjectRows.splice(index, 1);
+    renderSubjectRows();
+}
+
+function syncSubjectRowsFromDOM() {
+    const rows = document.querySelectorAll("#subjectRows tr");
+    rows.forEach((tr, i) => {
+        if (!currentSubjectRows[i]) return;
+        currentSubjectRows[i].subject = tr.querySelector(".subject-input").value;
+        TERM_KEYS.forEach(term => {
+            const maxInput = tr.querySelector(`[data-term="${term}"][data-field="max"]`);
+            const obtInput = tr.querySelector(`[data-term="${term}"][data-field="obt"]`);
+            currentSubjectRows[i][term] = {
+                max: maxInput ? maxInput.value : "",
+                obt: obtInput ? obtInput.value : ""
+            };
+        });
+    });
+}
+
+function renderSubjectRows() {
+    const tbody = document.getElementById("subjectRows");
+
+    if (!currentSubjectRows.length) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="14" class="no-subjects-hint">
+                    No subjects yet. Click "Add Subject" to start entering marks
+                    (it will appear in every term automatically).
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = currentSubjectRows.map((row, i) => {
+        const termCells = TERM_KEYS.map(term => {
+            const val = row[term] || { max: "", obt: "" };
+            return `
+                <td><input type="number" min="0" class="mark-input" data-term="${term}" data-field="max" value="${val.max ?? ""}"></td>
+                <td><input type="number" min="0" class="mark-input" data-term="${term}" data-field="obt" value="${val.obt ?? ""}"></td>
+            `;
+        }).join("");
+
+        return `
+            <tr>
+                <td><input type="text" class="subject-input" placeholder="Subject name" value="${escapeAttr(row.subject)}" onchange="syncSubjectRowsFromDOM()"></td>
+                ${termCells}
+                <td><button type="button" class="btn-remove-subject" onclick="syncSubjectRowsFromDOM(); removeSubjectRow(${i})"><i class="fas fa-times"></i></button></td>
+            </tr>
+        `;
+    }).join("");
+
+    // keep the in-memory copy fresh whenever a mark input changes
+    tbody.querySelectorAll(".mark-input").forEach(input => {
+        input.addEventListener("change", syncSubjectRowsFromDOM);
+    });
+}
+
+function collectMarksPayload() {
+    syncSubjectRowsFromDOM();
+
+    const marks = {};
+    TERM_KEYS.forEach(term => { marks[term] = []; });
+
+    currentSubjectRows.forEach(row => {
+        const subject = (row.subject || "").trim();
+        if (!subject) return;
+
+        TERM_KEYS.forEach(term => {
+            const val = row[term] || {};
+            marks[term].push({
+                subject,
+                maxMarks: Number(val.max) || 0,
+                obtainedMarks: Number(val.obt) || 0
+            });
+        });
+    });
+
+    return marks;
+}
+
+
 function openAddModal() {
     editingStudentId = null;
     document.getElementById("modalTitle").innerHTML = '<i class="fas fa-user-plus"></i> Add Student';
     document.getElementById("studentForm").reset();
+    currentSubjectRows = [];
+    renderSubjectRows();
     document.getElementById("studentModal").classList.add("show");
 }
 
@@ -1207,14 +1463,19 @@ function editStudent(index) {
     setValue("studentName", student.name);
     setValue("fatherName", student.fatherName);
     setValue("motherName", student.motherName);
+    setValue("fatherOccupation", student.fatherOccupation);
     setValue("phone", student.phone);
     setValue("alternatePhone", student.alternatePhone);
+    setValue("srNumber", student.srNumber);
     setValue("rollNumber", student.rollNumber);
     setValue("admissionNumber", student.admissionNumber);
     setValue("penNumber", student.penNumber);
     setValue("aadharNumber", student.aadharNumber);
     setValue("email", student.email);
     setValue("dob", student.dob);
+    setValue("caste", student.caste);
+    setValue("category", student.category);
+    setValue("studentClass", student.studentClass);
     setValue("gender", student.gender);
     setValue("address", student.address);
 
@@ -1225,19 +1486,15 @@ function editStudent(index) {
     setValue("stationaryFee", student.stationaryFee);
     setValue("examFee", student.examFee);
 
-    setValue("unitTest1", student.unitTest1);
-    setValue("unitTest2", student.unitTest2);
-    setValue("halfYearly", student.halfYearly);
-    setValue("annualExam", student.annualExam);
-    setValue("totalMarks", student.totalMarks);
-    setValue("percentage", student.percentage);
     setValue("result", student.result);
     setValue("grade", student.grade);
     setValue("remarks", student.remarks);
-
     setValue("attendance", student.attendance);
     setValue("scholarship", student.scholarship);
     setValue("transport", student.transport);
+
+    currentSubjectRows = buildSubjectRowsFromStudent(student);
+    renderSubjectRows();
 
     document.getElementById("studentModal").classList.add("show");
 }
@@ -1250,14 +1507,19 @@ document.getElementById("studentForm").addEventListener("submit", async function
         name: getValue("studentName"),
         fatherName: getValue("fatherName"),
         motherName: getValue("motherName"),
+        fatherOccupation: getValue("fatherOccupation"),
         phone: getValue("phone"),
         alternatePhone: getValue("alternatePhone"),
+        srNumber: getValue("srNumber"),
         rollNumber: getValue("rollNumber"),
         admissionNumber: getValue("admissionNumber"),
         penNumber: getValue("penNumber"),
         aadharNumber: getValue("aadharNumber"),
         email: getValue("email"),
         dob: getValue("dob"),
+        caste: getValue("caste"),
+        category: getValue("category"),
+        studentClass: getValue("studentClass"),
         gender: getValue("gender"),
         address: getValue("address"),
         monthlyFee: numberValue("monthlyFee"),
@@ -1266,12 +1528,7 @@ document.getElementById("studentForm").addEventListener("submit", async function
         bookFee: numberValue("bookFee"),
         stationaryFee: numberValue("stationaryFee"),
         examFee: numberValue("examFee"),
-        unitTest1: numberValue("unitTest1"),
-        unitTest2: numberValue("unitTest2"),
-        halfYearly: numberValue("halfYearly"),
-        annualExam: numberValue("annualExam"),
-        totalMarks: numberValue("totalMarks"),
-        percentage: numberValue("percentage"),
+        marks: collectMarksPayload(),
         result: getValue("result"),
         grade: getValue("grade"),
         remarks: getValue("remarks"),
@@ -1357,6 +1614,22 @@ function closeModal() {
 }
 
 
+// ==========================================
+// STUDENT PROFILE - navigates to the dedicated profile page
+// ==========================================
+
+function viewStudent(index) {
+    const student = students[index];
+    if (!student) return;
+
+    const studentId = student._id || "";
+    const url = `extra-class-students-profle.html?classId=${encodeURIComponent(classId)}&index=${index}` +
+        (studentId ? `&id=${encodeURIComponent(studentId)}` : "");
+
+    window.location.href = url;
+}
+
+
 function goBack() {
     window.location.href = "extra-class.html";
 }
@@ -1386,8 +1659,837 @@ function escapeHTML(value) {
         .replace(/'/g, "&#039;");
 }
 
+function escapeAttr(value) {
+    return escapeHTML(value);
+}
 
-loadClass();
+
+// ==========================================
+// RESULT CALCULATION HELPERS
+// ==========================================
+
+function calcGrade(pct) {
+    if (pct >= 90) return "A+";
+    if (pct >= 75) return "A";
+    if (pct >= 60) return "B+";
+    if (pct >= 50) return "B";
+    if (pct >= 40) return "C";
+    if (pct >= 33) return "D";
+    return "F";
+}
+
+function calcResultLabel(pct) {
+    return pct >= 33 ? "Pass" : "Fail";
+}
+
+// Flattens a student's marks object into a subject-ordered list, and
+// computes per-subject + overall totals across all terms that have data.
+function computeResultData(student) {
+    const marks = (student && student.marks) || {};
+    const subjectOrder = [];
+    const bySubject = {};
+
+    TERM_KEYS.forEach(term => {
+        const rows = Array.isArray(marks[term]) ? marks[term] : [];
+        rows.forEach(row => {
+            const subject = (row.subject || "").trim();
+            if (!subject) return;
+            if (!bySubject[subject]) {
+                bySubject[subject] = { subject };
+                subjectOrder.push(subject);
+            }
+            bySubject[subject][term] = {
+                max: Number(row.maxMarks) || 0,
+                obtained: Number(row.obtainedMarks) || 0
+            };
+        });
+    });
+
+    let grandMax = 0;
+    let grandObtained = 0;
+
+    subjectOrder.forEach(subject => {
+        TERM_KEYS.forEach(term => {
+            const cell = bySubject[subject][term];
+            if (cell) {
+                grandMax += cell.max;
+                grandObtained += cell.obtained;
+            }
+        });
+    });
+
+    const percentage = grandMax > 0 ? (grandObtained / grandMax) * 100 : 0;
+
+    return {
+        subjects: subjectOrder.map(s => bySubject[s]),
+        grandMax,
+        grandObtained,
+        percentage,
+        grade: calcGrade(percentage),
+        resultLabel: calcResultLabel(percentage)
+    };
+}
+
+
+// ==========================================
+// RESULT PDF - exact same design as result.html
+// (header, watermark, term totals, grade chart, stamps, signatures)
+// Images use the same paths: ./images/logo.png, stamp2.png, stamp1.png
+// ==========================================
+
+const RESULT_TERM_LABELS = {
+    unit1: "Unit 1",
+    unit2: "Unit 2",
+    halfYearly: "Half Yearly",
+    unit3: "Unit 3",
+    unit4: "Unit 4",
+    annual: "Annual"
+};
+
+function loadImageSafe(src) {
+    return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => {
+            console.warn("Could not load image:", src);
+            resolve(null);
+        };
+        img.src = src;
+    });
+}
+
+async function loadResultImages() {
+    const [logo, leftStamp, rightStamp] = await Promise.all([
+        loadImageSafe("./images/logo.png"),
+        loadImageSafe("./images/stamp2.png"),
+        loadImageSafe("./images/stamp1.png")
+    ]);
+    return { logo, leftStamp, rightStamp };
+}
+
+function resultCleanFileName(value) {
+    return String(value || "")
+        .replace(/[\\/:*?"<>|]/g, "")
+        .replace(/\s+/g, "_")
+        .trim();
+}
+
+function resultSafeValue(value, fallback = "N/A") {
+    if (value === undefined || value === null || String(value).trim() === "") return fallback;
+    return String(value);
+}
+
+function resultLibsReady() {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+        alert("PDF library did not load. Please check your internet connection.");
+        return false;
+    }
+    const testDoc = new window.jspdf.jsPDF();
+    if (typeof testDoc.autoTable !== "function") {
+        alert("jspdf-autotable is not loaded. Make sure it is included AFTER jsPDF.");
+        return false;
+    }
+    return true;
+}
+
+// Builds ONE pdf "writer". Call renderStudent() once per student
+// (add a page between students), then save().
+function createResultPdf(images) {
+    const { jsPDF } = window.jspdf;
+    const { logo, leftStamp, rightStamp } = images;
+
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4", compress: true });
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const marginLeft = 10;
+    const marginRight = 10;
+    const marginBottom = 9;
+    const contentWidth = pageWidth - marginLeft - marginRight;
+
+    // ---------- watermark ----------
+    function drawBackgroundLogo() {
+        if (!logo) return;
+        const logoWidth = 220;
+        const logoHeight = 290;
+        const logoX = (pageWidth - logoWidth) / 2;
+        const logoY = (pageHeight - logoHeight) / 2;
+        if (typeof doc.saveGraphicsState === "function") doc.saveGraphicsState();
+        if (typeof doc.setGState === "function") doc.setGState(new doc.GState({ opacity: 0.1 }));
+        doc.addImage(logo, "PNG", logoX, logoY, logoWidth, logoHeight);
+        if (typeof doc.restoreGraphicsState === "function") doc.restoreGraphicsState();
+    }
+
+    // ---------- header ----------
+    function drawHeader() {
+        drawBackgroundLogo();
+
+        const headerTop = 4;
+        const logoSize = 28;
+        const logoX = marginLeft;
+        const logoY = headerTop;
+
+        if (logo) doc.addImage(logo, "PNG", logoX, logoY, logoSize, logoSize);
+
+        const titleAreaX = logoX + logoSize + 3;
+        const titleAreaWidth = (pageWidth - marginRight) - titleAreaX;
+        const titleCenterX = titleAreaX + titleAreaWidth / 2;
+
+        let textY = headerTop + 12;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(27);
+        doc.setTextColor(178, 24, 24);
+        doc.setDrawColor(0, 0, 0);
+        doc.setLineWidth(0.35);
+        doc.text("SUN SHINE JUNIOR HIGH SCHOOL", titleCenterX, textY, {
+            align: "center",
+            renderingMode: "fillThenStroke"
+        });
+
+        textY += 3.5;
+        const dividerHalfWidth = 30;
+        doc.setDrawColor(178, 24, 24);
+        doc.setLineWidth(0.35);
+        doc.line(titleCenterX - dividerHalfWidth, textY, titleCenterX - 5, textY);
+        doc.line(titleCenterX + 5, textY, titleCenterX + dividerHalfWidth, textY);
+
+        function drawDiamond(cx, cy, size) {
+            doc.setFillColor(178, 24, 24);
+            doc.triangle(cx - size, cy, cx, cy - size, cx + size, cy, "F");
+            doc.triangle(cx - size, cy, cx, cy + size, cx + size, cy, "F");
+        }
+        drawDiamond(titleCenterX, textY, 1.6);
+
+        textY += 6;
+
+        function drawPinIcon(cx, cy) {
+            doc.setFillColor(178, 24, 24);
+            doc.circle(cx, cy - 0.6, 1.6, "F");
+            doc.triangle(cx - 1.1, cy, cx + 1.1, cy, cx, cy + 2.2, "F");
+            doc.setFillColor(255, 255, 255);
+            doc.circle(cx, cy - 0.6, 0.6, "F");
+        }
+
+        function drawPhoneIcon(cx, cy) {
+            doc.setFillColor(178, 24, 24);
+            doc.circle(cx - 0.9, cy - 0.9, 1.4, "F");
+            doc.circle(cx + 0.9, cy + 0.9, 1.4, "F");
+            doc.setDrawColor(178, 24, 24);
+            doc.setLineWidth(1.1);
+            doc.line(cx - 0.6, cy - 0.6, cx + 0.6, cy + 0.6);
+        }
+
+        function drawGlobeIcon(cx, cy) {
+            doc.setDrawColor(30, 60, 150);
+            doc.setLineWidth(0.35);
+            doc.circle(cx, cy, 1.8, "S");
+            doc.ellipse(cx, cy, 0.8, 1.8, "S");
+            doc.line(cx - 1.8, cy, cx + 1.8, cy);
+        }
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(20, 20, 20);
+
+        const addressText = "20 Futa Road, Mohalla Garhi Nai Aabadi Pilkhuwa Hapur, U.P - 245304";
+        const addrTextWidth = doc.getTextWidth(addressText);
+        const addrIconX = titleCenterX - addrTextWidth / 2 - 4;
+        drawPinIcon(addrIconX, textY - 1);
+        doc.text(addressText, titleCenterX + 2, textY, { align: "center" });
+
+        textY += 5.5;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8.5);
+
+        const phoneText = "Mobile :- +91 87917-64372 | 92596-95556";
+        const websiteText = "sunshinejuniorhighschool.com";
+        const gap = 8;
+        const phoneWidth = doc.getTextWidth(phoneText);
+        const websiteWidth = doc.getTextWidth(websiteText);
+        const totalLineWidth = phoneWidth + gap + websiteWidth + 10;
+        let lineX = titleCenterX - totalLineWidth / 2;
+
+        drawPhoneIcon(lineX, textY - 1);
+        doc.setTextColor(20, 20, 20);
+        doc.text(phoneText, lineX + 4, textY);
+        lineX += 4 + phoneWidth + 4;
+
+        doc.setDrawColor(150, 150, 150);
+        doc.setLineWidth(0.3);
+        doc.line(lineX, textY - 2.5, lineX, textY + 0.8);
+        lineX += gap - 4;
+
+        drawGlobeIcon(lineX, textY - 1);
+        doc.setTextColor(30, 60, 150);
+        doc.text(websiteText, lineX + 4, textY);
+
+        textY += 4.5;
+        doc.setDrawColor(178, 24, 24);
+        doc.setLineWidth(0.6);
+        doc.line(marginLeft, textY, pageWidth - marginRight, textY);
+
+        textY += 2;
+        doc.setFillColor(20, 20, 20);
+        doc.rect(marginLeft, textY, contentWidth, 2.5, "F");
+
+        return textY + 2.5 + 4;
+    }
+
+    // ---------- footer ----------
+    function drawFooter(pageNumber) {
+        const footerY = pageHeight - 6;
+        doc.setDrawColor(190, 190, 190);
+        doc.setLineWidth(0.3);
+        doc.line(marginLeft, pageHeight - 10, pageWidth - marginRight, pageHeight - 10);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(7);
+        doc.setTextColor(120, 120, 120);
+        doc.text("Sun Shine Junior High School", marginLeft, footerY);
+        doc.text(`Page ${pageNumber}`, pageWidth - marginRight, footerY, { align: "right" });
+    }
+
+    function ensureSpace(currentYRef, requiredHeight) {
+        if (currentYRef + requiredHeight > pageHeight - marginBottom - 7) {
+            doc.addPage();
+            const pageNumber = doc.internal.getNumberOfPages();
+            drawHeader();
+            drawFooter(pageNumber);
+            return 37;
+        }
+        return currentYRef;
+    }
+
+    // ---------- grade helpers (same as result.html) ----------
+    function getGrade(p) {
+        if (p >= 90) return "A+";
+        if (p >= 80) return "A";
+        if (p >= 70) return "B";
+        if (p >= 60) return "C";
+        if (p >= 50) return "D";
+        if (p >= 40) return "E";
+        return "F";
+    }
+    function getRemark(p) {
+        if (p >= 90) return "Outstanding";
+        if (p >= 80) return "Excellent";
+        if (p >= 70) return "Very Good";
+        if (p >= 60) return "Good";
+        if (p >= 50) return "Average";
+        if (p >= 40) return "Pass";
+        return "Fail";
+    }
+    function getDivision(p) {
+        if (p >= 60) return "First Division";
+        if (p >= 45) return "Second Division";
+        if (p >= 33) return "Third Division";
+        return "Fail";
+    }
+
+    // ---------- ONE student's full report ----------
+    function renderStudent(student) {
+        const marks = student.marks || {};
+
+        // ALWAYS show every column, in fixed order:
+        // Unit 1, Unit 2, Half Yearly, Term 1 Total, Unit 3, Unit 4, Annual, Term 2 Total, Grand Total
+        const examOrder = [...TERM_KEYS];
+
+        const isHalfYearly = k => k === "halfYearly";
+        const isAnnual = k => k === "annual";
+
+        // Subject map
+        const subjectMap = {};
+        TERM_KEYS.forEach(term => {
+            const rows = Array.isArray(marks[term]) ? marks[term] : [];
+            rows.forEach(row => {
+                const displaySubject = String(row.subject || "").trim();
+                if (!displaySubject) return;
+                const subjectKey = displaySubject.toLowerCase().replace(/\s+/g, " ");
+                if (!subjectMap[subjectKey]) subjectMap[subjectKey] = { displayName: displaySubject, exams: {} };
+                const max = Number(row.maxMarks);
+                const obt = Number(row.obtainedMarks);
+                subjectMap[subjectKey].exams[term] = {
+                    max: Number.isFinite(max) ? max : "-",
+                    obtained: Number.isFinite(obt) ? obt : "-"
+                };
+            });
+        });
+
+        if (Object.keys(subjectMap).length === 0) {
+            subjectMap["__none"] = { displayName: "No marks recorded", exams: {} };
+        }
+        const subjects = Object.keys(subjectMap);
+
+        // Terms
+        const halfYearlyIndex = examOrder.findIndex(isHalfYearly);
+        const annualIndex = examOrder.findIndex(isAnnual);
+
+        let term1Exams = [];
+        let term2Exams = [];
+
+        if (halfYearlyIndex >= 0) term1Exams = examOrder.slice(0, halfYearlyIndex + 1);
+        if (annualIndex >= 0) {
+            term2Exams = examOrder.slice(halfYearlyIndex >= 0 ? halfYearlyIndex + 1 : 0, annualIndex + 1);
+        } else if (halfYearlyIndex >= 0) {
+            term2Exams = examOrder.slice(halfYearlyIndex + 1);
+        }
+        if (term1Exams.length === 0 && term2Exams.length === 0) {
+            const mid = Math.ceil(examOrder.length / 2);
+            term1Exams = examOrder.slice(0, mid);
+            term2Exams = examOrder.slice(mid);
+        }
+
+        function groupSum(subjectKey, examKeys) {
+            let max = 0, obtained = 0, hasMax = false, hasObtained = false;
+            examKeys.forEach(k => {
+                const mark = subjectMap[subjectKey].exams[k];
+                if (!mark) return;
+                if (typeof mark.max === "number") { max += mark.max; hasMax = true; }
+                if (typeof mark.obtained === "number") { obtained += mark.obtained; hasObtained = true; }
+            });
+            return { max: hasMax ? max : "-", obtained: hasObtained ? obtained : "-" };
+        }
+
+        const subjectFinalTotals = {};
+        let grandTotalMax = 0, grandTotalObtained = 0, hasGrandMax = false, hasGrandObtained = false;
+
+        subjects.forEach(subjectKey => {
+            const term1Total = groupSum(subjectKey, term1Exams);
+            const term2Total = groupSum(subjectKey, term2Exams);
+
+            let finalMax = 0, finalObtained = 0, hasFinalMax = false, hasFinalObtained = false;
+            if (typeof term1Total.max === "number") { finalMax += term1Total.max; hasFinalMax = true; }
+            if (typeof term2Total.max === "number") { finalMax += term2Total.max; hasFinalMax = true; }
+            if (typeof term1Total.obtained === "number") { finalObtained += term1Total.obtained; hasFinalObtained = true; }
+            if (typeof term2Total.obtained === "number") { finalObtained += term2Total.obtained; hasFinalObtained = true; }
+
+            subjectFinalTotals[subjectKey] = {
+                term1: term1Total,
+                term2: term2Total,
+                final: {
+                    max: hasFinalMax ? finalMax : "-",
+                    obtained: hasFinalObtained ? finalObtained : "-"
+                }
+            };
+
+            if (hasFinalMax) { grandTotalMax += finalMax; hasGrandMax = true; }
+            if (hasFinalObtained) { grandTotalObtained += finalObtained; hasGrandObtained = true; }
+        });
+
+        const totalMarks = hasGrandMax ? grandTotalMax : 0;
+        const totalMarksObtained = hasGrandObtained ? grandTotalObtained : 0;
+        const overallPercentage = totalMarks > 0 ? (totalMarksObtained / totalMarks) * 100 : 0;
+
+        const grade = getGrade(overallPercentage);
+        const remark = getRemark(overallPercentage);
+        const overallDivision = getDivision(overallPercentage);
+
+        // ================= PAGE CONTENT =================
+        let currentY = drawHeader() + 4;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10.5);
+        doc.setTextColor(30, 45, 60);
+        doc.text("ASSESSMENT SHEET FOR ACADEMIC SESSION 2026-27", pageWidth / 2, currentY, { align: "center" });
+        currentY += 4;
+
+        doc.setFont("helvetica", "italic");
+        doc.setFontSize(7.5);
+        doc.setTextColor(70, 70, 70);
+        doc.text('"Empowering Young Minds for a Brighter Future"', pageWidth / 2, currentY, { align: "center" });
+        currentY += 4;
+
+        doc.setFillColor(240, 230, 211);
+        doc.setDrawColor(30, 42, 58);
+        doc.setLineWidth(0.5);
+        doc.rect(marginLeft, currentY, contentWidth, 6, "FD");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(30, 42, 58);
+        doc.text("STUDENT PROFILE", pageWidth / 2, currentY + 4.1, { align: "center" });
+        currentY += 6;
+
+        const dobText = student.dob ? formatDOB(student.dob) : "N/A";
+
+        doc.autoTable({
+            startY: currentY,
+            margin: { left: marginLeft, right: marginRight },
+            theme: "grid",
+            body: [
+                ["Roll No.", resultSafeValue(student.rollNumber || student.srNumber || student.admissionNumber), "Student Name", resultSafeValue(student.name)],
+                ["Class", resultSafeValue(student.studentClass || currentClassName), "Session", "2026-27"],
+                ["Father Name", resultSafeValue(student.fatherName), "Mother Name", resultSafeValue(student.motherName)],
+                ["D.O.B", dobText, "Contact", resultSafeValue(student.phone)]
+            ],
+            styles: { font: "helvetica", fontSize: 7.8, fontStyle: "bold", textColor: [35, 35, 35], cellPadding: 1.25, valign: "middle" },
+            columnStyles: {
+                0: { cellWidth: 22, fillColor: [248, 244, 238] },
+                1: { cellWidth: 55 },
+                2: { cellWidth: 22, fillColor: [248, 244, 238] },
+                3: { cellWidth: contentWidth - 22 - 55 - 22 }
+            }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 2;
+
+        doc.setFillColor(240, 230, 211);
+        doc.setDrawColor(30, 42, 58);
+        doc.rect(marginLeft, currentY, contentWidth, 6, "FD");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.setTextColor(30, 42, 58);
+        doc.text("ACADEMIC PERFORMANCE REPORT", pageWidth / 2, currentY + 4.1, { align: "center" });
+        currentY += 6;
+
+        // Table headers
+        const academicHeadTop = [{ content: "Subject", rowSpan: 2 }];
+        const academicHeadBottom = [];
+
+        examOrder.forEach(k => {
+            academicHeadTop.push({ content: RESULT_TERM_LABELS[k], colSpan: 2 });
+            academicHeadBottom.push("M.M", "M.O");
+
+            if (isHalfYearly(k)) {
+                academicHeadTop.push({ content: "Term 1 Total", colSpan: 2 });
+                academicHeadBottom.push("M.M", "M.O");
+            }
+            if (isAnnual(k)) {
+                academicHeadTop.push({ content: "Term 2 Total", colSpan: 2 });
+                academicHeadBottom.push("M.M", "M.O");
+                academicHeadTop.push({ content: "Grand Total", colSpan: 2 });
+                academicHeadBottom.push("M.M", "M.O");
+            }
+        });
+
+        if (halfYearlyIndex < 0) {
+            academicHeadTop.push({ content: "Term 1 Total", colSpan: 2 });
+            academicHeadBottom.push("M.M", "M.O");
+        }
+        if (annualIndex < 0) {
+            academicHeadTop.push({ content: "Term 2 Total", colSpan: 2 });
+            academicHeadBottom.push("M.M", "M.O");
+            academicHeadTop.push({ content: "Grand Total", colSpan: 2 });
+            academicHeadBottom.push("M.M", "M.O");
+        }
+
+        // Table body
+        const academicBody = [];
+        subjects.forEach(subjectKey => {
+            const subjectData = subjectMap[subjectKey];
+            const totals = subjectFinalTotals[subjectKey];
+            const row = [subjectData.displayName];
+
+            examOrder.forEach(k => {
+                const mark = subjectData.exams[k] || null;
+                row.push(mark ? mark.max : "-", mark ? mark.obtained : "-");
+
+                if (isHalfYearly(k)) row.push(totals.term1.max, totals.term1.obtained);
+                if (isAnnual(k)) row.push(totals.term2.max, totals.term2.obtained, totals.final.max, totals.final.obtained);
+            });
+
+            if (halfYearlyIndex < 0) row.push(totals.term1.max, totals.term1.obtained);
+            if (annualIndex < 0) row.push(totals.term2.max, totals.term2.obtained, totals.final.max, totals.final.obtained);
+
+            academicBody.push(row);
+        });
+
+        // TOTAL row
+        const academicColumnCount = academicBody[0].length;
+        const totalRow = ["TOTAL"];
+        for (let col = 1; col < academicColumnCount; col++) {
+            let colSum = 0, colHasValue = false;
+            academicBody.forEach(row => {
+                const cellVal = row[col];
+                if (typeof cellVal === "number" && Number.isFinite(cellVal)) { colSum += cellVal; colHasValue = true; }
+            });
+            totalRow.push(colHasValue ? colSum : "-");
+        }
+        const totalRowIndex = academicBody.length;
+        academicBody.push(totalRow);
+
+        const totalColumns = academicBody[0].length;
+        const subjectWidth = 27;
+        const smallWidth = (contentWidth - subjectWidth) / Math.max(totalColumns - 1, 1);
+
+        const academicColumnStyles = { 0: { cellWidth: subjectWidth, halign: "left", fontStyle: "bold" } };
+        for (let i = 1; i < totalColumns; i++) {
+            academicColumnStyles[i] = { cellWidth: Math.max(5.2, smallWidth), halign: "center" };
+        }
+
+        doc.autoTable({
+            startY: currentY,
+            margin: { left: marginLeft, right: marginRight, top: 40, bottom: 11 },
+            head: [academicHeadTop, academicHeadBottom],
+            body: academicBody,
+            theme: "grid",
+            styles: {
+                font: "helvetica",
+                fontSize: totalColumns > 14 ? 5.7 : totalColumns > 10 ? 6.3 : 7.2,
+                fontStyle: "bold",
+                textColor: [30, 30, 30],
+                cellPadding: totalColumns > 14 ? 1.35 : 1.7,
+                valign: "middle",
+                halign: "center",
+                lineColor: [30, 42, 58],
+                lineWidth: 0.25
+            },
+            headStyles: {
+                fillColor: [232, 221, 208],
+                textColor: [20, 30, 40],
+                fontStyle: "bold",
+                halign: "center",
+                valign: "middle",
+                lineColor: [30, 42, 58],
+                lineWidth: 0.3
+            },
+            alternateRowStyles: { fillColor: [252, 250, 247] },
+            columnStyles: academicColumnStyles,
+            didParseCell: function (data) {
+                if (data.section === "body") {
+                    if (data.row.index === totalRowIndex) {
+                        data.cell.styles.fillColor = [232, 221, 208];
+                        data.cell.styles.textColor = [20, 30, 40];
+                        data.cell.styles.fontStyle = "bold";
+                        data.cell.styles.lineWidth = 0.4;
+                        if (data.column.index === 0) data.cell.styles.halign = "left";
+                    } else if (data.column.index === 0) {
+                        data.cell.styles.fillColor = [252, 250, 247];
+                    }
+                }
+            },
+            didDrawPage: function () {
+                const pageNumber = doc.internal.getNumberOfPages();
+                drawHeader();
+                drawFooter(pageNumber);
+            }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 2;
+
+        // FINAL RESULT SUMMARY
+        currentY = ensureSpace(currentY, 30);
+        doc.setFillColor(240, 230, 211);
+        doc.setDrawColor(30, 42, 58);
+        doc.rect(marginLeft, currentY, contentWidth, 6, "FD");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.setTextColor(30, 42, 58);
+        doc.text("FINAL RESULT SUMMARY", pageWidth / 2, currentY + 4.1, { align: "center" });
+        currentY += 6;
+
+        doc.autoTable({
+            startY: currentY,
+            margin: { left: marginLeft, right: marginRight },
+            theme: "grid",
+            body: [
+                ["Total Marks", totalMarks, "Total Marks Obtained", totalMarksObtained],
+                ["Percentage", `${overallPercentage.toFixed(2)}%`, "Grade", grade],
+                ["Performance", remark, "Division", overallDivision]
+            ],
+            styles: { font: "helvetica", fontSize: 8.5, fontStyle: "bold", textColor: [30, 30, 30], cellPadding: 1.6, halign: "center", valign: "middle" },
+            columnStyles: {
+                0: { fillColor: [248, 244, 238], cellWidth: contentWidth * 0.21 },
+                1: { cellWidth: contentWidth * 0.29 },
+                2: { fillColor: [248, 244, 238], cellWidth: contentWidth * 0.21 },
+                3: { cellWidth: contentWidth * 0.29 }
+            }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 2;
+
+        // GRADE CHART
+        currentY = ensureSpace(currentY, 48);
+        doc.setFillColor(240, 230, 211);
+        doc.setDrawColor(30, 42, 58);
+        doc.rect(marginLeft, currentY, contentWidth, 5.5, "FD");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8.5);
+        doc.setTextColor(30, 42, 58);
+        doc.text("GRADE CHART", pageWidth / 2, currentY + 3.8, { align: "center" });
+        currentY += 5.5;
+
+        const pctText = `${overallPercentage.toFixed(2)}%`;
+        const gradeRows = [
+            ["90% – 100%", "A+", "Outstanding", grade === "A+" ? pctText : ""],
+            ["80% – 89%", "A", "Excellent", grade === "A" ? pctText : ""],
+            ["70% – 79%", "B", "Very Good", grade === "B" ? pctText : ""],
+            ["60% – 69%", "C", "Good", grade === "C" ? pctText : ""],
+            ["50% – 59%", "D", "Average", grade === "D" ? pctText : ""],
+            ["40% – 49%", "E", "Pass", grade === "E" ? pctText : ""],
+            ["Below 40%", "F", "Fail", grade === "F" ? pctText : ""]
+        ];
+
+        doc.autoTable({
+            startY: currentY,
+            margin: { left: marginLeft, right: marginRight },
+            theme: "grid",
+            head: [["Percentage", "Grade", "Remark", "Student's Percentage"]],
+            body: gradeRows,
+            styles: { font: "helvetica", fontSize: 7, fontStyle: "bold", cellPadding: 1.05, halign: "center", valign: "middle", textColor: [40, 40, 40] },
+            headStyles: { fillColor: [232, 221, 208], textColor: [20, 30, 40], fontStyle: "bold", cellPadding: 1.2 },
+            alternateRowStyles: { fillColor: [252, 250, 247] }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 2;
+
+        // SIGNATURES / STAMPS
+        currentY = ensureSpace(currentY, 32);
+        doc.setDrawColor(180, 180, 180);
+        doc.setLineWidth(0.35);
+        doc.line(marginLeft, currentY, pageWidth - marginRight, currentY);
+        currentY += 3;
+
+        const stampWidth = 26;
+        const stampHeight = 20;
+        const leftStampX = marginLeft + 8;
+        const rightStampX = pageWidth - marginRight - stampWidth - 8;
+        const stampY = currentY;
+
+        if (leftStamp) doc.addImage(leftStamp, "PNG", leftStampX, stampY, stampWidth, stampHeight);
+        if (rightStamp) doc.addImage(rightStamp, "PNG", rightStampX, stampY, stampWidth, stampHeight);
+
+        const signatureLineY = stampY + stampHeight + 4;
+        doc.setDrawColor(50, 50, 50);
+        doc.setLineWidth(0.35);
+        doc.line(leftStampX - 4, signatureLineY, leftStampX + stampWidth + 4, signatureLineY);
+        const teacherCenter = pageWidth / 2;
+        doc.line(teacherCenter - 24, signatureLineY, teacherCenter + 24, signatureLineY);
+        doc.line(rightStampX - 4, signatureLineY, rightStampX + stampWidth + 4, signatureLineY);
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(7);
+        doc.setTextColor(45, 45, 45);
+        doc.text("Director Signature / Stamp", leftStampX + stampWidth / 2, signatureLineY + 4, { align: "center" });
+        doc.text("Class Teacher Signature", teacherCenter, signatureLineY + 4, { align: "center" });
+        doc.text("Principal Signature / Stamp", rightStampX + stampWidth / 2, signatureLineY + 4, { align: "center" });
+    }
+
+    function save(fileName) {
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let page = 1; page <= totalPages; page++) {
+            doc.setPage(page);
+            drawFooter(page);
+        }
+        doc.save(fileName);
+    }
+
+    return { doc, renderStudent, save };
+}
+
+async function downloadStudentResultPDF(index) {
+    const student = students[index];
+    if (!student) return;
+    if (!resultLibsReady()) return;
+
+    try {
+        const images = await loadResultImages();
+        const pdf = createResultPdf(images);
+        pdf.renderStudent(student);
+        pdf.save(`Result_${resultCleanFileName(student.name || "Student")}_${resultCleanFileName(student.studentClass || currentClassName || "Class")}.pdf`);
+    } catch (error) {
+        console.error("Result PDF generation error:", error);
+        alert("Could not generate Result PDF.\n\n" + error.message);
+    }
+}
+
+async function downloadAllResultsPDF() {
+    if (!students.length) {
+        alert("No students to generate results for.");
+        return;
+    }
+    if (!resultLibsReady()) return;
+
+    try {
+        const images = await loadResultImages();
+        const pdf = createResultPdf(images);
+        students.forEach((student, i) => {
+            if (i > 0) pdf.doc.addPage(); // every student on a fresh page
+            pdf.renderStudent(student);
+        });
+        pdf.save(`All_Results_${resultCleanFileName(currentClassName || "Extra_Class")}.pdf`);
+    } catch (error) {
+        console.error("All-results PDF generation error:", error);
+        alert("Could not generate combined PDF.\n\n" + error.message);
+    }
+}
+
+
+// ==========================================
+// ALL STUDENTS DATA PDF (tabular, one row per student)
+// ==========================================
+
+function downloadAllStudentsDataPDF() {
+    if (!students.length) {
+        alert("No students to export.");
+        return;
+    }
+
+    if (typeof window.jspdf === "undefined") {
+        alert("PDF library did not load. Please check your internet connection.");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF("l", "mm", "a4");
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    doc.setFillColor(252, 243, 232);
+    doc.rect(0, 0, pageWidth, 22, "F");
+    doc.setTextColor(45, 31, 12);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(15);
+    doc.text("SUNSHINE SCHOOL", pageWidth / 2, 10, { align: "center" });
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Extra Class - Students Data (${currentClassName})`, pageWidth / 2, 17, { align: "center" });
+
+    const head = [["#", ...STUDENT_COLUMNS.map(col => col.label)]];
+    const body = students.map((student, i) => [
+        i + 1,
+        ...STUDENT_COLUMNS.map(col => col.key === "dob" ? formatDOB(student.dob) : (student[col.key] || "-"))
+    ]);
+
+    doc.autoTable({
+        startY: 26,
+        margin: { left: 8, right: 8 },
+        theme: "grid",
+        head,
+        body,
+        styles: { font: "helvetica", fontSize: 6.5, cellPadding: 1.3, textColor: [40, 40, 40], overflow: "linebreak" },
+        headStyles: { fillColor: [245, 138, 46], textColor: [255, 255, 255], fontStyle: "bold" },
+        columnStyles: { 0: { cellWidth: 7 } }
+    });
+
+    const safeClassName = currentClassName.replace(/[^a-z0-9]+/gi, "_").toLowerCase();
+    doc.save(`${safeClassName || "extra_class"}_students_data.pdf`);
+}
+
+
+// Close modal on ESC key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeModal();
+    }
+});
+
+// Close modal on outside click
+document.getElementById("studentModal").addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+
+
+loadClass().then(() => {
+    // If we arrived back here from the profile page's "Edit" button
+    // (?edit=<index>), open the edit modal for that student automatically.
+    const editIndex = params.get("edit");
+    if (editIndex !== null && students[Number(editIndex)]) {
+        editStudent(Number(editIndex));
+    }
+});
 
 </script>
 

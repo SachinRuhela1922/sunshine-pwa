@@ -252,6 +252,70 @@ body {
     box-shadow: 0 6px 20px rgba(26, 82, 118, 0.3);
 }
 
+/* ===== SEARCH BAR ===== */
+.search-bar-wrapper {
+    margin-bottom: 1.2rem;
+}
+
+.search-bar {
+    background: white;
+    border-radius: 16px;
+    padding: 0.2rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    border: 1px solid rgba(245, 138, 46, 0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    transition: all 0.2s;
+}
+
+.search-bar:focus-within {
+    border-color: #f58a2e;
+    box-shadow: 0 0 0 3px rgba(245, 138, 46, 0.08);
+}
+
+.search-bar i.fa-search {
+    color: #f58a2e;
+    font-size: 0.95rem;
+}
+
+.search-bar input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0.7rem 0;
+    font-size: 0.9rem;
+    color: #2d1f0c;
+    font-weight: 500;
+}
+
+.search-bar input::placeholder {
+    color: #b8a58b;
+    font-weight: 400;
+}
+
+.clear-search-btn {
+    border: none;
+    background: #fcf3e8;
+    color: #b09a7e;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.clear-search-btn:hover {
+    background: #fce4e0;
+    color: #b53b2e;
+}
+
 /* ===== SECTION HEADER ===== */
 .section-header {
     display: flex;
@@ -1087,6 +1151,31 @@ td input[readonly] {
     }
 }
 
+/* ===== HOLIDAY ROW (admit card preview) ===== */
+.admit-card-preview table td.holiday-cell {
+    text-align: center;
+    background: #fff1f0;
+    color: #8b0000;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid #c97b73;
+}
+
+.admit-card-preview .holiday-cell .holiday-date {
+    color: #8b0000;
+}
+
+.admit-card-preview .holiday-cell .holiday-sep {
+    margin: 0 0.6rem;
+    color: #b53b2e;
+}
+
+.admit-card-preview .holiday-cell .holiday-tag {
+    color: #8b0000;
+    letter-spacing: 3px;
+}
+
 /* Extra small devices (<=360px) */
 @media (max-width: 360px) {
     body {
@@ -1257,6 +1346,23 @@ td input:focus {
         </div>
     </div>
 
+    <!-- ===== SEARCH BAR ===== -->
+    <div class="search-bar-wrapper">
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input
+                type="text"
+                id="studentSearchInput"
+                placeholder="Search by name, roll no, or admission no..."
+                oninput="filterStudents(this.value)"
+                autocomplete="off"
+            >
+            <button type="button" id="clearSearchBtn" class="clear-search-btn" onclick="clearStudentSearch()" style="display:none;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- ===== SECTION HEADER ===== -->
     <div class="section-header">
         <h3>
@@ -1409,17 +1515,64 @@ async function loadStudents() {
 // RENDER STUDENTS
 // ==========================================
 
+let currentSearchTerm = "";
+
+function studentMatchesSearch(student, term) {
+    if (!term) return true;
+    const haystack = [
+        student.studentName,
+        student.studentId,
+        student.rollNumber,
+        student.admissionNumber
+    ]
+        .filter(Boolean)
+        .map(v => String(v).toLowerCase())
+        .join(" | ");
+    return haystack.includes(term);
+}
+
 function renderStudents() {
     const container = document.getElementById("studentsContainer");
 
     if (!students.length) {
         container.innerHTML = `<div class="error"><i class="fas fa-users-slash"></i> No students found in this class.</div>`;
+        document.getElementById("studentCount").textContent = "0";
         return;
     }
 
-    container.innerHTML = students.map((student, index) => 
-        createStudentCard(student, index)
-    ).join("");
+    const term = currentSearchTerm.trim().toLowerCase();
+
+    // Keep original indices intact (studentSubjects / DOM ids rely on them)
+    // while only rendering the cards that match the current search term.
+    const visibleEntries = students
+        .map((student, index) => ({ student, index }))
+        .filter(({ student }) => studentMatchesSearch(student, term));
+
+    document.getElementById("studentCount").textContent =
+        term ? `${visibleEntries.length}/${students.length}` : students.length;
+
+    if (!visibleEntries.length) {
+        container.innerHTML = `<div class="error"><i class="fas fa-search"></i> No students match "${escapeHtml(currentSearchTerm)}".</div>`;
+        return;
+    }
+
+    container.innerHTML = visibleEntries
+        .map(({ student, index }) => createStudentCard(student, index))
+        .join("");
+}
+
+function filterStudents(value) {
+    currentSearchTerm = value || "";
+    document.getElementById("clearSearchBtn").style.display = currentSearchTerm ? "flex" : "none";
+    renderStudents();
+}
+
+function clearStudentSearch() {
+    currentSearchTerm = "";
+    const input = document.getElementById("studentSearchInput");
+    if (input) input.value = "";
+    document.getElementById("clearSearchBtn").style.display = "none";
+    renderStudents();
 }
 
 function updateSubjectNameInState(studentIndex, rowNum, newSubjectName) {
@@ -1437,11 +1590,12 @@ function getSavedSubjectEntry(savedMarks, subjectName, subjectIndex) {
     return savedMarks.find(item => item.subjectName === subjectName);
 }
 
-// A row is "locked" only when it was already saved AND has an obtained
-// mark greater than 0. Rows that are blank / 0 stay editable even after
-// the student has been saved once.
+// SECURITY RULE: once a student has ANY saved marks record, that student
+// is permanently locked — no editing, ever, regardless of whether the
+// obtained marks were 0 or higher. Only students with NO saved record at
+// all (fresh students) can have marks added.
 function isRowLocked(savedSubject) {
-    return !!(savedSubject && Number(savedSubject.obtainedMarks) > 0);
+    return !!savedSubject;
 }
 
 function createStudentCard(student, index) {
@@ -1453,14 +1607,17 @@ function createStudentCard(student, index) {
     const savedMarks = saved?.marks || [];
     const initials = (student.studentName || 'S').charAt(0).toUpperCase();
 
-    // Per-row lock flags: true only for subjects already saved with marks > 0
+    // A saved record (even with all-zero marks) permanently locks the
+    // whole student. No partial / per-row editing after first save.
+    const hasExistingRecord = !!(saved && saved.marks && saved.marks.length);
+
     const rowLockFlags = subjects.map((subjectName, subjectIndex) => {
         const savedSubject = getSavedSubjectEntry(savedMarks, subjectName, subjectIndex);
-        return isRowLocked(savedSubject);
+        return hasExistingRecord ? true : isRowLocked(savedSubject);
     });
 
     const lockedCount = rowLockFlags.filter(Boolean).length;
-    const isFullyLocked = subjects.length > 0 && lockedCount === subjects.length;
+    const isFullyLocked = hasExistingRecord;
     const hasAnyLocked = lockedCount > 0;
 
     return `
@@ -1703,11 +1860,25 @@ function toggleAbsent(studentIndex, subjectIndex, button) {
     }
 }
 // ==========================================
-// SAVE MARKS - LOCKS ONLY ROWS WITH MARKS > 0
+// SAVE MARKS - PERMANENTLY LOCKS THE STUDENT ONCE SAVED
+// Fresh students (no existing record) can be saved once. After that,
+// no further edits are allowed — not even for 0/blank marks.
 // ==========================================
 
 async function saveMarks(index) {
     const student = students[index];
+
+    // Hard guard: block save entirely if a record already exists for this
+    // student, even if someone tampers with the DOM/readonly attributes.
+    const alreadySaved = existingMarks.find(
+        record => String(record.studentMongoId) === String(student._id)
+    );
+    if (alreadySaved && alreadySaved.marks && alreadySaved.marks.length) {
+        alert("⚠️ Marks for this student are already saved and permanently locked. Editing is not allowed.");
+        renderStudents();
+        return;
+    }
+
     const card = document.getElementById(`student-${index}`);
 
     const rows = card.querySelectorAll(`#marks-body-${index} tr`);
@@ -1801,15 +1972,11 @@ async function saveMarks(index) {
         return;
     }
 
-    // Warn only about the rows that will actually get locked this time
-    // (obtainedMarks > 0). 0 / blank rows stay editable for later.
-    const willLockNow = marks.filter(m => m.obtainedMarks > 0).length;
-
     const confirmSubmit = confirm(
-        `⚠️ Subjects with obtained marks greater than 0 will be LOCKED and cannot be edited again ` +
-        `(${willLockNow} subject${willLockNow !== 1 ? 's' : ''} this time).\n` +
-        `Subjects left at 0 / blank will remain editable for later.\n\n` +
-        `Do you want to continue?`
+        `⚠️ Once saved, marks for ${student.studentName} CANNOT be edited again — ever, ` +
+        `even if a subject is left at 0 or blank.\n` +
+        `Please double-check every value before continuing.\n\n` +
+        `Do you want to save?`
     );
 
     if (!confirmSubmit) return;
@@ -1850,7 +2017,7 @@ async function saveMarks(index) {
         // Re-render to show updated lock state
         renderStudents();
 
-        alert(`✅ Marks for ${student.studentName} saved. Subjects with marks > 0 are now locked; 0/blank subjects remain editable.`);
+        alert(`✅ Marks for ${student.studentName} saved and permanently locked.`);
 
     } catch (error) {
         console.error(error);
@@ -1928,6 +2095,28 @@ document.getElementById('admitCardOverlay').addEventListener('click', function(e
         closeOverlay();
     }
 });
+
+function isHolidayName(v) {
+    return /holiday/i.test(String(v || ""));
+}
+
+// Returns { label, date, day } if this row is a holiday, else null
+function getHolidayInfo(row, keys) {
+    const subKey = keys.find(k => k.toLowerCase().includes("subject"));
+    if (!subKey || !isHolidayName(row[subKey])) return null;
+    const dateKey = keys.find(k => k.toLowerCase().includes("date"));
+    const dayKey = keys.find(k => k.toLowerCase().includes("day"));
+    return {
+        label: String(row[subKey]).trim().toUpperCase(),
+        date: dateKey ? formatDateValue(row[dateKey]) : "",
+        day: dayKey ? String(row[dayKey] || "").toUpperCase() : ""
+    };
+}
+
+function holidayText(h) {
+    const when = [h.date, h.day ? "(" + h.day + ")" : ""].filter(Boolean).join(" ");
+    return when ? when + "  -  " + h.label : h.label;
+}
 
 function generateAdmitCardPreviewHTML(rows) {
     if (!rows || !rows.length) {
@@ -2022,7 +2211,19 @@ function generateAdmitCardPreviewHTML(rows) {
                     </tr>
                 </thead>
                 <tbody>
-                    ${studentRows.map(row => `
+                    ${studentRows.map(row => {
+                        const h = getHolidayInfo(row, subjectKeys);
+                        if (h) {
+                            const when = [h.date, h.day ? "(" + h.day + ")" : ""].filter(Boolean).join(" ");
+                            return `
+                        <tr class="holiday-row">
+                            <td colspan="${subjectKeys.length}" class="holiday-cell">
+                                ${when ? `<span class="holiday-date">${escapeHtml(when)}</span><span class="holiday-sep">-</span>` : ""}
+                                <span class="holiday-tag">${escapeHtml(h.label)}</span>
+                            </td>
+                        </tr>`;
+                        }
+                        return `
                         <tr>
                             ${subjectKeys.map(k => {
                                 const rawValue = row[k] || '';
@@ -2032,7 +2233,8 @@ function generateAdmitCardPreviewHTML(rows) {
                                 return `<td>${escapeHtml(displayValue)}</td>`;
                             }).join('')}
                         </tr>
-                    `).join('')}
+                    `;
+                    }).join('')}
                 </tbody>
             </table>`;
             html += `</div>`;
@@ -2386,8 +2588,22 @@ async function generateAdmitCardsPDF(rows) {
         // "Signature" column appended to the schedule table, left
         // blank for the student/invigilator to sign against each row.
         const tableHead = [[...sampleKeys, "Signature"]];
-        const tableBody = studentRows.map(row =>
-            [
+        const tableBody = studentRows.map(row => {
+            const h = getHolidayInfo(row, sampleKeys);
+            if (h) {
+                return [{
+                    content: holidayText(h),
+                    colSpan: sampleKeys.length + 1,
+                    styles: {
+                        halign: "center",
+                        fontStyle: "bold",
+                        textColor: [139, 0, 0],
+                        fillColor: [253, 236, 234],
+                        minCellHeight: 10
+                    }
+                }];
+            }
+            return [
                 ...sampleKeys.map(k => {
                     if (row[k] === undefined) return "";
                     return k.toLowerCase().includes("date")
@@ -2395,11 +2611,36 @@ async function generateAdmitCardsPDF(rows) {
                         : String(row[k]);
                 }),
                 "" // Signature — intentionally blank
-            ]
-        );
+            ];
+        });
 
-        if (sampleKeys.length) {
-            doc.autoTable({
+        // Signature block neeche shift kiya (pehle -40 / -33 tha) taaki table ko
+        // zyada jagah mile aur kuch overlap na ho.
+        const sigBoxWidth = 55;
+        const sigImgWidth = 32;
+        const sigImgHeight = 16;
+        const sigLineY = pageHeight - 17;
+        const sigTextY = pageHeight - 11;
+        const sigImgY = sigLineY - sigImgHeight - 2;
+
+        // Table ka max end Y: "Examiner Signature" label (sigImgY - 3) se upar
+        const tableMaxEndY = sigImgY - 8;
+
+        // [fontSize, cellPadding, min row height]  (comfortable -> compact)
+        const tableSizes = [
+            [9.5, 6, 15],
+            [9.5, 5, 13.5],
+            [9, 4.5, 12],
+            [9, 4, 10.5],
+            [9, 3, 8],
+            [8.5, 2.5, 7],
+            [8, 2, 6],
+            [8, 1.5, 5.5],
+            [7.5, 1, 5]
+        ];
+
+        const buildTable = (d, tblFont, pad, minRowH) => {
+            d.autoTable({
                 startY: y,
                 margin: {
                     left: margin,
@@ -2412,11 +2653,11 @@ async function generateAdmitCardsPDF(rows) {
                     fillColor: [180, 30, 30],
                     textColor: 255,
                     fontStyle: "bold",
-                    fontSize: 9
+                    fontSize: tblFont
                 },
                 styles: {
-                    fontSize: 9,
-                    cellPadding: 4,
+                    fontSize: tblFont,
+                    cellPadding: pad,
                     textColor: [40, 40, 40]
                 },
                 alternateRowStyles: {
@@ -2424,9 +2665,25 @@ async function generateAdmitCardsPDF(rows) {
                 },
                 columnStyles: {
                     // Keep the Signature column wide enough to actually sign in
-                    [sampleKeys.length]: { cellWidth: 30, minCellHeight: 10 }
+                    [sampleKeys.length]: { cellWidth: 30, minCellHeight: minRowH }
                 }
             });
+            return d.lastAutoTable.finalY;
+        };
+
+        if (sampleKeys.length) {
+            // Scratch PDF me measure karke sabse bada size chuno jo signature se overlap na kare
+            let chosen = tableSizes[tableSizes.length - 1];
+            for (const size of tableSizes) {
+                const scratch = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+                scratch.setFont("helvetica", "normal");
+                const endY = buildTable(scratch, size[0], size[1], size[2]);
+                if (scratch.internal.getNumberOfPages() === 1 && endY <= tableMaxEndY) {
+                    chosen = size;
+                    break;
+                }
+            }
+            buildTable(doc, chosen[0], chosen[1], chosen[2]);
         } else {
             doc.setFontSize(10);
             doc.setTextColor(100, 100, 100);
@@ -2442,12 +2699,7 @@ async function generateAdmitCardsPDF(rows) {
         // sitting above its own line, with a text label below the line.
         // Positioned above the footer disclaimer text at the very bottom.
         // ---------------------------------------------------------------
-        const sigBoxWidth = 55;
-        const sigImgWidth = 32;
-        const sigImgHeight = 16;
-        const sigLineY = pageHeight - 40;
-        const sigTextY = pageHeight - 33;
-        const sigImgY = sigLineY - sigImgHeight - 2;
+        // (signature positions upar define kiye gaye hain)
 
         doc.setDrawColor(40, 40, 40);
         doc.setLineWidth(0.5);
@@ -2507,31 +2759,6 @@ async function generateAdmitCardsPDF(rows) {
             rightBoxX + sigBoxWidth / 2,
             sigTextY,
             { align: "center" }
-        );
-
-        doc.setFontSize(8);
-        doc.setTextColor(120, 120, 120);
-        doc.text(
-            "This is a system-generated admit card for examination purposes – Sunshine School",
-            pageWidth / 2,
-            pageHeight - 18,
-            {
-                align: "center"
-            }
-        );
-        doc.text(
-            `Generated on ${new Date().toLocaleString("en-IN", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            })}`,
-            pageWidth / 2,
-            pageHeight - 13,
-            {
-                align: "center"
-            }
         );
     });
 

@@ -568,6 +568,83 @@
                 font-size: 0.8rem;
             }
         }
+
+        /* ---------- holiday / festival option ---------- */
+        .holiday-box {
+            background: #fcf9f4;
+            border: 1.5px dashed #f0e2d2;
+            border-radius: 20px;
+            padding: 0.9rem 1.2rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+
+        .holiday-box.active {
+            background: #e8f1fc;
+            border: 1.5px solid #9dc1ef;
+        }
+
+        .holiday-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #3d2e1b;
+            cursor: pointer;
+        }
+
+        .holiday-toggle input {
+            width: 18px;
+            height: 18px;
+            accent-color: #1565c0;
+            cursor: pointer;
+        }
+
+        .holiday-details {
+            display: none;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.8rem;
+            margin-top: 0.8rem;
+        }
+
+        .holiday-box.active .holiday-details {
+            display: flex;
+        }
+
+        .holiday-details select,
+        .holiday-details input[type="text"] {
+            padding: 0.5rem 0.9rem;
+            border: 1.5px solid #f0e2d2;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            background: white;
+            outline: none;
+            color: #2d1f0c;
+            font-weight: 500;
+        }
+
+        .holiday-details select:focus,
+        .holiday-details input[type="text"]:focus {
+            border-color: #1565c0;
+        }
+
+        .holiday-details input[type="text"] {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .holiday-note {
+            width: 100%;
+            font-size: 0.75rem;
+            color: #5d6f86;
+        }
+
+        .student-list.holiday-mode .student-row {
+            opacity: 0.5;
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -641,7 +718,7 @@
     </div>
 
     <script>
-        const API_URL = "https://sunshine-swp6.onrender.com";
+        const API_URL = "https://sunshine-swp6.onrender.com"; // Change this to your actual API URL
 
         // ==========================================
         // GET TEACHER'S ASSIGNED CLASSES
@@ -796,7 +873,7 @@
                 }
 
                 // Build student list
-                let html = `<div class="student-list">`;
+                let html = holidayPanelHtml() + `<div class="student-list">`;
 
                 students.forEach((student, index) => {
                     html += `
@@ -805,6 +882,8 @@
                                 <span class="index">${index + 1}.</span>
                                 <span class="name">${student.studentName || '-'}</span>
                                 <span class="roll"><i class="fas fa-sort-numeric-up"></i> ${student.rollNumber || 'N/A'}</span>
+                                <span class="name"> - > ${student.father?.name || '-'}</span>
+                                <span class="name"> - > ${student.mother?.name || '-'}</span>
                             </div>
                             <div class="attendance-options">
                                 <label class="present">
@@ -832,6 +911,7 @@
                 `;
 
                 studentsContainer.innerHTML = html;
+                initHolidayControls();
 
                 // Attach save event
                 document.getElementById('saveAttendanceBtn').addEventListener('click', () => {
@@ -855,11 +935,87 @@
         // SAVE ATTENDANCE
         // ==========================================
 
-        async function saveAttendance(students, className) {
+        // ==========================================
+    // HOLIDAY / FESTIVAL OPTION
+    // ==========================================
+
+    function holidayPanelHtml() {
+        return `
+            <div class="holiday-box" id="holidayBox">
+                <label class="holiday-toggle">
+                    <input type="checkbox" id="holidayToggle">
+                    <i class="fas fa-umbrella-beach" style="color:#1565c0;"></i>
+                    Mark today as Holiday (all students of this class)
+                </label>
+                <div class="holiday-details">
+                    <select id="holidayReason">
+                        <option value="Festival">Festival</option>
+                        <option value="General Holiday">General Holiday</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="holidayName" maxlength="80"
+                        placeholder="Festival name (e.g. Diwali, Holi, Eid)">
+                    <span class="holiday-note">
+                        All students will be saved as "Holiday" for the selected date.
+                        This day will not count as Present or Absent.
+                    </span>
+                </div>
+            </div>
+        `;
+    }
+
+    function initHolidayControls() {
+        const box = document.getElementById("holidayBox");
+        const toggle = document.getElementById("holidayToggle");
+        const reason = document.getElementById("holidayReason");
+        const nameInput = document.getElementById("holidayName");
+        const list = document.querySelector(".student-list");
+
+        if (!box || !toggle) return;
+
+        function refreshPlaceholder() {
+            nameInput.placeholder = reason.value === "Festival"
+                ? "Festival name (e.g. Diwali, Holi, Eid)"
+                : "Reason (optional)";
+        }
+
+        toggle.addEventListener("change", () => {
+            const on = toggle.checked;
+            box.classList.toggle("active", on);
+            if (list) list.classList.toggle("holiday-mode", on);
+            document.querySelectorAll(".student-row input[type='radio']")
+                .forEach(r => { r.disabled = on; });
+            if (on) nameInput.focus();
+        });
+
+        reason.addEventListener("change", refreshPlaceholder);
+        refreshPlaceholder();
+    }
+
+    function getHolidayState() {
+        const toggle = document.getElementById("holidayToggle");
+        const isHoliday = !!(toggle && toggle.checked);
+
+        return {
+            isHoliday,
+            reason: isHoliday ? document.getElementById("holidayReason").value : "",
+            name: isHoliday ? document.getElementById("holidayName").value.trim() : ""
+        };
+    }
+
+    async function saveAttendance(students, className) {
             const selectedDate = attendanceDate.value;
 
             if (!selectedDate) {
                 alert("Please select attendance date.");
+                return;
+            }
+
+            const holiday = getHolidayState();
+
+            if (holiday.isHoliday && holiday.reason === "Festival" && !holiday.name) {
+                alert("Please type the festival name.");
+                document.getElementById("holidayName").focus();
                 return;
             }
 
@@ -871,7 +1027,7 @@
                     studentId: student._id,
                     studentName: student.studentName,
                     rollNumber: student.rollNumber || "",
-                    status: selected ? selected.value : "Absent"
+                    status: holiday.isHoliday ? "Holiday" : (selected ? selected.value : "Absent")
                 };
             });
 
@@ -879,7 +1035,10 @@
                 date: selectedDate,
                 className: className,
                 session: "2026-27",
-                students: attendanceData
+                students: attendanceData,
+                isHoliday: holiday.isHoliday,
+                holidayReason: holiday.reason,
+                holidayName: holiday.name
             };
 
             const saveBtn = document.getElementById('saveAttendanceBtn');

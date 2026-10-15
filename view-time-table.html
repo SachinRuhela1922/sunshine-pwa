@@ -82,8 +82,8 @@ tr:hover td{background:#fcf9f4}
 <div class="container">
 <div class="page-header">
 <div>
-<h1><i class="fas fa-clock"></i> Time Table</h1>
-<div class="header-sub"><i class="fas fa-school"></i> View school schedule</div>
+<h1><i class="fas fa-clock"></i> My Time Table</h1>
+<div class="header-sub"><i class="fas fa-user-tie"></i> <span id="myTimetableSub">Your personal teaching schedule</span></div>
 </div>
 <div class="actions">
 <button class="btn-action btn-secondary" id="downloadPdfBtn" onclick="downloadPDF()" disabled><i class="fas fa-file-pdf"></i> Download PDF</button>
@@ -95,11 +95,11 @@ tr:hover td{background:#fcf9f4}
 <div class="banner-info">
 <div class="banner-icon"><i class="fas fa-calendar-alt"></i></div>
 <div class="banner-details">
-<h2>School Time Table</h2>
-<p><i class="fas fa-info-circle"></i> View summer and winter schedules</p>
+<h2>My Time Table</h2>
+<p><i class="fas fa-info-circle"></i> Only your own classes &amp; lectures are shown below</p>
 </div>
 </div>
-<div class="banner-badge"><i class="fas fa-clock"></i> Academic Year 2025-26</div>
+<div class="banner-badge" id="teacherNameBadge"><i class="fas fa-user"></i> Loading...</div>
 </div>
 
 <div class="season-buttons">
@@ -126,6 +126,53 @@ tr:hover td{background:#fcf9f4}
 const API = "https://sunshine-swp6.onrender.com";
 const TOTAL_CLASSES = 10;
 let currentTimetable = null;
+
+// ==================================================
+// LOGGED-IN TEACHER SESSION
+// (Same session key/pattern used on teacher.html.
+// This page must only ever show THIS teacher's own
+// lectures -- never the full school grid.)
+// ==================================================
+const loggedTeacher = JSON.parse(localStorage.getItem("loggedInTeacher"));
+
+if (!loggedTeacher) {
+    window.location.href = "index.html";
+}
+
+const loggedTeacherId = String(loggedTeacher?.teacherId || "").trim();
+const loggedEmployeeId = String(loggedTeacher?.employeeId || "").trim();
+const loggedMongoId = String(loggedTeacher?._id || loggedTeacher?.id || "").trim();
+const loggedTeacherName = String(loggedTeacher?.name || "").trim().toLowerCase();
+
+document.addEventListener("DOMContentLoaded", () => {
+    const badge = document.getElementById("teacherNameBadge");
+    const sub = document.getElementById("myTimetableSub");
+    if (badge) {
+        badge.innerHTML = `<i class="fas fa-user"></i> ${escapeHtml(loggedTeacher?.name || "Teacher")}`;
+    }
+    if (sub) {
+        sub.textContent = `Personal schedule for ${loggedTeacher?.name || "you"}`;
+    }
+});
+
+// Matches a class-slot's teacher against the logged-in teacher.
+// Tries teacherId, employeeId, Mongo _id, then falls back to
+// a case-insensitive name match (older timetable entries only
+// stored a plain teacher name string).
+function isMyLecture(classData) {
+    const data = normalizeClassData(classData);
+    if (!data.teacherName && !data.teacherId) return false;
+
+    const dataTeacherId = String(data.teacherId || "").trim();
+    const dataTeacherName = String(data.teacherName || "").trim().toLowerCase();
+
+    if (loggedTeacherId && dataTeacherId && loggedTeacherId === dataTeacherId) return true;
+    if (loggedEmployeeId && dataTeacherId && loggedEmployeeId === dataTeacherId) return true;
+    if (loggedMongoId && dataTeacherId && loggedMongoId === dataTeacherId) return true;
+    if (loggedTeacherName && dataTeacherName && loggedTeacherName === dataTeacherName) return true;
+
+    return false;
+}
 
 async function loadTimetable(season) {
     const container = document.getElementById("timetableContainer");
@@ -277,6 +324,7 @@ function renderTimetable(timetable) {
     const lectures = Array.isArray(timetable.lectures) ? timetable.lectures : [];
 
     let lectureRows = "";
+    let hasAnyOfMyLectures = false;
 
     if (lectures.length) {
         lectureRows = lectures.map((lecture, index) => {
@@ -291,31 +339,50 @@ function renderTimetable(timetable) {
                         </td>
                         <td style="color:#856404;">${escapeHtml(from)}</td>
                         <td style="color:#856404;">${escapeHtml(to)}</td>
-                        <td colspan="${TOTAL_CLASSES}" style="color:#856404;">—</td>
+                        <td colspan="2" style="color:#856404;">—</td>
                     </tr>
                 `;
             }
 
+            // Find the ONE class slot (if any) in this lecture period that
+            // belongs to the logged-in teacher. A teacher teaches at most
+            // one class per lecture period.
             const classesObj = mapToObject(lecture.classes);
-            let classCells = "";
+            let myClassNum = null;
+            let mySubject = "";
 
             for (let c = 1; c <= TOTAL_CLASSES; c++) {
-                classCells += renderClassCell(getClassData(classesObj, c));
+                const data = getClassData(classesObj, c);
+                if (isMyLecture(data)) {
+                    myClassNum = c;
+                    mySubject = data.subject || "";
+                    hasAnyOfMyLectures = true;
+                    break;
+                }
             }
+
+            const classCell = myClassNum
+                ? `<td><span class="teacher-name">Class ${myClassNum}</span></td>`
+                : `<td><span class="no-teacher">-</span></td>`;
+
+            const subjectCell = mySubject
+                ? `<td><span class="subject-name">${escapeHtml(mySubject)}</span></td>`
+                : `<td><span class="no-teacher">${myClassNum ? "-" : "Free Period"}</span></td>`;
 
             return `
                 <tr>
                     <td class="lecture-number">${lecture.lectureNumber ?? index + 1}</td>
                     <td>${escapeHtml(from)}</td>
                     <td>${escapeHtml(to)}</td>
-                    ${classCells}
+                    ${classCell}
+                    ${subjectCell}
                 </tr>
             `;
         }).join("");
     } else {
         lectureRows = `
             <tr>
-                <td colspan="${3 + TOTAL_CLASSES}" style="text-align:center;color:#b09a7e;padding:1.5rem;">
+                <td colspan="5" style="text-align:center;color:#b09a7e;padding:1.5rem;">
                     <i class="fas fa-book" style="color:#f0e2d2;display:block;font-size:1.5rem;margin-bottom:.3rem;"></i>
                     No lecture data available.
                 </td>
@@ -350,9 +417,17 @@ function renderTimetable(timetable) {
         <div class="timing-box">
             <div class="box-title">
                 <i class="fas fa-list"></i>
-                Lecture Schedule
+                My Lecture Schedule
                 <span class="title-badge">${lectures.length} Lectures</span>
             </div>
+
+            ${!hasAnyOfMyLectures ? `
+                <div class="empty" style="padding:1.5rem;margin-bottom:1rem;">
+                    <i class="fas fa-user-clock"></i>
+                    <h4>No classes assigned to you</h4>
+                    <p>We couldn't find any lecture in the ${escapeHtml(season)} timetable assigned to your name/ID.</p>
+                </div>
+            ` : ""}
 
             <div class="table-wrapper">
                 <table>
@@ -361,7 +436,8 @@ function renderTimetable(timetable) {
                             <th><i class="fas fa-hashtag"></i> Lecture No.</th>
                             <th><i class="fas fa-arrow-right"></i> From</th>
                             <th><i class="fas fa-arrow-left"></i> To</th>
-                            ${Array.from({length: TOTAL_CLASSES}, (_, i) => `<th>Class ${i + 1}</th>`).join("")}
+                            <th><i class="fas fa-chalkboard"></i> Class</th>
+                            <th><i class="fas fa-book-open"></i> Subject</th>
                         </tr>
                     </thead>
                     <tbody>${lectureRows}</tbody>
@@ -391,9 +467,11 @@ function downloadPDF() {
     const prayerBell = currentTimetable.prayerBell || "-";
     const lectures = Array.isArray(currentTimetable.lectures) ? currentTimetable.lectures : [];
 
+    const teacherDisplayName = loggedTeacher?.name || "Teacher";
+
     doc.setFontSize(16);
     doc.setTextColor(45,31,12);
-    doc.text(`Sunshine School - ${season} Timetable`,14,15);
+    doc.text(`Sunshine School - ${teacherDisplayName}'s ${season} Timetable`,14,15);
 
     doc.setFontSize(10);
     doc.setTextColor(90,75,55);
@@ -402,8 +480,7 @@ function downloadPDF() {
         14,22
     );
 
-    const classHeaders = Array.from({length:TOTAL_CLASSES},(_,i)=>`Class ${i+1}`);
-    const tableHead = [["Lecture No.","From","To",...classHeaders]];
+    const tableHead = [["Lecture No.","From","To","Class","Subject"]];
 
     const body = lectures.map((lecture,index)=>{
         const from = formatTimeValue(lecture.from) || lecture.from || "-";
@@ -412,25 +489,30 @@ function downloadPDF() {
         if (lecture.type === "lunch") {
             return [
                 "Lunch",from,to,
-                {content:"—",colSpan:TOTAL_CLASSES,styles:{halign:"center"}}
+                {content:"—",colSpan:2,styles:{halign:"center"}}
             ];
         }
 
+        // Only this teacher's own class slot for this lecture period
         const classesObj = mapToObject(lecture.classes);
-        const classCells = Array.from({length:TOTAL_CLASSES},(_,i)=>{
-            const data = getClassData(classesObj,i+1);
-            if (!data.teacherName && !data.subject) return "-";
-            if (data.teacherName && data.subject) {
-                return `${data.teacherName}\n${data.subject}`;
+        let myClassNum = null;
+        let mySubject = "-";
+
+        for (let c=1;c<=TOTAL_CLASSES;c++){
+            const data = getClassData(classesObj,c);
+            if (isMyLecture(data)) {
+                myClassNum = c;
+                mySubject = data.subject || "-";
+                break;
             }
-            return data.teacherName || data.subject || "-";
-        });
+        }
 
         return [
             lecture.lectureNumber ?? index+1,
             from,
             to,
-            ...classCells
+            myClassNum ? `Class ${myClassNum}` : "-",
+            myClassNum ? mySubject : "Free Period"
         ];
     });
 
@@ -481,7 +563,7 @@ function downloadPDF() {
         );
     }
 
-    doc.save(`Sunshine_${season}_Timetable.pdf`);
+    doc.save(`Sunshine_${teacherDisplayName.replace(/\s+/g,"_")}_${season}_Timetable.pdf`);
 }
 
 function escapeHtml(value) {

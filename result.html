@@ -262,6 +262,63 @@
             overflow: hidden;
         }
 
+        /* ===== STUDENT SEARCH ===== */
+.student-search-box {
+    background: white;
+    border: 1px solid rgba(245, 138, 46, 0.12);
+    border-radius: 18px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.03);
+}
+
+.student-search-box > i {
+    color: #f58a2e;
+    font-size: 1rem;
+}
+
+.student-search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.9rem;
+    color: #2d1f0c;
+}
+
+.student-search-box input::placeholder {
+    color: #b09a7e;
+}
+
+.student-search-box button {
+    border: none;
+    background: #fcf3e8;
+    color: #f58a2e;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.student-search-box button:hover {
+    background: #f58a2e;
+    color: white;
+}
+
+.student-search-info {
+    font-size: 0.78rem;
+    color: #8a765e;
+    margin: -0.5rem 0 1rem;
+    display: none;
+}
+
         .class-card::before {
             content: '';
             position: absolute;
@@ -496,6 +553,13 @@
 
         .marks-table tr:hover td {
             background: #fcf9f4;
+        }
+
+        .marks-table tfoot td {
+            background: #fcf3e8 !important;
+            font-weight: 700;
+            color: #2d1f0c;
+            border-top: 2px solid #f58a2e;
         }
 
         /* ===== RESULT SUMMARY ===== */
@@ -1127,14 +1191,45 @@
                 <i class="fas fa-arrow-left"></i> Back to Classes
             </button>
             <div class="section-header">
-                <h3 id="classTitle">
-                    <i class="fas fa-users"></i> Students
-                </h3>
-                <span class="hint">
-                    <i class="fas fa-hand-pointer"></i> Click a student to view results
-                </span>
-            </div>
-            <div id="students"></div>
+    <h3 id="classTitle">
+        <i class="fas fa-users"></i> Students
+    </h3>
+
+    <span class="hint">
+        <i class="fas fa-hand-pointer"></i> Click a student to view results
+    </span>
+</div>
+
+<div class="action-bar">
+    <button class="btn-pdf" id="allPdfBtn" onclick="downloadAllResultsPDF()">
+        <i class="fas fa-file-pdf"></i> Download All Students PDF
+    </button>
+</div>
+
+<div class="student-search-box">
+    <i class="fas fa-search"></i>
+
+    <input
+        type="text"
+        id="studentSearch"
+        placeholder="Search by name, ID, roll no, father/mother name, mobile..."
+        oninput="filterStudents()"
+        autocomplete="off"
+    />
+
+    <button
+        type="button"
+        id="clearStudentSearch"
+        onclick="clearStudentSearch()"
+        title="Clear search"
+    >
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+
+<div id="studentSearchInfo" class="student-search-info"></div>
+
+<div id="students"></div>
         </div>
 
         <!-- ===== RESULT SECTION ===== -->
@@ -1189,6 +1284,7 @@
 
     <script>
         const API_URL = "https://sunshine-swp6.onrender.com/api/exam-marks";
+const STUDENTS_API_URL = "https://sunshine-swp6.onrender.com/api/students";
 
         let allExamMarks = [];
         let selectedClass = "";
@@ -1197,29 +1293,100 @@
         window.editingExam = null;
 
         // ======================== FETCH ========================
-        async function loadData(silent) {
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
-                console.log("ExamMarks loaded:", data);
-                allExamMarks = data.examMarks || data.data || data;
-                if (!Array.isArray(allExamMarks)) {
-                    console.error("Unexpected data format:", data);
-                    allExamMarks = [];
-                }
-                if (!silent) showClasses();
-            } catch (error) {
-                console.error("Load error:", error);
-                document.getElementById("classes").innerHTML = `
+       // ======================== STUDENT DATA HELPERS ========================
+function pickName(person) {
+    if (!person) return "";
+    if (typeof person === "string") return person;
+    return person.name || person.fullName || person.fatherName || person.motherName || "";
+}
+
+// Phone: flat fields, father/mother/guardian/contact ke andar, ya kahin bhi nested
+function pickPhone(s) {
+    if (!s) return "";
+    const direct = [
+        s.phone, s.mobile, s.mobileNumber, s.phoneNumber, s.contactNumber,
+        s.father?.phone, s.father?.mobile, s.father?.mobileNumber, s.father?.contact, s.father?.phoneNumber,
+        s.mother?.phone, s.mother?.mobile, s.mother?.mobileNumber, s.mother?.contact, s.mother?.phoneNumber,
+        s.guardian?.phone, s.guardian?.mobile,
+        s.contact?.phone, s.contact?.mobile, s.contact?.primary,
+        s.alternatePhone
+    ].find(v => v !== undefined && v !== null && String(v).trim() !== "");
+    if (direct) return String(direct);
+
+    // Last fallback: poore object me phone/mobile/contact naam ki key dhoondo
+    let found = "";
+    (function scan(obj, depth) {
+        if (!obj || typeof obj !== "object" || depth > 3 || found) return;
+        for (const key of Object.keys(obj)) {
+            const val = obj[key];
+            if (/phone|mobile|contact/i.test(key) && (typeof val === "string" || typeof val === "number")
+                && String(val).replace(/\D/g, "").length >= 8) {
+                found = String(val);
+                return;
+            }
+            if (val && typeof val === "object") scan(val, depth + 1);
+            if (found) return;
+        }
+    })(s, 0);
+    return found;
+}
+
+// ======================== FETCH ========================
+async function loadData(silent) {
+    try {
+        const [marksRes, studentsRes] = await Promise.all([
+            fetch(API_URL),
+            fetch(STUDENTS_API_URL).catch(() => null)
+        ]);
+
+        const data = await marksRes.json();
+        allExamMarks = data.examMarks || data.data || data;
+        if (!Array.isArray(allExamMarks)) {
+            console.error("Unexpected data format:", data);
+            allExamMarks = [];
+        }
+
+        let studentList = [];
+        try {
+            if (studentsRes && studentsRes.ok) {
+                const sData = await studentsRes.json();
+                studentList = sData.students || sData.data || (Array.isArray(sData) ? sData : []);
+            }
+        } catch (e) {
+            console.warn("Students fetch failed:", e);
+        }
+        console.log("Students loaded:", studentList.length, "| sample:", studentList[0]);
+
+        const byMongoId = new Map(studentList.map(s => [String(s._id), s]));
+        const byStudentId = new Map(studentList.filter(s => s.studentId).map(s => [String(s.studentId), s]));
+
+        allExamMarks = allExamMarks.map(item => {
+            const s = byMongoId.get(String(item.studentMongoId))
+                   || byStudentId.get(String(item.studentId))
+                   || {};
+            return {
+                ...item,
+                fatherName: item.fatherName || pickName(s.father) || s.fatherName || "",
+                motherName: item.motherName || pickName(s.mother) || s.motherName || "",
+                phone: item.phone || pickPhone(s) || "",
+                dob: item.dob || s.dob || "",
+                rollNumber: item.rollNumber || s.rollNumber || "",
+                admissionNumber: item.admissionNumber || s.admissionNumber || ""
+            };
+        });
+
+        if (!silent) showClasses();
+    } catch (error) {
+        console.error("Load error:", error);
+        document.getElementById("classes").innerHTML = `
             <div class="empty-state" style="grid-column:1/-1;">
                 <i class="fas fa-exclamation-triangle"></i>
                 <h4>Unable to Load Results</h4>
                 <p>${escapeHtml(error.message)}</p>
             </div>
         `;
-            }
-        }
-
+    }
+}
         // ======================== GRADE HELPER ========================
         function getGrade(percentage) {
             if (percentage >= 90) return { grade: "A+", remark: "Outstanding" };
@@ -1312,45 +1479,166 @@
             document.getElementById("resultSection").classList.add("hidden");
             document.getElementById("classTitle").innerHTML = `<i class="fas fa-users"></i> Class ${escapeHtml(selectedClass)} · Students`;
 
-            const container = document.getElementById("students");
-            container.innerHTML = "";
-            const studentsMap = new Map();
-            allExamMarks.filter(item => item.className === selectedClass).forEach(item => {
-                const id = item.studentMongoId;
-                if (!studentsMap.has(id)) studentsMap.set(id, item);
-            });
-            if (studentsMap.size === 0) {
-                container.innerHTML = `
+            // Reset the search box whenever a class is opened fresh
+            const searchInput = document.getElementById("studentSearch");
+            if (searchInput) searchInput.value = "";
+            const searchInfo = document.getElementById("studentSearchInfo");
+            if (searchInfo) searchInfo.style.display = "none";
+
+            renderStudents();
+        }
+
+        // Called on every keystroke in the search box (oninput="filterStudents()")
+        function filterStudents() {
+            renderStudents();
+        }
+
+        // Called by the little clear (x) button next to the search box
+        function clearStudentSearch() {
+            const searchInput = document.getElementById("studentSearch");
+            if (searchInput) searchInput.value = "";
+            renderStudents();
+            if (searchInput) searchInput.focus();
+        }
+
+
+        function renderStudents() {
+    const container = document.getElementById("students");
+    const searchInput = document.getElementById("studentSearch");
+    const searchInfo = document.getElementById("studentSearchInfo");
+
+    const searchTerm = (searchInput?.value || "").trim().toLowerCase();
+
+    container.innerHTML = "";
+
+    const studentsMap = new Map();
+
+    allExamMarks
+        .filter(item => item.className === selectedClass)
+        .forEach(item => {
+            const id = item.studentMongoId;
+
+            if (!studentsMap.has(id)) {
+                studentsMap.set(id, item);
+            }
+        });
+
+    let students = Array.from(studentsMap.values());
+
+    // Search across multiple student details
+    if (searchTerm) {
+        students = students.filter(student => {
+            const searchableText = [
+                student.studentName,
+                student.studentId,
+                student.rollNumber,
+                student.fatherName,
+                student.motherName,
+                student.className,
+                student.admissionNumber,
+                student.phone,
+                student.mobile
+            ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+            return searchableText.includes(searchTerm);
+        });
+    }
+
+    // Search result count
+    if (searchInfo) {
+        if (searchTerm) {
+            searchInfo.style.display = "block";
+            searchInfo.innerHTML =
+                `<i class="fas fa-search"></i> ${students.length} student${students.length !== 1 ? "s" : ""} found`;
+        } else {
+            searchInfo.style.display = "none";
+        }
+    }
+
+    if (students.length === 0) {
+        container.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-user-slash"></i>
-                <h4>No Students Found</h4>
-                <p>No students have results in this class.</p>
+                <h4>${searchTerm ? "No Students Found" : "No Students Found"}</h4>
+                <p>
+                    ${
+                        searchTerm
+                            ? `No student matches "${escapeHtml(searchTerm)}".`
+                            : "No students have results in this class."
+                    }
+                </p>
             </div>
         `;
-                return;
-            }
-            studentsMap.forEach(student => {
-                const initials = (student.studentName || 'S').charAt(0).toUpperCase();
-                const div = document.createElement("div");
-                div.className = "student-card";
-                div.innerHTML = `
+        return;
+    }
+
+    students.forEach(student => {
+        const initials = (student.studentName || "S")
+            .charAt(0)
+            .toUpperCase();
+
+        const div = document.createElement("div");
+        div.className = "student-card";
+
+        div.innerHTML = `
             <div class="student-info">
-                <div class="avatar">${initials}</div>
-                <div class="details">
-                    <h4>${escapeHtml(student.studentName || "-")}</h4>
-                    <div class="meta">
-                        <span><i class="fas fa-id-badge"></i> ${escapeHtml(student.studentId || "-")}</span>
-                        <span><i class="fas fa-sort-numeric-up"></i> Roll: ${escapeHtml(student.rollNumber || "-")}</span>
-                        <span><i class="fas fa-user-tie"></i> ${escapeHtml(student.fatherName || "-")}</span>
-                    </div>
+
+                <div class="avatar">
+                    ${escapeHtml(initials)}
                 </div>
+
+                <div class="details">
+
+                    <h4>
+                        ${escapeHtml(student.studentName || "-")}
+                    </h4>
+
+                    <div class="meta">
+
+                        <span>
+                            <i class="fas fa-id-badge"></i>
+                            ${escapeHtml(student.studentId || "-")}
+                        </span>
+
+                        <span>
+                            <i class="fas fa-sort-numeric-up"></i>
+                            Roll: ${escapeHtml(student.rollNumber || "-")}
+                        </span>
+
+                        <span>
+                            <i class="fas fa-user-tie"></i>
+                            Father: ${escapeHtml(student.fatherName || "-")}
+                        </span>
+
+                        <span>
+                            <i class="fas fa-female"></i>
+                            Mother: ${escapeHtml(student.motherName || "-")}
+                        </span>
+
+                        <span>
+                            <i class="fas fa-phone"></i>
+                            ${escapeHtml(student.phone || student.mobile || "-")}
+                        </span>
+
+                    </div>
+
+                </div>
+
             </div>
-            <div class="student-arrow"><i class="fas fa-chevron-right"></i></div>
+
+            <div class="student-arrow">
+                <i class="fas fa-chevron-right"></i>
+            </div>
         `;
-                div.onclick = () => showResult(student.studentMongoId);
-                container.appendChild(div);
-            });
-        }
+
+        div.onclick = () => showResult(student.studentMongoId);
+
+        container.appendChild(div);
+    });
+}
 
         // ======================== SHOW RESULT ========================
         function showResult(studentMongoId) {
@@ -1428,12 +1716,20 @@
                         <thead><tr><th><i class="fas fa-book-open"></i> Subject</th><th><i class="fas fa-arrow-up"></i> Max Marks</th><th><i class="fas fa-arrow-down"></i> Obtained</th></tr></thead>
                         <tbody>
         `;
+                let examTotalMax = 0;
+                let examTotalObtained = 0;
+                let examHasAbsent = false;
                 (exam.marks || []).forEach(mark => {
 
-                    const obtained =
-                        String(mark.status || "").toUpperCase() === "ABSENT"
-                            ? "AB"
-                            : (mark.obtainedMarks ?? 0);
+                    const isAbsentRow = String(mark.status || "").toUpperCase() === "ABSENT";
+                    const obtained = isAbsentRow ? "AB" : (mark.obtainedMarks ?? 0);
+
+                    examTotalMax += Number(mark.maxMarks) || 0;
+                    if (isAbsentRow) {
+                        examHasAbsent = true;
+                    } else {
+                        examTotalObtained += Number(mark.obtainedMarks) || 0;
+                    }
 
                     html += `
         <tr>
@@ -1445,6 +1741,13 @@
                 });
                 html += `
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td><i class="fas fa-calculator"></i> Total</td>
+                                <td>${examTotalMax}</td>
+                                <td>${examTotalObtained}${examHasAbsent ? "*" : ""}</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
                 <div class="result-summary">
@@ -1518,11 +1821,11 @@
     // =========================================================
     // BUTTON STATE
     // =========================================================
-    const pdfBtn = document.querySelector(".pdf-btn");
-    const originalButtonText = pdfBtn ? pdfBtn.textContent : "";
+    const pdfBtn = document.getElementById("pdfBtn");
+    const originalButtonText = pdfBtn ? pdfBtn.innerHTML : "";
     if (pdfBtn) {
         pdfBtn.disabled = true;
-        pdfBtn.textContent = "⏳ Generating PDF...";
+        pdfBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
     }
 
     try {
@@ -2185,6 +2488,28 @@
             academicBody.push(row);
         });
 
+        // ===== SUBJECT TOTAL ROW (sum of every subject, per exam column) =====
+        // Adds one row at the bottom of the Academic Performance table showing
+        // the combined M.M / M.O for ALL subjects — for every column: Unit 1,
+        // Unit 2, Half Yearly, Term 1 Total, Unit 3, Unit 4, Annual, Term 2
+        // Total, and Grand Total.
+        const academicColumnCount = academicBody.length > 0 ? academicBody[0].length : 1;
+        const totalRow = ["TOTAL"];
+        for (let col = 1; col < academicColumnCount; col++) {
+            let colSum = 0;
+            let colHasValue = false;
+            academicBody.forEach(row => {
+                const cellVal = row[col];
+                if (typeof cellVal === "number" && Number.isFinite(cellVal)) {
+                    colSum += cellVal;
+                    colHasValue = true;
+                }
+            });
+            totalRow.push(colHasValue ? colSum : "-");
+        }
+        const totalRowIndex = academicBody.length; // index of the row we're about to add
+        academicBody.push(totalRow);
+
         // ACADEMIC COLUMN WIDTHS
         const totalColumns = academicBody.length > 0 ? academicBody[0].length : 1;
         const subjectWidth = 27;
@@ -2227,8 +2552,19 @@
             alternateRowStyles: { fillColor: [252, 250, 247] },
             columnStyles: academicColumnStyles,
             didParseCell: function (data) {
-                if (data.section === "body" && data.column.index === 0) {
-                    data.cell.styles.fillColor = [252, 250, 247];
+                if (data.section === "body") {
+                    if (data.row.index === totalRowIndex) {
+                        // Highlight the bottom "TOTAL" row distinctly
+                        data.cell.styles.fillColor = [232, 221, 208];
+                        data.cell.styles.textColor = [20, 30, 40];
+                        data.cell.styles.fontStyle = "bold";
+                        data.cell.styles.lineWidth = 0.4;
+                        if (data.column.index === 0) {
+                            data.cell.styles.halign = "left";
+                        }
+                    } else if (data.column.index === 0) {
+                        data.cell.styles.fillColor = [252, 250, 247];
+                    }
                 }
             },
             didDrawPage: function () {
@@ -2377,7 +2713,7 @@
 
         if (pdfBtn) {
             pdfBtn.disabled = false;
-            pdfBtn.textContent = originalButtonText || "📄 Download PDF";
+            pdfBtn.innerHTML = originalButtonText || '<i class="fas fa-file-pdf"></i> Download PDF';
         }
 
     } catch (error) {
@@ -2385,10 +2721,665 @@
         alert("Could not generate Result PDF.\n\n" + error.message);
         if (pdfBtn) {
             pdfBtn.disabled = false;
-            pdfBtn.textContent = originalButtonText || "📄 Download PDF";
+            pdfBtn.innerHTML = originalButtonText || '<i class="fas fa-file-pdf"></i> Download PDF';
         }
     }
 }
+        // ======================== DOWNLOAD ALL STUDENTS' PDF (ONE FILE) ========================
+        // Same layout/design as the single-student PDF above (downloadResultPDF).
+        // Builds ONE combined PDF for every student currently listed in the
+        // selected class — one student's full result per page (or pages, if a
+        // student's table needs to spill onto extra pages, exactly like the
+        // single-download version already handles).
+        async function downloadAllResultsPDF() {
+
+            if (!selectedClass) {
+                alert("No class selected.");
+                return;
+            }
+
+            // Build the same unique students list used on the Students screen
+            // (dedup by studentMongoId), but WITHOUT the search filter — this
+            // always covers every student in the class.
+            const studentsMap = new Map();
+            allExamMarks
+                .filter(item => item.className === selectedClass)
+                .forEach(item => {
+                    const id = item.studentMongoId;
+                    if (!studentsMap.has(id)) studentsMap.set(id, item);
+                });
+            const studentIds = Array.from(studentsMap.keys());
+
+            if (studentIds.length === 0) {
+                alert("No students found in this class.");
+                return;
+            }
+
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert("jsPDF is not loaded. Please check the PDF library <script> tags.");
+                console.error("window.jspdf is undefined.");
+                return;
+            }
+            const { jsPDF } = window.jspdf;
+            const testDoc = new jsPDF();
+            if (typeof testDoc.autoTable !== "function") {
+                alert("jspdf-autotable is not loaded. Make sure it is included AFTER jsPDF.");
+                console.error("jspdf-autotable plugin missing.");
+                return;
+            }
+
+            const allPdfBtn = document.getElementById("allPdfBtn");
+            const originalButtonText = allPdfBtn ? allPdfBtn.innerHTML : "";
+            if (allPdfBtn) {
+                allPdfBtn.disabled = true;
+                allPdfBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+            }
+
+            try {
+
+                // ---------- same small helpers as the single-PDF version ----------
+                function normalizeExamName(name) {
+                    return String(name || "").toLowerCase().replace(/\s+/g, " ").trim();
+                }
+                function normalizeSubjectName(name) {
+                    return String(name || "").toLowerCase().replace(/\s+/g, " ").trim();
+                }
+                function safeValue(value, fallback = "N/A") {
+                    if (value === undefined || value === null || String(value).trim() === "") return fallback;
+                    return String(value);
+                }
+                function cleanFileName(value) {
+                    return String(value || "").replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, "_").trim();
+                }
+                function pdfFormatDate(value) {
+                    if (!value) return "N/A";
+                    const d = new Date(value);
+                    if (isNaN(d.getTime())) return String(value);
+                    const day = String(d.getDate()).padStart(2, "0");
+                    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    return `${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
+                }
+                function loadImageSafe(src) {
+                    return new Promise(resolve => {
+                        const img = new Image();
+                        img.onload = () => resolve(img);
+                        img.onerror = () => { console.warn("Could not load image:", src); resolve(null); };
+                        img.src = src;
+                    });
+                }
+                function isHalfYearly(name) {
+                    return /half\s*yearly|half-yearly|halfyearly/i.test(String(name || ""));
+                }
+                function isAnnual(name) {
+                    return (/^annual$/i.test(String(name || "").trim()) || /^final$/i.test(String(name || "").trim()));
+                }
+                function examOrderIndex(name, preferredOrder) {
+                    const key = normalizeExamName(name);
+                    const index = preferredOrder.indexOf(key);
+                    return index === -1 ? 999 : index;
+                }
+                function getGrade(p) {
+                    if (p >= 90) return "A+";
+                    if (p >= 80) return "A";
+                    if (p >= 70) return "B";
+                    if (p >= 60) return "C";
+                    if (p >= 50) return "D";
+                    if (p >= 40) return "E";
+                    return "F";
+                }
+                function getRemark(p) {
+                    if (p >= 90) return "Outstanding";
+                    if (p >= 80) return "Excellent";
+                    if (p >= 70) return "Very Good";
+                    if (p >= 60) return "Good";
+                    if (p >= 50) return "Average";
+                    if (p >= 40) return "Pass";
+                    return "Fail";
+                }
+                function getDivision(p) {
+                    if (p >= 60) return "First Division";
+                    if (p >= 45) return "Second Division";
+                    if (p >= 33) return "Third Division";
+                    return "Fail";
+                }
+
+                // Load the logo/stamps ONCE for the whole combined PDF
+                const [logo, leftStamp, rightStamp] = await Promise.all([
+                    loadImageSafe("./images/logo.png"),
+                    loadImageSafe("./images/stamp2.png"),
+                    loadImageSafe("./images/stamp1.png")
+                ]);
+
+                const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4", compress: true });
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const marginLeft = 10;
+                const marginRight = 10;
+                const marginBottom = 9;
+                const contentWidth = pageWidth - marginLeft - marginRight;
+
+                function drawBackgroundLogo() {
+                    if (!logo) return;
+                    const logoWidth = 220;
+                    const logoHeight = 290;
+                    const logoX = (pageWidth - logoWidth) / 2;
+                    const logoY = (pageHeight - logoHeight) / 2;
+                    if (typeof doc.saveGraphicsState === "function") doc.saveGraphicsState();
+                    if (typeof doc.setGState === "function") doc.setGState(new doc.GState({ opacity: 0.1 }));
+                    doc.addImage(logo, "PNG", logoX, logoY, logoWidth, logoHeight);
+                    if (typeof doc.restoreGraphicsState === "function") doc.restoreGraphicsState();
+                }
+
+                function drawHeader() {
+                    drawBackgroundLogo();
+                    const headerTop = 4;
+                    const logoSize = 28;
+                    const logoX = marginLeft;
+                    const logoY = headerTop;
+
+                    if (logo) doc.addImage(logo, "PNG", logoX, logoY, logoSize, logoSize);
+
+                    const titleAreaX = logoX + logoSize + 3;
+                    const titleAreaWidth = (pageWidth - marginRight) - titleAreaX;
+                    const titleCenterX = titleAreaX + titleAreaWidth / 2;
+
+                    let textY = headerTop + 12;
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(27);
+                    doc.setTextColor(178, 24, 24);
+                    doc.setDrawColor(0, 0, 0);
+                    doc.setLineWidth(0.35);
+                    doc.text("SUN SHINE JUNIOR HIGH SCHOOL", titleCenterX, textY, { align: "center", renderingMode: "fillThenStroke" });
+
+                    textY += 3.5;
+                    const dividerHalfWidth = 30;
+                    doc.setDrawColor(178, 24, 24);
+                    doc.setLineWidth(0.35);
+                    doc.line(titleCenterX - dividerHalfWidth, textY, titleCenterX - 5, textY);
+                    doc.line(titleCenterX + 5, textY, titleCenterX + dividerHalfWidth, textY);
+
+                    function drawDiamond(cx, cy, size) {
+                        doc.setFillColor(178, 24, 24);
+                        doc.triangle(cx - size, cy, cx, cy - size, cx + size, cy, "F");
+                        doc.triangle(cx - size, cy, cx, cy + size, cx + size, cy, "F");
+                    }
+                    drawDiamond(titleCenterX, textY, 1.6);
+                    textY += 6;
+
+                    function drawPinIcon(cx, cy) {
+                        doc.setFillColor(178, 24, 24);
+                        doc.circle(cx, cy - 0.6, 1.6, "F");
+                        doc.triangle(cx - 1.1, cy, cx + 1.1, cy, cx, cy + 2.2, "F");
+                        doc.setFillColor(255, 255, 255);
+                        doc.circle(cx, cy - 0.6, 0.6, "F");
+                    }
+                    function drawPhoneIcon(cx, cy) {
+                        doc.setFillColor(178, 24, 24);
+                        doc.circle(cx - 0.9, cy - 0.9, 1.4, "F");
+                        doc.circle(cx + 0.9, cy + 0.9, 1.4, "F");
+                        doc.setDrawColor(178, 24, 24);
+                        doc.setLineWidth(1.1);
+                        doc.line(cx - 0.6, cy - 0.6, cx + 0.6, cy + 0.6);
+                    }
+                    function drawGlobeIcon(cx, cy) {
+                        doc.setDrawColor(30, 60, 150);
+                        doc.setLineWidth(0.35);
+                        doc.circle(cx, cy, 1.8, "S");
+                        doc.ellipse(cx, cy, 0.8, 1.8, "S");
+                        doc.line(cx - 1.8, cy, cx + 1.8, cy);
+                    }
+
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(9);
+                    doc.setTextColor(20, 20, 20);
+                    const addressText = "20 Futa Road, Mohalla Garhi Nai Aabadi Pilkhuwa Hapur, U.P - 245304";
+                    const addrTextWidth = doc.getTextWidth(addressText);
+                    const addrIconX = titleCenterX - addrTextWidth / 2 - 4;
+                    drawPinIcon(addrIconX, textY - 1);
+                    doc.text(addressText, titleCenterX + 2, textY, { align: "center" });
+                    textY += 5.5;
+
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(8.5);
+                    const phoneText = "Mobile :- +91 87917-64372 | 92596-95556";
+                    const websiteText = "sunshinejuniorhighschool.com";
+                    const gap = 8;
+                    const phoneWidth = doc.getTextWidth(phoneText);
+                    const websiteWidth = doc.getTextWidth(websiteText);
+                    const totalLineWidth = phoneWidth + gap + websiteWidth + 10;
+                    let lineX = titleCenterX - totalLineWidth / 2;
+                    drawPhoneIcon(lineX, textY - 1);
+                    doc.setTextColor(20, 20, 20);
+                    doc.text(phoneText, lineX + 4, textY);
+                    lineX += 4 + phoneWidth + 4;
+                    doc.setDrawColor(150, 150, 150);
+                    doc.setLineWidth(0.3);
+                    doc.line(lineX, textY - 2.5, lineX, textY + 0.8);
+                    lineX += gap - 4;
+                    drawGlobeIcon(lineX, textY - 1);
+                    doc.setTextColor(30, 60, 150);
+                    doc.text(websiteText, lineX + 4, textY);
+
+                    textY += 4.5;
+                    doc.setDrawColor(178, 24, 24);
+                    doc.setLineWidth(0.6);
+                    doc.line(marginLeft, textY, pageWidth - marginRight, textY);
+                    textY += 2;
+                    doc.setFillColor(20, 20, 20);
+                    doc.rect(marginLeft, textY, contentWidth, 2.5, "F");
+                    return textY + 2.5 + 4;
+                }
+
+                function drawFooter(pageNumber) {
+                    const footerY = pageHeight - 6;
+                    doc.setDrawColor(190, 190, 190);
+                    doc.setLineWidth(0.3);
+                    doc.line(marginLeft, pageHeight - 10, pageWidth - marginRight, pageHeight - 10);
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(7);
+                    doc.setTextColor(120, 120, 120);
+                    doc.text("Sun Shine Junior High School", marginLeft, footerY);
+                    doc.text(`Page ${pageNumber}`, pageWidth - marginRight, footerY, { align: "right" });
+                }
+
+                function ensureSpace(currentYRef, requiredHeight) {
+                    if (currentYRef + requiredHeight > pageHeight - marginBottom - 7) {
+                        doc.addPage();
+                        const pageNumber = doc.internal.getNumberOfPages();
+                        drawHeader();
+                        drawFooter(pageNumber);
+                        return 37;
+                    }
+                    return currentYRef;
+                }
+
+                // ---------- renders ONE student's full report on the current page ----------
+                function renderOneStudent(studentResults) {
+                    const student = studentResults[0];
+
+                    const rawExamNames = [];
+                    studentResults.forEach(exam => {
+                        const examName = String(exam.exam || "Exam").trim();
+                        if (!rawExamNames.some(e => normalizeExamName(e) === normalizeExamName(examName))) {
+                            rawExamNames.push(examName);
+                        }
+                    });
+
+                    const preferredOrder = ["unit 1", "unit 2", "half yearly", "half-yearly", "halfyearly", "unit 3", "unit 4", "annual", "final"];
+                    const examOrder = [...rawExamNames].sort((a, b) => {
+                        const ai = examOrderIndex(a, preferredOrder);
+                        const bi = examOrderIndex(b, preferredOrder);
+                        if (ai !== bi) return ai - bi;
+                        return rawExamNames.indexOf(a) - rawExamNames.indexOf(b);
+                    });
+
+                    const subjectMap = {};
+                    studentResults.forEach(exam => {
+                        const examName = String(exam.exam || "Exam").trim();
+                        const examKey = normalizeExamName(examName);
+                        (exam.marks || []).forEach(mark => {
+                            const displaySubject = String(mark.subjectName || "N/A").trim();
+                            const subjectKey = normalizeSubjectName(displaySubject);
+                            if (!subjectMap[subjectKey]) subjectMap[subjectKey] = { displayName: displaySubject, exams: {} };
+                            const maxMarks = (mark.maxMarks !== undefined && mark.maxMarks !== null && mark.maxMarks !== "") ? Number(mark.maxMarks) : "-";
+                            const isAbsent = String(mark.status || "").toUpperCase() === "ABSENT";
+                            const obtainedMarks = isAbsent
+                                ? "AB"
+                                : ((mark.obtainedMarks !== undefined && mark.obtainedMarks !== null && mark.obtainedMarks !== "") ? Number(mark.obtainedMarks) : "-");
+                            subjectMap[subjectKey].exams[examKey] = {
+                                max: Number.isFinite(maxMarks) ? maxMarks : "-",
+                                obtained: isAbsent ? "AB" : (Number.isFinite(obtainedMarks) ? obtainedMarks : "-")
+                            };
+                        });
+                    });
+                    const subjects = Object.keys(subjectMap);
+
+                    const halfYearlyIndex = examOrder.findIndex(isHalfYearly);
+                    const annualIndex = examOrder.findIndex(isAnnual);
+                    let term1Exams = [];
+                    let term2Exams = [];
+                    if (halfYearlyIndex >= 0) term1Exams = examOrder.slice(0, halfYearlyIndex + 1);
+                    if (annualIndex >= 0) term2Exams = examOrder.slice(halfYearlyIndex >= 0 ? halfYearlyIndex + 1 : 0, annualIndex + 1);
+                    if (term1Exams.length === 0 && term2Exams.length === 0) {
+                        const mid = Math.ceil(examOrder.length / 2);
+                        term1Exams = examOrder.slice(0, mid);
+                        term2Exams = examOrder.slice(mid);
+                    }
+
+                    function groupSum(subjectKey, examNames) {
+                        let max = 0, obtained = 0, hasMax = false, hasObtained = false;
+                        examNames.forEach(examName => {
+                            const examKey = normalizeExamName(examName);
+                            const subjectData = subjectMap[subjectKey];
+                            if (!subjectData || !subjectData.exams) return;
+                            const mark = subjectData.exams[examKey];
+                            if (!mark) return;
+                            if (typeof mark.max === "number") { max += mark.max; hasMax = true; }
+                            if (typeof mark.obtained === "number") { obtained += mark.obtained; hasObtained = true; }
+                        });
+                        return { max: hasMax ? max : "-", obtained: hasObtained ? obtained : "-" };
+                    }
+
+                    const subjectFinalTotals = {};
+                    let grandTotalMax = 0, grandTotalObtained = 0, hasGrandMax = false, hasGrandObtained = false;
+                    subjects.forEach(subjectKey => {
+                        const term1Total = groupSum(subjectKey, term1Exams);
+                        const term2Total = groupSum(subjectKey, term2Exams);
+                        let finalMax = 0, finalObtained = 0, hasFinalMax = false, hasFinalObtained = false;
+                        if (typeof term1Total.max === "number") { finalMax += term1Total.max; hasFinalMax = true; }
+                        if (typeof term2Total.max === "number") { finalMax += term2Total.max; hasFinalMax = true; }
+                        if (typeof term1Total.obtained === "number") { finalObtained += term1Total.obtained; hasFinalObtained = true; }
+                        if (typeof term2Total.obtained === "number") { finalObtained += term2Total.obtained; hasFinalObtained = true; }
+                        subjectFinalTotals[subjectKey] = {
+                            term1: term1Total, term2: term2Total,
+                            final: { max: hasFinalMax ? finalMax : "-", obtained: hasFinalObtained ? finalObtained : "-" }
+                        };
+                        if (hasFinalMax) { grandTotalMax += finalMax; hasGrandMax = true; }
+                        if (hasFinalObtained) { grandTotalObtained += finalObtained; hasGrandObtained = true; }
+                    });
+
+                    const totalMarks = hasGrandMax ? grandTotalMax : 0;
+                    const totalMarksObtained = hasGrandObtained ? grandTotalObtained : 0;
+                    const overallPercentage = totalMarks > 0 ? (totalMarksObtained / totalMarks) * 100 : 0;
+
+                    const grade = getGrade(overallPercentage);
+                    const remark = getRemark(overallPercentage);
+                    const latestExam = studentResults[studentResults.length - 1];
+                    const overallDivision = latestExam && latestExam.division ? latestExam.division : getDivision(overallPercentage);
+
+                    let currentY = drawHeader() + 4;
+
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(10.5);
+                    doc.setTextColor(30, 45, 60);
+                    doc.text("ASSESSMENT SHEET FOR ACADEMIC SESSION 2026-27", pageWidth / 2, currentY, { align: "center" });
+                    currentY += 4;
+
+                    doc.setFont("helvetica", "italic");
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(70, 70, 70);
+                    doc.text('"Empowering Young Minds for a Brighter Future"', pageWidth / 2, currentY, { align: "center" });
+                    currentY += 4;
+
+                    doc.setFillColor(240, 230, 211);
+                    doc.setDrawColor(30, 42, 58);
+                    doc.setLineWidth(0.5);
+                    doc.rect(marginLeft, currentY, contentWidth, 6, "FD");
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(9);
+                    doc.setTextColor(30, 42, 58);
+                    doc.text("STUDENT PROFILE", pageWidth / 2, currentY + 4.1, { align: "center" });
+                    currentY += 6;
+
+                    doc.autoTable({
+                        startY: currentY,
+                        margin: { left: marginLeft, right: marginRight },
+                        theme: "grid",
+                        body: [
+                            ["Roll No.", safeValue(student.rollNumber || student.studentId), "Student Name", safeValue(student.studentName)],
+                            ["Class", safeValue(student.className), "Session", "2026-27"],
+                            ["Father Name", safeValue(student.fatherName), "Mother Name", safeValue(student.motherName)],
+                            ["D.O.B", pdfFormatDate(student.dob), "Contact", safeValue(student.phone || student.mobile)]
+                        ],
+                        styles: { font: "helvetica", fontSize: 7.8, fontStyle: "bold", textColor: [35, 35, 35], cellPadding: 1.25, valign: "middle" },
+                        columnStyles: {
+                            0: { cellWidth: 22, fillColor: [248, 244, 238] },
+                            1: { cellWidth: 55 },
+                            2: { cellWidth: 22, fillColor: [248, 244, 238] },
+                            3: { cellWidth: contentWidth - 22 - 55 - 22 }
+                        }
+                    });
+                    currentY = doc.lastAutoTable.finalY + 2;
+
+                    doc.setFillColor(240, 230, 211);
+                    doc.setDrawColor(30, 42, 58);
+                    doc.rect(marginLeft, currentY, contentWidth, 6, "FD");
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(9.5);
+                    doc.setTextColor(30, 42, 58);
+                    doc.text("ACADEMIC PERFORMANCE REPORT", pageWidth / 2, currentY + 4.1, { align: "center" });
+                    currentY += 6;
+
+                    const academicHeadTop = [{ content: "Subject", rowSpan: 2 }];
+                    const academicHeadBottom = [];
+                    examOrder.forEach(examName => {
+                        academicHeadTop.push({ content: examName, colSpan: 2 });
+                        academicHeadBottom.push("M.M", "M.O");
+                        if (isHalfYearly(examName)) {
+                            academicHeadTop.push({ content: "Term 1 Total", colSpan: 2 });
+                            academicHeadBottom.push("M.M", "M.O");
+                        }
+                        if (isAnnual(examName)) {
+                            academicHeadTop.push({ content: "Term 2 Total", colSpan: 2 });
+                            academicHeadBottom.push("M.M", "M.O");
+                            academicHeadTop.push({ content: "Grand Total", colSpan: 2 });
+                            academicHeadBottom.push("M.M", "M.O");
+                        }
+                    });
+                    if (halfYearlyIndex < 0) {
+                        academicHeadTop.push({ content: "Term 1 Total", colSpan: 2 });
+                        academicHeadBottom.push("M.M", "M.O");
+                    }
+                    if (annualIndex < 0) {
+                        academicHeadTop.push({ content: "Term 2 Total", colSpan: 2 });
+                        academicHeadBottom.push("M.M", "M.O");
+                        academicHeadTop.push({ content: "Grand Total", colSpan: 2 });
+                        academicHeadBottom.push("M.M", "M.O");
+                    }
+
+                    const academicBody = [];
+                    subjects.forEach(subjectKey => {
+                        const subjectData = subjectMap[subjectKey];
+                        const totals = subjectFinalTotals[subjectKey];
+                        const row = [subjectData.displayName];
+                        examOrder.forEach(examName => {
+                            const examKey = normalizeExamName(examName);
+                            const mark = subjectData.exams && subjectData.exams[examKey] ? subjectData.exams[examKey] : null;
+                            row.push(mark ? mark.max : "-", mark ? mark.obtained : "-");
+                            if (isHalfYearly(examName)) row.push(totals.term1.max, totals.term1.obtained);
+                            if (isAnnual(examName)) row.push(totals.term2.max, totals.term2.obtained, totals.final.max, totals.final.obtained);
+                        });
+                        if (halfYearlyIndex < 0) row.push(totals.term1.max, totals.term1.obtained);
+                        if (annualIndex < 0) row.push(totals.term2.max, totals.term2.obtained, totals.final.max, totals.final.obtained);
+                        academicBody.push(row);
+                    });
+
+                    const academicColumnCount = academicBody.length > 0 ? academicBody[0].length : 1;
+                    const totalRow = ["TOTAL"];
+                    for (let col = 1; col < academicColumnCount; col++) {
+                        let colSum = 0, colHasValue = false;
+                        academicBody.forEach(row => {
+                            const cellVal = row[col];
+                            if (typeof cellVal === "number" && Number.isFinite(cellVal)) { colSum += cellVal; colHasValue = true; }
+                        });
+                        totalRow.push(colHasValue ? colSum : "-");
+                    }
+                    const totalRowIndex = academicBody.length;
+                    academicBody.push(totalRow);
+
+                    const totalColumns = academicBody.length > 0 ? academicBody[0].length : 1;
+                    const subjectWidth = 27;
+                    const smallWidth = (contentWidth - subjectWidth) / Math.max(totalColumns - 1, 1);
+                    const academicColumnStyles = { 0: { cellWidth: subjectWidth, halign: "left", fontStyle: "bold" } };
+                    for (let i = 1; i < totalColumns; i++) academicColumnStyles[i] = { cellWidth: Math.max(5.2, smallWidth), halign: "center" };
+
+                    doc.autoTable({
+                        startY: currentY,
+                        margin: { left: marginLeft, right: marginRight, top: 40, bottom: 11 },
+                        head: [academicHeadTop, academicHeadBottom],
+                        body: academicBody,
+                        theme: "grid",
+                        styles: {
+                            font: "helvetica",
+                            fontSize: totalColumns > 14 ? 5.7 : totalColumns > 10 ? 6.3 : 7.2,
+                            fontStyle: "bold", textColor: [30, 30, 30],
+                            cellPadding: totalColumns > 14 ? 1.35 : 1.7,
+                            valign: "middle", halign: "center",
+                            lineColor: [30, 42, 58], lineWidth: 0.25
+                        },
+                        headStyles: {
+                            fillColor: [232, 221, 208], textColor: [20, 30, 40], fontStyle: "bold",
+                            halign: "center", valign: "middle", lineColor: [30, 42, 58], lineWidth: 0.3
+                        },
+                        alternateRowStyles: { fillColor: [252, 250, 247] },
+                        columnStyles: academicColumnStyles,
+                        didParseCell: function (data) {
+                            if (data.section === "body") {
+                                if (data.row.index === totalRowIndex) {
+                                    data.cell.styles.fillColor = [232, 221, 208];
+                                    data.cell.styles.textColor = [20, 30, 40];
+                                    data.cell.styles.fontStyle = "bold";
+                                    data.cell.styles.lineWidth = 0.4;
+                                    if (data.column.index === 0) data.cell.styles.halign = "left";
+                                } else if (data.column.index === 0) {
+                                    data.cell.styles.fillColor = [252, 250, 247];
+                                }
+                            }
+                        },
+                        didDrawPage: function () {
+                            const pageNumber = doc.internal.getNumberOfPages();
+                            drawHeader();
+                            drawFooter(pageNumber);
+                        }
+                    });
+                    currentY = doc.lastAutoTable.finalY + 2;
+
+                    currentY = ensureSpace(currentY, 30);
+                    doc.setFillColor(240, 230, 211);
+                    doc.setDrawColor(30, 42, 58);
+                    doc.rect(marginLeft, currentY, contentWidth, 6, "FD");
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(9.5);
+                    doc.setTextColor(30, 42, 58);
+                    doc.text("FINAL RESULT SUMMARY", pageWidth / 2, currentY + 4.1, { align: "center" });
+                    currentY += 6;
+
+                    doc.autoTable({
+                        startY: currentY,
+                        margin: { left: marginLeft, right: marginRight },
+                        theme: "grid",
+                        body: [
+                            ["Total Marks", totalMarks, "Total Marks Obtained", totalMarksObtained],
+                            ["Percentage", `${overallPercentage.toFixed(2)}%`, "Grade", grade],
+                            ["Performance", remark, "Division", overallDivision]
+                        ],
+                        styles: { font: "helvetica", fontSize: 8.5, fontStyle: "bold", textColor: [30, 30, 30], cellPadding: 1.6, halign: "center", valign: "middle" },
+                        columnStyles: {
+                            0: { fillColor: [248, 244, 238], cellWidth: contentWidth * 0.21 },
+                            1: { cellWidth: contentWidth * 0.29 },
+                            2: { fillColor: [248, 244, 238], cellWidth: contentWidth * 0.21 },
+                            3: { cellWidth: contentWidth * 0.29 }
+                        }
+                    });
+                    currentY = doc.lastAutoTable.finalY + 2;
+
+                    currentY = ensureSpace(currentY, 48);
+                    doc.setFillColor(240, 230, 211);
+                    doc.setDrawColor(30, 42, 58);
+                    doc.rect(marginLeft, currentY, contentWidth, 5.5, "FD");
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(8.5);
+                    doc.setTextColor(30, 42, 58);
+                    doc.text("GRADE CHART", pageWidth / 2, currentY + 3.8, { align: "center" });
+                    currentY += 5.5;
+
+                    const gradeRows = [
+                        ["90% – 100%", "A+", "Outstanding", grade === "A+" ? `${overallPercentage.toFixed(2)}%` : ""],
+                        ["80% – 89%", "A", "Excellent", grade === "A" ? `${overallPercentage.toFixed(2)}%` : ""],
+                        ["70% – 79%", "B", "Very Good", grade === "B" ? `${overallPercentage.toFixed(2)}%` : ""],
+                        ["60% – 69%", "C", "Good", grade === "C" ? `${overallPercentage.toFixed(2)}%` : ""],
+                        ["50% – 59%", "D", "Average", grade === "D" ? `${overallPercentage.toFixed(2)}%` : ""],
+                        ["40% – 49%", "E", "Pass", grade === "E" ? `${overallPercentage.toFixed(2)}%` : ""],
+                        ["Below 40%", "F", "Fail", grade === "F" ? `${overallPercentage.toFixed(2)}%` : ""]
+                    ];
+
+                    doc.autoTable({
+                        startY: currentY,
+                        margin: { left: marginLeft, right: marginRight },
+                        theme: "grid",
+                        head: [["Percentage", "Grade", "Remark", "Student's Percentage"]],
+                        body: gradeRows,
+                        styles: { font: "helvetica", fontSize: 7, fontStyle: "bold", cellPadding: 1.05, halign: "center", valign: "middle", textColor: [40, 40, 40] },
+                        headStyles: { fillColor: [232, 221, 208], textColor: [20, 30, 40], fontStyle: "bold", cellPadding: 1.2 },
+                        alternateRowStyles: { fillColor: [252, 250, 247] }
+                    });
+                    currentY = doc.lastAutoTable.finalY + 2;
+
+                    currentY = ensureSpace(currentY, 32);
+                    doc.setDrawColor(180, 180, 180);
+                    doc.setLineWidth(0.35);
+                    doc.line(marginLeft, currentY, pageWidth - marginRight, currentY);
+                    currentY += 3;
+
+                    const stampWidth = 26;
+                    const stampHeight = 20;
+                    const leftStampX = marginLeft + 8;
+                    const rightStampX = pageWidth - marginRight - stampWidth - 8;
+                    const stampY = currentY;
+
+                    if (leftStamp) doc.addImage(leftStamp, "PNG", leftStampX, stampY, stampWidth, stampHeight);
+                    if (rightStamp) doc.addImage(rightStamp, "PNG", rightStampX, stampY, stampWidth, stampHeight);
+
+                    const signatureLineY = stampY + stampHeight + 4;
+                    doc.setDrawColor(50, 50, 50);
+                    doc.setLineWidth(0.35);
+                    doc.line(leftStampX - 4, signatureLineY, leftStampX + stampWidth + 4, signatureLineY);
+                    const teacherCenter = pageWidth / 2;
+                    doc.line(teacherCenter - 24, signatureLineY, teacherCenter + 24, signatureLineY);
+                    doc.line(rightStampX - 4, signatureLineY, rightStampX + stampWidth + 4, signatureLineY);
+
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(7);
+                    doc.setTextColor(45, 45, 45);
+                    doc.text("Director Signature / Stamp", leftStampX + stampWidth / 2, signatureLineY + 4, { align: "center" });
+                    doc.text("Class Teacher Signature", teacherCenter, signatureLineY + 4, { align: "center" });
+                    doc.text("Principal Signature / Stamp", rightStampX + stampWidth / 2, signatureLineY + 4, { align: "center" });
+                }
+
+                // ---------- loop through every student, one fresh page each ----------
+                let renderedAny = false;
+                studentIds.forEach((id) => {
+                    const studentResults = allExamMarks.filter(item => item.studentMongoId === id && item.className === selectedClass);
+                    if (studentResults.length === 0) return;
+                    if (renderedAny) doc.addPage(); // start every next student on a brand-new page
+                    renderOneStudent(studentResults);
+                    renderedAny = true;
+                });
+
+                if (!renderedAny) {
+                    alert("No results found for any student in this class.");
+                    if (allPdfBtn) {
+                        allPdfBtn.disabled = false;
+                        allPdfBtn.innerHTML = originalButtonText || '<i class="fas fa-file-pdf"></i> Download All Students PDF';
+                    }
+                    return;
+                }
+
+                // Footer on every page of the combined PDF
+                const totalPages = doc.internal.getNumberOfPages();
+                for (let page = 1; page <= totalPages; page++) {
+                    doc.setPage(page);
+                    drawFooter(page);
+                }
+
+                const fileName = `All_Results_${cleanFileName(selectedClass)}.pdf`;
+                doc.save(fileName);
+
+                if (allPdfBtn) {
+                    allPdfBtn.disabled = false;
+                    allPdfBtn.innerHTML = originalButtonText || '<i class="fas fa-file-pdf"></i> Download All Students PDF';
+                }
+
+            } catch (error) {
+                console.error("All-results PDF generation error:", error);
+                alert("Could not generate combined PDF.\n\n" + error.message);
+                if (allPdfBtn) {
+                    allPdfBtn.disabled = false;
+                    allPdfBtn.innerHTML = originalButtonText || '<i class="fas fa-file-pdf"></i> Download All Students PDF';
+                }
+            }
+        }
+
         // ======================== EDIT MODAL ========================
         function openEditModal(examIndex) {
             const exam = currentStudentResults[examIndex];

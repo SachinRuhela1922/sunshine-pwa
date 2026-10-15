@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Teacher Attendance · Sunshine School</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: #f7f3ed;
+            padding: 1.5rem;
+            color: #2d1f0c;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            background: linear-gradient(135deg, #f58a2e, #f9b042);
+            border-radius: 32px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 8px 30px rgba(245, 138, 46, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .page-header .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1;
+        }
+
+        .page-header .header-left .avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .page-header .header-left .header-text h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.1rem;
+        }
+
+        .page-header .header-left .header-text p {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.85rem;
+        }
+
+        .page-header .header-left .header-text p i {
+            margin-right: 0.3rem;
+        }
+
+        .page-header .header-right {
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .header-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 0.45rem 1.1rem;
+            border-radius: 30px;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .header-badge i {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        /* ===== LAYOUT ===== */
+        .layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== CARD ===== */
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem 1.8rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(245, 138, 46, 0.06);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: rgba(245, 138, 46, 0.12);
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #2d1f0c;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 2px solid #fcf3e8;
+        }
+
+        .sidebar-title i {
+            color: #f58a2e;
+        }
+
+        .sidebar-title .title-badge {
+            background: #fcf3e8;
+            color: #f58a2e;
+            padding: 0.1rem 0.6rem;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .field label {
+            font-size: 0.7rem;
+            color: #b09a7e;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .field label i {
+            color: #f58a2e;
+            margin-right: 0.3rem;
+        }
+
+        input[type="date"],
+        input[type="month"],
+        select {
+            padding: 0.65rem 0.9rem;
+            border: 1px solid #f0e2d2;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            background: #fcfaf7;
+            width: 100%;
+            color: #2d1f0c;
+            font-weight: 600;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        input[type="date"]:focus,
+        input[type="month"]:focus,
+        select:focus {
+            border-color: #f58a2e;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(245, 138, 46, 0.1);
+        }
+
+        .btn {
+            border: none;
+            border-radius: 60px;
+            padding: 0.7rem 1.5rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            letter-spacing: 0.2px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f58a2e, #f9b042);
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 138, 46, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(245, 138, 46, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* ===== DATE LIST ===== */
+        .date-list-label {
+            font-size: 0.7rem;
+            color: #b09a7e;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-top: 1.2rem;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .date-list-label i {
+            color: #f58a2e;
+        }
+
+        .date-list {
+            max-height: 380px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            padding-right: 4px;
+        }
+
+        .date-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .date-list::-webkit-scrollbar-track {
+            background: #f0e2d2;
+            border-radius: 10px;
+        }
+
+        .date-list::-webkit-scrollbar-thumb {
+            background: #f58a2e;
+            border-radius: 10px;
+        }
+
+        .date-item {
+            padding: 0.6rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            cursor: pointer;
+            border: 1px solid #f0e2d2;
+            background: #fcfaf7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #2d1f0c;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .date-item:hover {
+            border-color: #f9b042;
+            background: #fcf9f4;
+            transform: translateX(2px);
+        }
+
+        .date-item.active {
+            background: linear-gradient(135deg, #f58a2e, #f9b042);
+            border-color: #f58a2e;
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 138, 46, 0.3);
+        }
+
+        .date-item.active .count {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+        }
+
+        .date-item .count {
+            background: #fcf3e8;
+            color: #f58a2e;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.6rem;
+            border-radius: 30px;
+            transition: all 0.2s;
+        }
+
+        /* ===== SUMMARY BOXES ===== */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .summary-box {
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .summary-box:hover {
+            transform: translateY(-2px);
+        }
+
+        .summary-box::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -20%;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .summary-box .num {
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .summary-box .lbl {
+            font-size: 0.7rem;
+            opacity: 0.95;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.2rem;
+        }
+
+        .summary-box .icon {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 0.2rem;
+        }
+
+        .box-total {
+            background: linear-gradient(135deg, #2d1f0c, #5a4228);
+        }
+
+        .box-present {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+        }
+
+        .box-absent {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+        }
+
+        .box-half {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+        }
+
+        /* ===== TABLE ===== */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #f0e2d2;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #fcf3e8;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.7rem 1rem;
+            color: #b09a7e;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        th i {
+            color: #f58a2e;
+            margin-right: 0.3rem;
+            font-size: 0.65rem;
+        }
+
+        td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #f0e2d2;
+            font-size: 0.85rem;
+            color: #2d1f0c;
+        }
+
+        tbody tr {
+            transition: background 0.15s;
+        }
+
+        tbody tr:hover {
+            background: #fcf9f4;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .teacher-name {
+            font-weight: 700;
+            color: #2d1f0c;
+            display: block;
+        }
+
+        .teacher-id {
+            color: #b09a7e;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .badge i {
+            font-size: 0.65rem;
+        }
+
+        .badge-present {
+            background: #e8f5e9;
+            color: #2b7a3a;
+        }
+
+        .badge-absent {
+            background: #fce4e0;
+            color: #b53b2e;
+        }
+
+        .badge-half {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .time-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #5a4228;
+            font-size: 0.8rem;
+        }
+
+        .time-cell.empty-time {
+            color: #b09a7e;
+            font-weight: 400;
+        }
+
+        /* ===== WHATSAPP BUTTON ===== */
+        .whatsapp-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #25d366, #128c7e);
+            color: white;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(37, 211, 102, 0.35);
+            transition: all 0.2s;
+        }
+
+        .whatsapp-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 5px 14px rgba(37, 211, 102, 0.45);
+        }
+
+        .whatsapp-btn:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        .whatsapp-btn.disabled {
+            background: #e5decf;
+            color: #b09a7e;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .whatsapp-btn.disabled:hover {
+            transform: none;
+        }
+
+        /* ===== EMPTY / LOADING ===== */
+        .empty,
+        .loading {
+            text-align: center;
+            color: #b09a7e;
+            padding: 2.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .empty i,
+        .loading i {
+            font-size: 2rem;
+            color: #f0e2d2;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .loading i {
+            color: #f58a2e;
+        }
+
+        /* ===== TOAST ===== */
+        #toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 0.9rem 1.3rem;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        #toast.error {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+        }
+
+        #toast.success {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 820px) {
+            body {
+                padding: 1rem;
+            }
+
+            .page-header {
+                padding: 1.2rem 1.2rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-header .header-left .avatar {
+                width: 48px;
+                height: 48px;
+                font-size: 1.4rem;
+            }
+
+            .page-header .header-left .header-text h1 {
+                font-size: 1.2rem;
+            }
+
+            .card {
+                padding: 1.2rem 1.2rem;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .page-header .header-right {
+                width: 100%;
+            }
+
+            .header-badge {
+                width: 100%;
+                justify-content: center;
+            }
+
+            th,
+            td {
+                padding: 0.6rem 0.7rem;
+                font-size: 0.78rem;
+            }
+
+            .summary-box .num {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* ===== MONTHLY PDF ===== */
+        .pdf-divider {
+            border-top: 1px dashed #f0e2d2;
+            margin: 1.2rem 0 1rem;
+        }
+
+        .btn-pdf {
+            background: linear-gradient(135deg, #d9482b, #ef6a4c);
+            color: white;
+            box-shadow: 0 4px 12px rgba(217, 72, 43, 0.3);
+        }
+
+        .btn-pdf:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(217, 72, 43, 0.4);
+        }
+
+        .btn-pdf:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+
+    <!-- PDF libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- ===== PAGE HEADER ===== -->
+        <div class="page-header">
+            <div class="header-left">
+                <div class="avatar">
+                    <i class="fas fa-chalkboard-user"></i>
+                </div>
+                <div class="header-text">
+                    <h1>Teacher Attendance</h1>
+                    <p><i class="fas fa-school"></i> Sunshine School · Staff Portal</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-badge">
+                    <i class="fas fa-calendar-check"></i>
+                    Back
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== LAYOUT ===== -->
+        <div class="layout">
+
+            <!-- SIDEBAR -->
+            <div class="card">
+                <div class="sidebar-title">
+                    <i class="fas fa-filter"></i>
+                    Filters
+                </div>
+
+                <div class="field">
+                    <label for="attendanceDate">
+                        <i class="fas fa-calendar-day"></i> Select Date
+                    </label>
+                    <input type="date" id="attendanceDate" />
+                </div>
+
+                <button class="btn btn-primary" id="fetchBtn">
+                    <i class="fas fa-search"></i> Show Attendance
+                </button>
+
+                <div class="pdf-divider"></div>
+
+                <div class="sidebar-title">
+                    <i class="fas fa-file-pdf"></i>
+                    Monthly PDF Report
+                </div>
+
+                <div class="field">
+                    <label for="pdfTeacher">
+                        <i class="fas fa-user"></i> Teacher
+                    </label>
+                    <select id="pdfTeacher">
+                        <option value="">Loading teachers...</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="pdfMonth">
+                        <i class="fas fa-calendar-alt"></i> Month
+                    </label>
+                    <input type="month" id="pdfMonth" />
+                </div>
+
+                <button class="btn btn-pdf" id="pdfBtn" type="button">
+                    <i class="fas fa-download"></i> Download PDF
+                </button>
+
+                <div class="date-list-label">
+                    <i class="fas fa-history"></i> Saved Dates
+                </div>
+
+                <div class="date-list" id="dateList">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Loading dates...
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN CONTENT -->
+            <div class="card">
+                <div id="summaryWrap"></div>
+                <div id="tableWrap">
+                    <div class="empty">
+                        <i class="fas fa-hand-pointer"></i>
+                        Select a date to view attendance.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        // ==========================================
+        // CONFIG
+        // ==========================================
+        const API_BASE = "https://sunshine-swp6.onrender.com"; // Change this to your server's base URL
+
+        const dateInput = document.getElementById("attendanceDate");
+        const fetchBtn = document.getElementById("fetchBtn");
+        const dateList = document.getElementById("dateList");
+        const summaryWrap = document.getElementById("summaryWrap");
+        const tableWrap = document.getElementById("tableWrap");
+        const toast = document.getElementById("toast");
+
+        // Local date (UTC wali toISOString subah ke time kal ki date de sakti thi)
+        const _now = new Date();
+        const _p = (x) => String(x).padStart(2, "0");
+        dateInput.value = `${_now.getFullYear()}-${_p(_now.getMonth() + 1)}-${_p(_now.getDate())}`;
+
+        const pdfTeacher = document.getElementById("pdfTeacher");
+        const pdfMonth = document.getElementById("pdfMonth");
+        const pdfBtn = document.getElementById("pdfBtn");
+        pdfMonth.value = dateInput.value.slice(0, 7);
+
+        let teacherList = [];
+
+        // Teacher phone lookup: id / teacherId / employeeId / name -> phone
+        let teacherPhoneMap = {};
+
+        // ==========================================
+        // HELPERS
+        // ==========================================
+        function showToast(message, type = "error") {
+            const icon = type === "success" ? "fa-check-circle" : "fa-exclamation-circle";
+            toast.innerHTML = `<i class="fas ${icon}"></i> ${escapeHtml(message)}`;
+            toast.className = type;
+            toast.style.display = "flex";
+            setTimeout(() => { toast.style.display = "none"; }, 2500);
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement("div");
+            div.textContent = str || "";
+            return div.innerHTML;
+        }
+
+        function badgeClass(status) {
+            if (status === "Present") return "badge-present";
+            if (status === "Absent") return "badge-absent";
+            return "badge-half";
+        }
+
+        function badgeIcon(status) {
+            if (status === "Present") return "fa-check-circle";
+            if (status === "Absent") return "fa-times-circle";
+            return "fa-clock";
+        }
+
+        function formatDateLabel(isoDate) {
+            const d = new Date(isoDate);
+            return d.toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            });
+        }
+
+        // ==========================================
+        // Convert a raw time string to proper 12-hour
+        // format with AM/PM. Handles:
+        //   - 24-hour strings like "14:30", "09:05:00"
+        //   - values that already carry AM/PM (normalized)
+        // ==========================================
+        function convertTo12Hour(rawTime) {
+            if (!rawTime) return "";
+
+            const str = String(rawTime).trim();
+
+            // Already has AM/PM -> just normalize spacing/case
+            const meridiemMatch = str.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*([APap][Mm])$/);
+            if (meridiemMatch) {
+                let [, h, m, mer] = meridiemMatch;
+                h = String(parseInt(h, 10) || 12);
+                return `${h}:${m} ${mer.toUpperCase()}`;
+            }
+
+            // Plain 24-hour "HH:MM" or "HH:MM:SS"
+            const match = str.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+            if (!match) return str; // unknown format, show as-is
+
+            let hours = parseInt(match[1], 10);
+            const minutes = match[2];
+            const meridiem = hours >= 12 ? "PM" : "AM";
+
+            hours = hours % 12;
+            if (hours === 0) hours = 12;
+
+            return `${hours}:${minutes} ${meridiem}`;
+        }
+
+        // ==========================================
+        // Clean a raw phone number into WhatsApp
+        // (wa.me) format: country code + number,
+        // digits only, no leading 0 / + / spaces.
+        // ==========================================
+        function cleanPhoneForWhatsapp(rawPhone) {
+            if (!rawPhone) return "";
+
+            let digits = String(rawPhone).replace(/\D/g, "");
+
+            if (!digits) return "";
+
+            // Strip a leading 0 (local dialing prefix)
+            if (digits.length === 11 && digits.startsWith("0")) {
+                digits = digits.slice(1);
+            }
+
+            // Plain 10-digit Indian mobile number -> add country code
+            if (digits.length === 10) {
+                digits = "91" + digits;
+            }
+
+            return digits;
+        }
+
+        // ==========================================
+        // Load teacher directory once, build a
+        // lookup map so we can find each teacher's
+        // phone number by id / teacherId / employeeId / name.
+        // ==========================================
+        async function loadTeacherPhoneMap() {
+            try {
+                const res = await fetch(`${API_BASE}/api/teachers`);
+                const data = await res.json();
+
+                if (!data.success || !Array.isArray(data.teachers)) return;
+
+                // PDF dropdown
+                teacherList = data.teachers;
+                pdfTeacher.innerHTML = `<option value="">Select teacher</option>` +
+                    teacherList
+                        .slice()
+                        .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+                        .map(t => `<option value="${escapeHtml(t._id)}">${escapeHtml(t.name || "-")}${t.teacherId ? " (" + escapeHtml(t.teacherId) + ")" : ""}</option>`)
+                        .join("");
+
+                const map = {};
+
+                data.teachers.forEach(teacher => {
+                    const phone = teacher.phone || teacher.alternatePhone || "";
+                    if (!phone) return;
+
+                    if (teacher._id) map[teacher._id] = phone;
+                    if (teacher.teacherId) map[teacher.teacherId] = phone;
+                    if (teacher.employeeId) map[teacher.employeeId] = phone;
+                    if (teacher.name) map[teacher.name.trim().toLowerCase()] = phone;
+                });
+
+                teacherPhoneMap = map;
+
+            } catch (err) {
+                console.error("Could not load teacher phone directory:", err);
+            }
+        }
+
+        // ==========================================
+        // Resolve the phone number for a teacher
+        // record coming from an attendance entry.
+        // ==========================================
+        function getTeacherPhone(t) {
+            return (
+                teacherPhoneMap[t.teacher] ||
+                teacherPhoneMap[t.teacherId] ||
+                teacherPhoneMap[t.employeeId] ||
+                teacherPhoneMap[(t.name || "").trim().toLowerCase()] ||
+                ""
+            );
+        }
+
+        // ==========================================
+        // Build the structured WhatsApp message and
+        // open wa.me with it pre-filled.
+        // ==========================================
+        function sendWhatsappMessage(t, isoDate) {
+            const rawPhone = getTeacherPhone(t);
+            const phone = cleanPhoneForWhatsapp(rawPhone);
+
+            if (!phone) {
+                showToast(`No phone number found for ${t.name || "this teacher"}.`);
+                return;
+            }
+
+            const inTimeDisplay = t.inTime ? convertTo12Hour(t.inTime) : "-";
+            const outTimeDisplay = t.outTime ? convertTo12Hour(t.outTime) : "-";
+
+            const lines = [
+                "*Sunshine School — Attendance Update*",
+                "",
+                `Teacher: ${t.name || "-"}`,
+                `Department: ${t.department || "-"}`,
+                `Date: ${formatDateLabel(isoDate)}`,
+                `Status: ${t.status || "-"}`,
+                `In Time: ${inTimeDisplay}`,
+                `Out Time: ${outTimeDisplay}`
+            ];
+
+            const message = encodeURIComponent(lines.join("\n"));
+            const waUrl = `https://wa.me/${phone}?text=${message}`;
+
+            window.open(waUrl, "_blank");
+        }
+
+        // ==========================================
+        // Load list of all saved dates (sidebar)
+        // ==========================================
+        async function loadDateList() {
+            dateList.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Loading dates...
+                </div>
+            `;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/teacher-attendance`, { cache: "no-store" });
+                const data = await res.json();
+
+                if (!data.success || !data.records || data.records.length === 0) {
+                    dateList.innerHTML = `
+                        <div class="empty" style="padding:1rem 0;">
+                            <i class="fas fa-inbox"></i>
+                            No records yet.
+                        </div>
+                    `;
+                    return;
+                }
+
+                dateList.innerHTML = "";
+
+                data.records.forEach(record => {
+                    const isoDate = record.date.slice(0, 10);
+
+                    const item = document.createElement("div");
+                    item.className = "date-item";
+                    item.dataset.date = isoDate;
+                    item.innerHTML = `
+                        <span>${formatDateLabel(record.date)}</span>
+                        <span class="count">${(record.teachers || []).length}</span>
+                    `;
+
+                    item.addEventListener("click", () => {
+                        dateInput.value = isoDate;
+                        loadAttendance(isoDate);
+                    });
+
+                    dateList.appendChild(item);
+                });
+
+                highlightActiveDate(dateInput.value);
+
+            } catch (err) {
+                console.error(err);
+                dateList.innerHTML = `
+                    <div class="empty" style="padding:1rem 0;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Could not load dates.
+                    </div>
+                `;
+            }
+        }
+
+        function highlightActiveDate(isoDate) {
+            document.querySelectorAll(".date-item").forEach(el => {
+                el.classList.toggle("active", el.dataset.date === isoDate);
+            });
+        }
+
+        // ==========================================
+        // Load attendance for a specific date
+        // ==========================================
+        async function loadAttendance(isoDate) {
+            tableWrap.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Loading attendance...
+                </div>
+            `;
+            summaryWrap.innerHTML = "";
+            highlightActiveDate(isoDate);
+
+            try {
+                const res = await fetch(`${API_BASE}/api/teacher-attendance/${isoDate}`, { cache: "no-store" });
+                const data = await res.json();
+
+                if (!data.success) {
+                    tableWrap.innerHTML = `
+                        <div class="empty">
+                            <i class="fas fa-calendar-times"></i>
+                            No attendance found for ${formatDateLabel(isoDate)}.
+                        </div>
+                    `;
+                    return;
+                }
+
+                const teachers = data.attendance.teachers || [];
+
+                if (teachers.length === 0) {
+                    tableWrap.innerHTML = `
+                        <div class="empty">
+                            <i class="fas fa-user-slash"></i>
+                            No teacher entries for this date.
+                        </div>
+                    `;
+                    return;
+                }
+
+                renderSummary(teachers);
+                renderTable(teachers, isoDate);
+
+            } catch (err) {
+                console.error(err);
+                showToast("Could not load attendance.");
+                tableWrap.innerHTML = `
+                    <div class="empty">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Something went wrong.
+                    </div>
+                `;
+            }
+        }
+
+        // ==========================================
+        // Render summary boxes
+        // ==========================================
+        function renderSummary(teachers) {
+            const total = teachers.length;
+            const present = teachers.filter(t => t.status === "Present").length;
+            const absent = teachers.filter(t => t.status === "Absent").length;
+            const half = teachers.filter(t => t.status === "Half Day").length;
+
+            summaryWrap.innerHTML = `
+                <div class="summary">
+                    <div class="summary-box box-total">
+                        <div class="icon"><i class="fas fa-users"></i></div>
+                        <div class="num">${total}</div>
+                        <div class="lbl">Total</div>
+                    </div>
+                    <div class="summary-box box-present">
+                        <div class="icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="num">${present}</div>
+                        <div class="lbl">Present</div>
+                    </div>
+                    <div class="summary-box box-absent">
+                        <div class="icon"><i class="fas fa-times-circle"></i></div>
+                        <div class="num">${absent}</div>
+                        <div class="lbl">Absent</div>
+                    </div>
+                    <div class="summary-box box-half">
+                        <div class="icon"><i class="fas fa-clock"></i></div>
+                        <div class="num">${half}</div>
+                        <div class="lbl">Half Day</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // Render teacher table
+        // ==========================================
+        function renderTable(teachers, isoDate) {
+            let html = `
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-user"></i> Teacher</th>
+                                <th><i class="fas fa-building"></i> Department</th>
+                                <th><i class="fas fa-circle-info"></i> Status</th>
+                                <th><i class="fas fa-right-to-bracket"></i> In Time</th>
+                                <th><i class="fas fa-right-from-bracket"></i> Out Time</th>
+                                <th><i class="fab fa-whatsapp"></i> WhatsApp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            teachers.forEach((t, index) => {
+                const inTime12 = t.inTime ? convertTo12Hour(t.inTime) : "";
+                const outTime12 = t.outTime ? convertTo12Hour(t.outTime) : "";
+                const hasPhone = !!cleanPhoneForWhatsapp(getTeacherPhone(t));
+
+                html += `
+                    <tr>
+                        <td>
+                            <span class="teacher-name">${escapeHtml(t.name)}</span>
+                            <span class="teacher-id">${escapeHtml(t.teacherId || t.employeeId || "")}</span>
+                        </td>
+                        <td>${escapeHtml(t.department || "-")}</td>
+                        <td>
+                            <span class="badge ${badgeClass(t.status)}">
+                                <i class="fas ${badgeIcon(t.status)}"></i>
+                                ${escapeHtml(t.status)}
+                            </span>
+                        </td>
+                        <td class="time-cell ${inTime12 ? '' : 'empty-time'}">${escapeHtml(inTime12) || "-"}</td>
+                        <td class="time-cell ${outTime12 ? '' : 'empty-time'}">${escapeHtml(outTime12) || "-"}</td>
+                        <td>
+                            <button
+                                type="button"
+                                class="whatsapp-btn ${hasPhone ? '' : 'disabled'}"
+                                data-index="${index}"
+                                title="${hasPhone ? 'Send in-time update on WhatsApp' : 'No phone number on file'}"
+                            >
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            tableWrap.innerHTML = html;
+
+            // Wire up WhatsApp buttons (event delegation keeps this simple)
+            tableWrap.querySelectorAll(".whatsapp-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const idx = Number(btn.dataset.index);
+                    sendWhatsappMessage(teachers[idx], isoDate);
+                });
+            });
+        }
+
+        // ==========================================
+        // MONTHLY PDF (one teacher, one page, in/out time)
+        // ==========================================
+        async function downloadMonthlyPdf() {
+            const teacherId = pdfTeacher.value;
+            const month = pdfMonth.value; // YYYY-MM
+
+            if (!teacherId) { showToast("Please select a teacher."); return; }
+            if (!month) { showToast("Please select a month."); return; }
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                showToast("PDF library failed to load. Check internet and refresh.");
+                return;
+            }
+
+            const originalHtml = pdfBtn.innerHTML;
+            pdfBtn.disabled = true;
+            pdfBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Preparing...`;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/teacher-attendance-report/${teacherId}/${month}`, { cache: "no-store" });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.message || "Could not load report.");
+
+                const teacher = teacherList.find(t => t._id === teacherId) || {};
+                const byDate = {};
+                data.days.forEach(d => { byDate[d.date] = d; });
+
+                const [y, m] = month.split("-").map(Number);
+                const daysInMonth = new Date(y, m, 0).getDate();
+                const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+                const monthLabel = new Date(y, m - 1, 1).toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+
+                const counts = { Present: 0, Absent: 0, "Half Day": 0, "Not Marked": 0 };
+                const rows = [];
+
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const iso = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+                    const dow = new Date(y, m - 1, d).getDay();
+                    const rec = byDate[iso];
+
+                    let status;
+                    if (rec) {
+                        status = rec.status;
+                        counts[status] = (counts[status] || 0) + 1;
+                    } else if (dow === 0) {
+                        status = "Sunday";
+                    } else {
+                        status = "Not Marked";
+                        counts["Not Marked"]++;
+                    }
+
+                    rows.push([
+                        String(d).padStart(2, "0") + " " + new Date(y, m - 1, d).toLocaleDateString("en-IN", { month: "short" }),
+                        dayNames[dow],
+                        status,
+                        rec && rec.inTime ? convertTo12Hour(rec.inTime) : "-",
+                        rec && rec.outTime ? convertTo12Hour(rec.outTime) : "-"
+                    ]);
+                }
+
+                const { jsPDF } = window.jspdf;
+
+                // Same logo file that result.html uses
+                const logo = await new Promise(resolve => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = () => { console.warn("Could not load logo"); resolve(null); };
+                    img.src = "./images/logo.png";
+                });
+
+                const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4", compress: true });
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const marginLeft = 10;
+                const marginRight = 10;
+                const contentWidth = pageWidth - marginLeft - marginRight;
+
+                // ===== Watermark + Header + Footer (copied from result.html) =====
+                function drawBackgroundLogo() {
+            if (!logo) return;
+            const logoWidth = 220;
+            const logoHeight = 290;
+            const logoX = (pageWidth - logoWidth) / 2;
+            const logoY = (pageHeight - logoHeight) / 2;
+
+            if (typeof doc.saveGraphicsState === "function") {
+                doc.saveGraphicsState();
+            }
+            if (typeof doc.setGState === "function") {
+                doc.setGState(new doc.GState({ opacity: 0.1 }));
+            }
+            doc.addImage(logo, "PNG", logoX, logoY, logoWidth, logoHeight);
+            if (typeof doc.restoreGraphicsState === "function") {
+                doc.restoreGraphicsState();
+            }
+        }
+
+        // =====================================================
+        // HEADER (fully manual — no tophead image)
+        // =====================================================
+        function drawHeader() {
+
+    drawBackgroundLogo();
+
+    const headerTop = 4;
+    const logoSize = 28;
+    const logoX = marginLeft;
+    const logoY = headerTop;
+    const logoCenterX = logoX + logoSize / 2;
+    const logoCenterY = logoY + logoSize / 2;
+
+    // ============================
+    // LOGO (LEFT SIDE, NO CIRCLE)
+    // ============================
+    if (logo) {
+        doc.addImage(
+            logo,
+            "PNG",
+            logoX,
+            logoY,
+            logoSize,
+            logoSize
+        );
+    }
+
+    // ============================
+    // TITLE AREA (RIGHT OF LOGO, CENTERED IN REMAINING SPACE)
+    // ============================
+    const titleAreaX = logoX + logoSize + 3;
+    const titleAreaWidth = (pageWidth - marginRight) - titleAreaX;
+    const titleCenterX = titleAreaX + titleAreaWidth / 2;
+
+    let textY = headerTop + 12;
+
+    // SCHOOL NAME - BIG, DARK RED FILL + BLACK OUTLINE
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(27);
+    doc.setTextColor(178, 24, 24);
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.35);
+
+    doc.text(
+        "SUN SHINE JUNIOR HIGH SCHOOL",
+        titleCenterX,
+        textY,
+        {
+            align: "center",
+            renderingMode: "fillThenStroke"
+        }
+    );
+
+    // ============================
+    // DECORATIVE DIVIDER
+    // ============================
+    textY += 3.5;
+    const dividerHalfWidth = 30;
+    doc.setDrawColor(178, 24, 24);
+    doc.setLineWidth(0.35);
+    doc.line(titleCenterX - dividerHalfWidth, textY, titleCenterX - 5, textY);
+    doc.line(titleCenterX + 5, textY, titleCenterX + dividerHalfWidth, textY);
+
+    function drawDiamond(cx, cy, size) {
+        doc.setFillColor(178, 24, 24);
+        doc.triangle(cx - size, cy, cx, cy - size, cx + size, cy, "F");
+        doc.triangle(cx - size, cy, cx, cy + size, cx + size, cy, "F");
+    }
+    drawDiamond(titleCenterX, textY, 1.6);
+
+    textY += 6;
+
+    // ============================
+    // ICON HELPERS
+    // ============================
+    function drawPinIcon(cx, cy) {
+        doc.setFillColor(178, 24, 24);
+        doc.circle(cx, cy - 0.6, 1.6, "F");
+        doc.triangle(cx - 1.1, cy, cx + 1.1, cy, cx, cy + 2.2, "F");
+        doc.setFillColor(255, 255, 255);
+        doc.circle(cx, cy - 0.6, 0.6, "F");
+    }
+
+    function drawPhoneIcon(cx, cy) {
+        doc.setFillColor(178, 24, 24);
+        doc.circle(cx - 0.9, cy - 0.9, 1.4, "F");
+        doc.circle(cx + 0.9, cy + 0.9, 1.4, "F");
+        doc.setDrawColor(178, 24, 24);
+        doc.setLineWidth(1.1);
+        doc.line(cx - 0.6, cy - 0.6, cx + 0.6, cy + 0.6);
+    }
+
+    function drawGlobeIcon(cx, cy) {
+        doc.setDrawColor(30, 60, 150);
+        doc.setLineWidth(0.35);
+        doc.circle(cx, cy, 1.8, "S");
+        doc.ellipse(cx, cy, 0.8, 1.8, "S");
+        doc.line(cx - 1.8, cy, cx + 1.8, cy);
+    }
+
+    // ============================
+    // ADDRESS LINE (CENTERED)
+    // ============================
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(20, 20, 20);
+
+    const addressText = "20 Futa Road, Mohalla Garhi Nai Aabadi Pilkhuwa Hapur, U.P - 245304";
+    const addrTextWidth = doc.getTextWidth(addressText);
+    const addrIconX = titleCenterX - addrTextWidth / 2 - 4;
+
+    drawPinIcon(addrIconX, textY - 1);
+    doc.text(addressText, titleCenterX + 2, textY, { align: "center" });
+
+    textY += 5.5;
+
+    // ============================
+    // PHONE + WEBSITE LINE (CENTERED, SIDE BY SIDE)
+    // ============================
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+
+    const phoneText = "Mobile :- +91 87917-64372 | 92596-95556";
+    const websiteText = "sunshinejuniorhighschool.com";
+    const gap = 8;
+
+    const phoneWidth = doc.getTextWidth(phoneText);
+    const websiteWidth = doc.getTextWidth(websiteText);
+    const totalLineWidth = phoneWidth + gap + websiteWidth + 10;
+
+    let lineX = titleCenterX - totalLineWidth / 2;
+
+    drawPhoneIcon(lineX, textY - 1);
+    doc.setTextColor(20, 20, 20);
+    doc.text(phoneText, lineX + 4, textY);
+    lineX += 4 + phoneWidth + 4;
+
+    doc.setDrawColor(150, 150, 150);
+    doc.setLineWidth(0.3);
+    doc.line(lineX, textY - 2.5, lineX, textY + 0.8);
+    lineX += gap - 4;
+
+    drawGlobeIcon(lineX, textY - 1);
+    doc.setTextColor(30, 60, 150);
+    doc.text(websiteText, lineX + 4, textY);
+
+    // ============================
+    // BOTTOM BORDER (RED LINE + BLACK BAR)
+    // ============================
+    textY += 4.5;
+
+    doc.setDrawColor(178, 24, 24);
+    doc.setLineWidth(0.6);
+    doc.line(marginLeft, textY, pageWidth - marginRight, textY);
+
+    textY += 2;
+    doc.setFillColor(20, 20, 20);
+    doc.rect(marginLeft, textY, contentWidth, 2.5, "F");
+
+    return textY + 2.5 + 4;
+}
+
+                function drawFooter(pageNumber) {
+            const footerY = pageHeight - 6;
+            doc.setDrawColor(190, 190, 190);
+            doc.setLineWidth(0.3);
+            doc.line(marginLeft, pageHeight - 10, pageWidth - marginRight, pageHeight - 10);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(7);
+            doc.setTextColor(120, 120, 120);
+            doc.text("Sun Shine Junior High School", marginLeft, footerY);
+            doc.text(`Page ${pageNumber}`, pageWidth - marginRight, footerY, { align: "right" });
+        }
+
+                // Har page par watermark + header ek hi baar draw ho
+                const framedPages = new Set();
+                let headerBottomY = 44;
+                function frameCurrentPage() {
+                    const n = doc.internal.getCurrentPageInfo().pageNumber;
+                    if (framedPages.has(n)) return;
+                    framedPages.add(n);
+                    headerBottomY = drawHeader();
+                }
+
+                // ===== PAGE 1 =====
+                frameCurrentPage();
+                let currentY = headerBottomY + 4;
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10.5);
+                doc.setTextColor(30, 45, 60);
+                doc.text("TEACHER MONTHLY ATTENDANCE REPORT", pageWidth / 2, currentY, { align: "center" });
+                currentY += 4;
+
+                doc.setFont("helvetica", "italic");
+                doc.setFontSize(7.5);
+                doc.setTextColor(70, 70, 70);
+                doc.text('"Empowering Young Minds for a Brighter Future"', pageWidth / 2, currentY, { align: "center" });
+                currentY += 4;
+
+                // TEACHER PROFILE bar
+                doc.setFillColor(240, 230, 211);
+                doc.setDrawColor(30, 42, 58);
+                doc.setLineWidth(0.5);
+                doc.rect(marginLeft, currentY, contentWidth, 6, "FD");
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(9);
+                doc.setTextColor(30, 42, 58);
+                doc.text("TEACHER PROFILE", pageWidth / 2, currentY + 4.1, { align: "center" });
+                currentY += 6;
+
+                doc.autoTable({
+                    startY: currentY,
+                    margin: { left: marginLeft, right: marginRight },
+                    theme: "grid",
+                    body: [
+                        ["Teacher Name", teacher.name || "-", "Teacher ID", teacher.teacherId || teacher.employeeId || "-"],
+                        ["Department", teacher.department || "-", "Month", monthLabel]
+                    ],
+                    styles: { font: "helvetica", fontSize: 7.8, fontStyle: "bold", textColor: [35, 35, 35], cellPadding: 1.25, valign: "middle" },
+                    columnStyles: {
+                        0: { cellWidth: 26, fillColor: [248, 244, 238] },
+                        1: { cellWidth: 55 },
+                        2: { cellWidth: 26, fillColor: [248, 244, 238] },
+                        3: { cellWidth: contentWidth - 26 - 55 - 26 }
+                    }
+                });
+                currentY = doc.lastAutoTable.finalY + 2;
+
+                // ATTENDANCE DETAILS bar
+                doc.setFillColor(240, 230, 211);
+                doc.setDrawColor(30, 42, 58);
+                doc.setLineWidth(0.5);
+                doc.rect(marginLeft, currentY, contentWidth, 6, "FD");
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(9);
+                doc.setTextColor(30, 42, 58);
+                doc.text("ATTENDANCE DETAILS", pageWidth / 2, currentY + 4.1, { align: "center" });
+                currentY += 6;
+
+                // Table (compact so a full month fits on ONE page)
+                doc.autoTable({
+                    startY: currentY,
+                    head: [["Date", "Day", "Status", "In Time", "Out Time"]],
+                    body: rows,
+                    theme: "grid",
+                    styles: { font: "helvetica", fontSize: 8, cellPadding: 1.05, halign: "center", valign: "middle", textColor: [35, 35, 35], lineColor: [150, 150, 150], lineWidth: 0.2 },
+                    headStyles: { fillColor: [178, 24, 24], textColor: 255, fontStyle: "bold" },
+                    margin: { left: marginLeft, right: marginRight, top: headerBottomY + 4, bottom: 14 },
+                    willDrawPage: () => frameCurrentPage(),
+                    didParseCell: (hook) => {
+                        if (hook.section !== "body") return;
+                        const status = hook.row.raw[2];
+                        if (hook.column.index === 2) {
+                            hook.cell.styles.fontStyle = "bold";
+                            if (status === "Present") hook.cell.styles.textColor = [22, 130, 70];
+                            else if (status === "Absent") hook.cell.styles.textColor = [200, 40, 40];
+                            else if (status === "Half Day") hook.cell.styles.textColor = [200, 120, 0];
+                            else hook.cell.styles.textColor = [150, 140, 125];
+                        }
+                        if (status === "Sunday") hook.cell.styles.fillColor = [244, 238, 228];
+                    }
+                });
+
+                // Summary
+                let y2 = doc.lastAutoTable.finalY + 6;
+                if (y2 > pageHeight - 22) {
+                    doc.addPage();
+                    frameCurrentPage();
+                    y2 = headerBottomY + 8;
+                }
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(9.5);
+                doc.setTextColor(30, 45, 60);
+                doc.text(
+                    `Present: ${counts.Present}     Absent: ${counts.Absent}     Half Day: ${counts["Half Day"]}     Not Marked: ${counts["Not Marked"]}`,
+                    marginLeft, y2
+                );
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(7.5);
+                doc.setTextColor(120, 120, 120);
+                doc.text(`Generated on ${new Date().toLocaleDateString("en-IN")}`, marginLeft, y2 + 5);
+
+                // Footer on all pages
+                const totalPages = doc.internal.getNumberOfPages();
+                for (let page = 1; page <= totalPages; page++) {
+                    doc.setPage(page);
+                    drawFooter(page);
+                }
+
+                const safeName = (teacher.name || "Teacher").replace(/[^a-z0-9]+/gi, "_");
+                doc.save(`${safeName}_Attendance_${month}.pdf`);
+
+                showToast("PDF downloaded.", "success");
+
+            } catch (err) {
+                console.error(err);
+                showToast(err.message || "Could not create PDF.");
+            } finally {
+                pdfBtn.disabled = false;
+                pdfBtn.innerHTML = originalHtml;
+            }
+        }
+
+        pdfBtn.addEventListener("click", downloadMonthlyPdf);
+
+        // ==========================================
+        // Event handlers
+        // ==========================================
+        fetchBtn.addEventListener("click", () => {
+            if (!dateInput.value) {
+                showToast("Please select a date.");
+                return;
+            }
+            loadAttendance(dateInput.value);
+        });
+
+        // ==========================================
+        // Init
+        // ==========================================
+        loadTeacherPhoneMap();
+        loadDateList();
+        loadAttendance(dateInput.value);
+    </script>
+
+</body>
+
+</html>

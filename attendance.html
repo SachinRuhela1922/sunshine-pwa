@@ -326,7 +326,8 @@
         .student-row .student-info {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            flex-wrap: wrap;
+            gap: 0.6rem 1rem;
         }
 
         .student-row .student-info .index {
@@ -336,9 +337,38 @@
             min-width: 28px;
         }
 
+        .student-row .student-info .name-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
         .student-row .student-info .name {
             font-weight: 600;
             color: #2d1f0c;
+        }
+
+        .student-row .student-info .parents {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .student-row .student-info .parents span {
+            font-size: 0.72rem;
+            color: #7f6a4b;
+            background: white;
+            padding: 0.1rem 0.55rem;
+            border-radius: 30px;
+            border: 1px solid #f0e2d2;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .student-row .student-info .parents span i {
+            color: #f58a2e;
+            font-size: 0.7rem;
         }
 
         .student-row .student-info .roll {
@@ -566,6 +596,83 @@
                 font-size: 0.8rem;
             }
         }
+
+        /* ---------- holiday / festival option ---------- */
+        .holiday-box {
+            background: #fcf9f4;
+            border: 1.5px dashed #f0e2d2;
+            border-radius: 20px;
+            padding: 0.9rem 1.2rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+
+        .holiday-box.active {
+            background: #e8f1fc;
+            border: 1.5px solid #9dc1ef;
+        }
+
+        .holiday-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #3d2e1b;
+            cursor: pointer;
+        }
+
+        .holiday-toggle input {
+            width: 18px;
+            height: 18px;
+            accent-color: #1565c0;
+            cursor: pointer;
+        }
+
+        .holiday-details {
+            display: none;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.8rem;
+            margin-top: 0.8rem;
+        }
+
+        .holiday-box.active .holiday-details {
+            display: flex;
+        }
+
+        .holiday-details select,
+        .holiday-details input[type="text"] {
+            padding: 0.5rem 0.9rem;
+            border: 1.5px solid #f0e2d2;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            background: white;
+            outline: none;
+            color: #2d1f0c;
+            font-weight: 500;
+        }
+
+        .holiday-details select:focus,
+        .holiday-details input[type="text"]:focus {
+            border-color: #1565c0;
+        }
+
+        .holiday-details input[type="text"] {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .holiday-note {
+            width: 100%;
+            font-size: 0.75rem;
+            color: #5d6f86;
+        }
+
+        .student-list.holiday-mode .student-row {
+            opacity: 0.5;
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -600,7 +707,7 @@
                 <div class="sidebar-divider"></div>
                 <a href="student.html"><i class="fas fa-user-plus"></i> Add Student</a>
                 <a href="teacher.html"><i class="fas fa-chalkboard-user"></i> Teachers</a>
-                
+
                 <a href="setting.html"><i class="fas fa-gear"></i> Settings</a>
             </nav>
         </aside>
@@ -610,7 +717,11 @@
 
             <!-- Class Buttons -->
             <div class="section-title"><i class="fas fa-layer-group"></i> Select Class</div>
-            <div class="class-buttons" id="classesContainer"></div>
+            <div class="class-buttons" id="classesContainer">
+                <div class="loading-state" style="padding:0.5rem 0;">
+                    <i class="fas fa-circle-notch fa-spin" style="color:#f58a2e;"></i>
+                </div>
+            </div>
 
             <!-- Selected Class & Students -->
             <div id="studentsSection">
@@ -639,13 +750,7 @@
 </div>
 
 <script>
-    const API_URL = "https://sunshine-swp6.onrender.com";
-
-    const classes = [
-        "Nursery", "LKG", "UKG",
-        "1", "2", "3", "4", "5",
-        "6", "7", "8", "9", "10","11","12"
-    ];
+    const API_URL = "https://sunshine-swp6.onrender.com"; // Change this to your actual API URL
 
     const classesContainer = document.getElementById("classesContainer");
     const studentsContainer = document.getElementById("studentsContainer");
@@ -660,27 +765,77 @@
     let activeClass = null;
 
     // ==========================================
-    // CREATE CLASS BUTTONS
+    // HELPER: DISPLAY NAME FOR A CLASS
+    // ==========================================
+    // Agar class ka naam sirf number hai (e.g. "1", "10") to
+    // "Class 1" jaisa dikhao, warna jo backend se aaya wahi dikhao
+    // (Nursery, LKG, UKG, ya koi bhi custom naam).
+
+    function getClassDisplayName(className) {
+        const isNumeric = /^\d+$/.test(String(className).trim());
+        return isNumeric ? `Class ${className}` : className;
+    }
+
+    // ==========================================
+    // LOAD CLASSES (DYNAMIC — NO HARDCODING)
     // ==========================================
 
-    classes.forEach(className => {
-        const button = document.createElement("button");
-        const displayName = className === "Nursery" || className === "LKG" || className === "UKG"
-            ? className
-            : `Class ${className}`;
-        button.textContent = displayName;
-        button.className = "class-btn";
-        button.dataset.class = className;
+    async function loadClasses() {
+        try {
+            classesContainer.innerHTML = `
+                <div class="loading-state" style="padding:0.5rem 0;">
+                    <i class="fas fa-circle-notch fa-spin" style="color:#f58a2e;"></i>
+                </div>
+            `;
 
-        button.addEventListener("click", () => {
-            document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
-            button.classList.add('active');
-            activeClass = className;
-            fetchStudentsByClass(className);
-        });
+            const response = await fetch(`${API_URL}/api/classes`);
+            const result = await response.json();
 
-        classesContainer.appendChild(button);
-    });
+            if (!response.ok || !result.success) {
+                classesContainer.innerHTML = `<p style="color:#b53b2e;font-size:0.85rem;">Unable to load classes.</p>`;
+                return;
+            }
+
+            const classes = result.classes || [];
+
+            if (classes.length === 0) {
+                classesContainer.innerHTML = `<p style="color:#b09a7e;font-size:0.85rem;">No classes found. Please add a class first.</p>`;
+                return;
+            }
+
+            classesContainer.innerHTML = "";
+
+            classes.forEach(cls => {
+                const className = cls.name;
+
+                const button = document.createElement("button");
+                button.textContent = getClassDisplayName(className);
+                button.className = "class-btn";
+                button.dataset.class = className;
+
+                button.addEventListener("click", () => {
+                    document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
+                    button.classList.add('active');
+                    activeClass = className;
+                    fetchStudentsByClass(className);
+                });
+
+                classesContainer.appendChild(button);
+            });
+
+            // Auto-select first class
+            const firstBtn = classesContainer.querySelector('.class-btn');
+            if (firstBtn) {
+                firstBtn.classList.add('active');
+                activeClass = firstBtn.dataset.class;
+                fetchStudentsByClass(activeClass);
+            }
+
+        } catch (error) {
+            console.error("Load classes error:", error);
+            classesContainer.innerHTML = `<p style="color:#b53b2e;font-size:0.85rem;">Unable to connect with server.</p>`;
+        }
+    }
 
     // ==========================================
     // FETCH STUDENTS BY CLASS
@@ -688,7 +843,7 @@
 
     async function fetchStudentsByClass(className) {
         try {
-            selectedClassTitle.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Loading ${className}...`;
+            selectedClassTitle.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Loading ${getClassDisplayName(className)}...`;
             studentsContainer.innerHTML = `
                 <div class="loading-state">
                     <div class="spinner"><i class="fas fa-circle-notch"></i></div>
@@ -712,10 +867,7 @@
 
             const students = result.students || [];
 
-            const displayName = className === "Nursery" || className === "LKG" || className === "UKG"
-                ? className
-                : `Class ${className}`;
-            selectedClassTitle.innerHTML = `<i class="fas fa-users"></i> ${displayName} Attendance`;
+            selectedClassTitle.innerHTML = `<i class="fas fa-users"></i> ${getClassDisplayName(className)} Attendance`;
             studentCountEl.textContent = `${students.length} students`;
 
             if (students.length === 0) {
@@ -729,14 +881,30 @@
             }
 
             // Build student list
-            let html = `<div class="student-list">`;
+            let html = holidayPanelHtml() + `<div class="student-list">`;
 
             students.forEach((student, index) => {
+                const fatherName =
+                    student.fatherName ||
+                    student.father?.name ||
+                    "";
+
+                const motherName =
+                    student.motherName ||
+                    student.mother?.name ||
+                    "";
+
                 html += `
                     <div class="student-row">
                         <div class="student-info">
                             <span class="index">${index + 1}.</span>
-                            <span class="name">${student.studentName || '-'}</span>
+                            <div class="name-block">
+                                <span class="name">${student.studentName || '-'}</span>
+                                <div class="parents">
+                                    <span><i class="fas fa-person"></i> ${fatherName || 'N/A'}</span>
+                                    <span><i class="fas fa-person-dress"></i> ${motherName || 'N/A'}</span>
+                                </div>
+                            </div>
                             <span class="roll"><i class="fas fa-sort-numeric-up"></i> ${student.rollNumber || 'N/A'}</span>
                         </div>
                         <div class="attendance-options">
@@ -765,6 +933,7 @@
             `;
 
             studentsContainer.innerHTML = html;
+                initHolidayControls();
 
             // Attach save event
             document.getElementById('saveAttendanceBtn').addEventListener('click', () => {
@@ -788,6 +957,74 @@
     // SAVE ATTENDANCE
     // ==========================================
 
+    // ==========================================
+    // HOLIDAY / FESTIVAL OPTION
+    // ==========================================
+
+    function holidayPanelHtml() {
+        return `
+            <div class="holiday-box" id="holidayBox">
+                <label class="holiday-toggle">
+                    <input type="checkbox" id="holidayToggle">
+                    <i class="fas fa-umbrella-beach" style="color:#1565c0;"></i>
+                    Mark today as Holiday (all students of this class)
+                </label>
+                <div class="holiday-details">
+                    <select id="holidayReason">
+                        <option value="Festival">Festival</option>
+                        <option value="General Holiday">General Holiday</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="holidayName" maxlength="80"
+                        placeholder="Festival name (e.g. Diwali, Holi, Eid)">
+                    <span class="holiday-note">
+                        All students will be saved as "Holiday" for the selected date.
+                        This day will not count as Present or Absent.
+                    </span>
+                </div>
+            </div>
+        `;
+    }
+
+    function initHolidayControls() {
+        const box = document.getElementById("holidayBox");
+        const toggle = document.getElementById("holidayToggle");
+        const reason = document.getElementById("holidayReason");
+        const nameInput = document.getElementById("holidayName");
+        const list = document.querySelector(".student-list");
+
+        if (!box || !toggle) return;
+
+        function refreshPlaceholder() {
+            nameInput.placeholder = reason.value === "Festival"
+                ? "Festival name (e.g. Diwali, Holi, Eid)"
+                : "Reason (optional)";
+        }
+
+        toggle.addEventListener("change", () => {
+            const on = toggle.checked;
+            box.classList.toggle("active", on);
+            if (list) list.classList.toggle("holiday-mode", on);
+            document.querySelectorAll(".student-row input[type='radio']")
+                .forEach(r => { r.disabled = on; });
+            if (on) nameInput.focus();
+        });
+
+        reason.addEventListener("change", refreshPlaceholder);
+        refreshPlaceholder();
+    }
+
+    function getHolidayState() {
+        const toggle = document.getElementById("holidayToggle");
+        const isHoliday = !!(toggle && toggle.checked);
+
+        return {
+            isHoliday,
+            reason: isHoliday ? document.getElementById("holidayReason").value : "",
+            name: isHoliday ? document.getElementById("holidayName").value.trim() : ""
+        };
+    }
+
     async function saveAttendance(students, className) {
         const selectedDate = attendanceDate.value;
 
@@ -796,7 +1033,15 @@
             return;
         }
 
-        const attendanceData = students.map(student => {
+        const holiday = getHolidayState();
+
+            if (holiday.isHoliday && holiday.reason === "Festival" && !holiday.name) {
+                alert("Please type the festival name.");
+                document.getElementById("holidayName").focus();
+                return;
+            }
+
+            const attendanceData = students.map(student => {
             const selected = document.querySelector(
                 `input[name="attendance-${student._id}"]:checked`
             );
@@ -804,7 +1049,7 @@
                 studentId: student._id,
                 studentName: student.studentName,
                 rollNumber: student.rollNumber || "",
-                status: selected ? selected.value : "Absent"
+                status: holiday.isHoliday ? "Holiday" : (selected ? selected.value : "Absent")
             };
         });
 
@@ -812,7 +1057,10 @@
             date: selectedDate,
             className: className,
             session: "2026-27",
-            students: attendanceData
+            students: attendanceData,
+                isHoliday: holiday.isHoliday,
+                holidayReason: holiday.reason,
+                holidayName: holiday.name
         };
 
         const saveBtn = document.getElementById('saveAttendanceBtn');
@@ -847,16 +1095,8 @@
         }
     }
 
-    // Auto-select first class on load
-    document.addEventListener('DOMContentLoaded', () => {
-        const firstBtn = document.querySelector('.class-btn');
-        if (firstBtn) {
-            firstBtn.classList.add('active');
-            const className = firstBtn.dataset.class;
-            activeClass = className;
-            fetchStudentsByClass(className);
-        }
-    });
+    // Load classes dynamically on page load (auto-selects the first one)
+    document.addEventListener('DOMContentLoaded', loadClasses);
 </script>
 
 </body>

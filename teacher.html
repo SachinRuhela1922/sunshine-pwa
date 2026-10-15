@@ -6,6 +6,8 @@
   <title>  · Teacher Panel</title>
   <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -265,6 +267,57 @@
       color: #f58a2e;
     }
 
+    /* ===== SYLLABUS (assigned class) ===== */
+    .syllabus-class-block {
+      background: #fcf9f4;
+      border: 1px solid #f0e2d2;
+      border-radius: 16px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .syllabus-class-block > h3 {
+      color: #2d1f0c;
+      font-size: 1.05rem;
+      margin-bottom: .8rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .syllabus-class-block > h3 i {
+      color: #f58a2e;
+    }
+    .syllabus-term-block {
+      background: white;
+      border-radius: 12px;
+      padding: .8rem 1rem;
+      margin-bottom: .7rem;
+      border: 1px solid rgba(245,138,46,.06);
+    }
+    .syllabus-term-block h4 {
+      font-size: .9rem;
+      color: #2d1f0c;
+      margin-bottom: .5rem;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .syllabus-term-block h4 i {
+      color: #f58a2e;
+    }
+    .syllabus-term-item {
+      padding: .4rem 0;
+      border-bottom: 1px dashed #f0e2d2;
+      font-size: .85rem;
+      color: #4a3c26;
+    }
+    .syllabus-term-item:last-child { border-bottom: none; }
+    .syllabus-term-item strong { color: #2d1f0c; }
+    .syllabus-empty-note {
+      color: #a68a5e;
+      font-size: .8rem;
+      padding: .3rem 0;
+    }
+
     /* Class Cards - Clickable */
     .class-card {
       background: #fcf9f4;
@@ -445,6 +498,7 @@
       <a href="view-notice.html"><i class="fas fa-calendar-check"></i> Notice Board</a>
       <a href="result2.html"><i class="fas fa-calendar-check"></i> Result</a>
       <a href="view-time-table.html"><i class="fas fa-calendar-check"></i> Time Table</a>
+      <a href="view-syllabus.html"><i class="fas fa-book-open"></i> Syllabus</a>
       <div class="sidebar-divider"></div>
       
       <a href="attendance2.html"><i class="fas fa-flag"></i> Attendance</a>
@@ -463,6 +517,45 @@
     <!-- ====== DYNAMIC DATA RENDERED HERE ====== -->
     <div id="dynamicTeacherPanel">
       <!-- Will be filled by JS (logic untouched) -->
+    </div>
+
+
+    <!-- ===== TEACHER ATTENDANCE ===== -->
+<div class="section-title" style="margin-top:2rem;">
+  <i class="fas fa-calendar-check"></i> My Attendance
+  <i class="fas fa-calendar-check"></i> Timing -> 07:20 AM
+</div>
+
+<div class="info-grid" style="margin-bottom:1rem;">
+  <div class="info-item">
+    <span class="label">Select Date</span>
+    <input type="date" id="teacherAttendanceDate"
+      style="margin-top:0.4rem;padding:0.6rem;border:1px solid #f0e2d2;border-radius:10px;">
+  </div>
+
+  <div class="info-item" style="justify-content:center;">
+    <button id="loadTeacherAttendance"
+      style="background:linear-gradient(135deg,#f9b042,#f58a2e);
+      color:white;border:none;padding:0.65rem 1rem;border-radius:10px;
+      font-weight:600;cursor:pointer;">
+      <i class="fas fa-search"></i> Show Attendance
+    </button>
+  </div>
+</div>
+
+<div id="teacherAttendanceResult">
+  <p style="color:#7f6a4b;padding:1rem 0;">
+    Select a date to view your attendance.
+  </p>
+</div>
+
+    <!-- ===== MY CLASS SYLLABUS ===== -->
+    <div class="section-title" style="margin-top:2rem;">
+      <i class="fas fa-book-open"></i> My Class Syllabus
+    </div>
+
+    <div id="teacherSyllabusResult">
+      <p class="syllabus-empty-note"><i class="fas fa-circle-notch fa-spin"></i> Loading syllabus...</p>
     </div>
 
     <div class="footer-note">
@@ -527,6 +620,7 @@ function getClassPageUrl(className) {
         { label: "Father's Name", key: 'fatherName', icon: 'fa-person' },
         { label: "Department", key: 'department', icon: 'fa-building' },
         { label: "Mother's Name", key: 'motherName', icon: 'fa-person-dress' },
+        { label: "Husband's Name", key: 'husbandName', icon: 'fa-ring' },
         { label: 'Email', key: 'email', icon: 'fa-envelope' },
         { label: 'Phone', key: 'phone', icon: 'fa-phone' },
         { label: 'Gender', key: 'gender', icon: 'fa-venus-mars' },
@@ -615,6 +709,305 @@ function getClassPageUrl(className) {
     // render the enhanced UI
     container.innerHTML = renderTeacherPanel(teacherData);
 
+    // ======================================================
+// LOGGED-IN TEACHER ATTENDANCE
+// ======================================================
+
+const attendanceDateInput =
+  document.getElementById("teacherAttendanceDate");
+
+const attendanceBtn =
+  document.getElementById("loadTeacherAttendance");
+
+const attendanceResult =
+  document.getElementById("teacherAttendanceResult");
+
+const API_BASE = "https://sunshine-swp6.onrender.com"; // Change this to your actual API URL
+
+// Default date = today
+attendanceDateInput.value = new Date().toISOString().slice(0, 10);
+
+
+// Escape HTML
+function escapeAttendanceHtml(value) {
+  const div = document.createElement("div");
+  div.textContent = value ?? "";
+  return div.innerHTML;
+}
+
+
+// Load only logged-in teacher attendance
+async function loadMyAttendance(date) {
+
+  if (!date) {
+    attendanceResult.innerHTML = `
+      <p style="color:#b06b6b;padding:1rem 0;">
+        Please select a date.
+      </p>
+    `;
+    return;
+  }
+
+  attendanceResult.innerHTML = `
+    <div style="text-align:center;padding:1.5rem;color:#b09a7e;">
+      <i class="fas fa-spinner fa-spin"></i>
+      Loading attendance...
+    </div>
+  `;
+
+  try {
+
+    // Logged-in teacher details
+    const loggedTeacher =
+      JSON.parse(localStorage.getItem("loggedInTeacher"));
+
+    if (!loggedTeacher) {
+      window.location.href = "index.html";
+      return;
+    }
+
+    const loggedTeacherId =
+      String(loggedTeacher.teacherId || "").trim();
+
+    const loggedEmployeeId =
+      String(loggedTeacher.employeeId || "").trim();
+
+    const loggedTeacherName =
+      String(loggedTeacher.name || "").trim();
+
+
+    // Fetch attendance for selected date
+    const res = await fetch(
+      `${API_BASE}/api/teacher-attendance/${date}`
+    );
+
+    const data = await res.json();
+
+    if (!data.success || !data.attendance) {
+      attendanceResult.innerHTML = `
+        <div style="
+          background:#fcf9f4;
+          padding:1.2rem;
+          border-radius:20px;
+          color:#7f6a4b;
+        ">
+          <i class="fas fa-info-circle" style="color:#f58a2e;"></i>
+          No attendance found for this date.
+        </div>
+      `;
+      return;
+    }
+
+
+    // All teachers attendance from backend
+    const teachers = data.attendance.teachers || [];
+
+
+    // ==================================================
+    // IMPORTANT:
+    // Match ONLY logged-in teacher
+    // ==================================================
+
+    const myAttendance = teachers.find(t => {
+
+      const attendanceTeacherId =
+        String(t.teacherId || "").trim();
+
+      const attendanceEmployeeId =
+        String(t.employeeId || "").trim();
+
+      const attendanceName =
+        String(t.name || "").trim();
+
+
+      // First priority: Teacher ID
+      if (
+        loggedTeacherId &&
+        attendanceTeacherId &&
+        loggedTeacherId === attendanceTeacherId
+      ) {
+        return true;
+      }
+
+      // Second priority: Employee ID
+      if (
+        loggedEmployeeId &&
+        attendanceEmployeeId &&
+        loggedEmployeeId === attendanceEmployeeId
+      ) {
+        return true;
+      }
+
+      return false;
+    });
+
+
+    if (!myAttendance) {
+
+      attendanceResult.innerHTML = `
+        <div style="
+          background:#fcf9f4;
+          border-radius:20px;
+          padding:1.5rem;
+          text-align:center;
+          color:#7f6a4b;
+        ">
+          <i class="fas fa-calendar-xmark"
+             style="color:#f58a2e;font-size:1.5rem;"></i>
+
+          <div style="margin-top:0.5rem;font-weight:600;">
+            No attendance found for you on this date.
+          </div>
+        </div>
+      `;
+
+      return;
+    }
+
+
+    // ==================================================
+    // SHOW ONLY THIS TEACHER
+    // ==================================================
+
+    const status = myAttendance.status || "-";
+
+    let statusColor = "#f58a2e";
+
+    if (status === "Present") {
+      statusColor = "#2b8c4a";
+    } else if (status === "Absent") {
+      statusColor = "#c94c4c";
+    }
+
+
+    attendanceResult.innerHTML = `
+      <div style="
+        background:#fcf9f4;
+        border-radius:24px;
+        padding:1.3rem 1.5rem;
+        border-left:6px solid ${statusColor};
+      ">
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          flex-wrap:wrap;
+          gap:1rem;
+        ">
+
+          <div>
+            <h3 style="
+              color:#2d1f0c;
+              font-size:1.1rem;
+              margin-bottom:0.4rem;
+            ">
+              <i class="fas fa-user-check"
+                 style="color:#f58a2e;"></i>
+              ${escapeAttendanceHtml(myAttendance.name || loggedTeacherName)}
+            </h3>
+
+            <div style="
+              color:#7f6a4b;
+              font-size:0.85rem;
+            ">
+              Teacher ID:
+              ${escapeAttendanceHtml(
+                myAttendance.teacherId ||
+                loggedTeacherId ||
+                "-"
+              )}
+            </div>
+          </div>
+
+
+          <span style="
+            background:${statusColor};
+            color:white;
+            padding:0.45rem 1rem;
+            border-radius:60px;
+            font-size:0.85rem;
+            font-weight:700;
+          ">
+            ${escapeAttendanceHtml(status)}
+          </span>
+
+        </div>
+
+
+        <div class="info-grid" style="margin-top:1rem;margin-bottom:0;">
+
+          <div class="info-item">
+            <span class="label">
+              <i class="fas fa-right-to-bracket"
+                 style="color:#f58a2e;"></i>
+              In Time
+            </span>
+
+            <span class="value">
+              ${escapeAttendanceHtml(myAttendance.inTime || "-")}
+            </span>
+          </div>
+
+
+          <div class="info-item">
+            <span class="label">
+              <i class="fas fa-right-from-bracket"
+                 style="color:#f58a2e;"></i>
+              Out Time
+            </span>
+
+            <span class="value">
+              ${escapeAttendanceHtml(myAttendance.outTime || "-")}
+            </span>
+          </div>
+
+
+          <div class="info-item">
+            <span class="label">
+              <i class="fas fa-calendar"
+                 style="color:#f58a2e;"></i>
+              Date
+            </span>
+
+            <span class="value">
+              ${new Date(date).toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+              })}
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+    `;
+
+  } catch (error) {
+
+    console.error("Teacher attendance error:", error);
+
+    attendanceResult.innerHTML = `
+      <div style="
+        background:#fff5f5;
+        padding:1rem;
+        border-radius:16px;
+        color:#c94c4c;
+      ">
+        <i class="fas fa-triangle-exclamation"></i>
+        Could not load attendance.
+      </div>
+    `;
+  }
+}
+
+
+// Button click
+attendanceBtn.addEventListener("click", () => {
+  loadMyAttendance(attendanceDateInput.value);
+});
+
     // ---- Hidden elements for original logic ----
     const hiddenContainer = document.createElement('div');
     hiddenContainer.style.display = 'none';
@@ -625,6 +1018,7 @@ function getClassPageUrl(className) {
       <span id="teacherFatherName"></span>
       <span id="teacherDepartment"></span>
       <span id="teacherMotherName"></span>
+      <span id="teacherHusbandName"></span>
       <span id="teacherEmail"></span>
       <span id="teacherPhone"></span>
       <span id="teacherGender"></span>
@@ -651,6 +1045,7 @@ function getClassPageUrl(className) {
         document.getElementById("teacherFatherName").textContent = teacherDataOrig.fatherName || "-";
         document.getElementById("teacherDepartment").textContent = teacherDataOrig.department || "-";
         document.getElementById("teacherMotherName").textContent = teacherDataOrig.motherName || "-";
+        document.getElementById("teacherHusbandName").textContent = teacherDataOrig.husbandName || "-";
         document.getElementById("teacherEmail").textContent = teacherDataOrig.email || "-";
         document.getElementById("teacherPhone").textContent = teacherDataOrig.phone || "-";
         document.getElementById("teacherGender").textContent = teacherDataOrig.gender || "-";
@@ -688,6 +1083,267 @@ function getClassPageUrl(className) {
         document.getElementById("bloodGroup").textContent = teacherDataOrig.profile?.bloodGroup || "-";
       }
     })();
+
+  })();
+</script>
+
+<!-- ===== SYLLABUS FOR ASSIGNED CLASS(ES) ===== -->
+<script>
+  (function() {
+
+    const API_BASE = "https://sunshine-swp6.onrender.com"; // Change this to your actual API URL
+
+    const SYLLABUS_TERMS = [
+      { key: "unit1",      label: "Unit 1",      icon: "fa-1" },
+      { key: "unit2",      label: "Unit 2",      icon: "fa-2" },
+      { key: "halfYearly", label: "Half Yearly", icon: "fa-calendar-check" },
+      { key: "unit3",      label: "Unit 3",      icon: "fa-3" },
+      { key: "unit4",      label: "Unit 4",      icon: "fa-4" },
+      { key: "annual",     label: "Annual",      icon: "fa-trophy" }
+    ];
+
+    function escapeHtmlSyllabus(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // className -> terms data, PDF banane ke liye yahi se uthayenge
+    const syllabusDataStore = {};
+
+    function buildPivotedSyllabusRows(terms) {
+
+      const subjectOrder = [];
+      const subjectMap = {};
+
+      SYLLABUS_TERMS.forEach((term) => {
+
+        const termRows = (terms && terms[term.key]) ? terms[term.key] : [];
+
+        termRows.forEach((row) => {
+
+          const subj = row.subject || "-";
+
+          if (!subjectMap[subj]) {
+            subjectMap[subj] = {};
+            subjectOrder.push(subj);
+          }
+
+          let cell = (row.chapterFrom || row.chapterTo)
+            ? `Ch ${row.chapterFrom || "-"} to ${row.chapterTo || "-"}`
+            : "-";
+
+          if (row.extra) {
+            cell = (cell === "-") ? row.extra : `${cell} (${row.extra})`;
+          }
+
+          subjectMap[subj][term.key] = cell;
+
+        });
+
+      });
+
+      return subjectOrder.map((subj) => {
+        const row = [subj];
+        SYLLABUS_TERMS.forEach((term) => {
+          row.push(subjectMap[subj][term.key] || "-");
+        });
+        return row;
+      });
+
+    }
+
+    function generateSyllabusPdf(className, terms) {
+
+      if (!window.jspdf) {
+        alert("PDF library load nahi hui, page reload karke try karo.");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF("landscape", "pt", "a4");
+
+      const rows = buildPivotedSyllabusRows(terms);
+
+      if (rows.length === 0) {
+        rows.push(["-", "-", "-", "-", "-", "-", "-"]);
+      }
+
+      const headers = [["Subject", ...SYLLABUS_TERMS.map(t => t.label)]];
+
+      doc.autoTable({
+        head: headers,
+        body: rows,
+        theme: "grid",
+        startY: 40,
+        margin: { left: 25, right: 25, top: 40, bottom: 25 },
+
+        styles: {
+          font: "helvetica",
+          fontSize: 8.5,
+          cellPadding: 5,
+          textColor: [0, 0, 0],
+          lineColor: [0, 0, 0],
+          lineWidth: 0.5,
+          overflow: "linebreak",
+          valign: "middle"
+        },
+
+        headStyles: {
+          fillColor: [245, 138, 46],
+          textColor: [255, 255, 255],
+          fontStyle: "bold",
+          fontSize: 9.5,
+          halign: "center"
+        },
+
+        columnStyles: {
+          0: { cellWidth: 100, fontStyle: "bold" }
+        },
+
+        didDrawPage: function () {
+          doc.setTextColor(0, 0, 0);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(13);
+          doc.text(`Syllabus - ${getClassDisplayNameLocal(className)} [Sunshine School]`, 25, 26);
+
+          const pageNumber = doc.internal.getNumberOfPages();
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(8);
+          doc.text(`Page ${pageNumber}`, doc.internal.pageSize.getWidth() - 60, 26);
+        }
+      });
+
+      doc.save(`Syllabus_${className}.pdf`);
+
+    }
+
+    function getClassDisplayNameLocal(className) {
+      if (!className) return "Class";
+      if (["Nursery", "LKG", "UKG"].includes(className)) return className;
+      return `Class ${className}`;
+    }
+
+    function renderClassSyllabusHtml(className, syllabus) {
+
+      const terms = (syllabus && syllabus.terms) ? syllabus.terms : {};
+      syllabusDataStore[className] = terms;
+
+      let html = `<div class="syllabus-class-block">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;margin-bottom:.8rem;">
+          <h3 style="margin-bottom:0;"><i class="fas fa-layer-group"></i> Class ${escapeHtmlSyllabus(className)}</h3>
+          <button type="button" class="syllabus-download-btn" data-class="${escapeHtmlSyllabus(className)}"
+            style="background:linear-gradient(135deg,#f58a2e,#f9b042);color:white;border:none;padding:.45rem .9rem;border-radius:60px;font-weight:600;font-size:.78rem;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;">
+            <i class="fas fa-file-pdf"></i> Download PDF
+          </button>
+        </div>`;
+
+      let anyData = false;
+
+      SYLLABUS_TERMS.forEach((term) => {
+
+        const rows = terms[term.key] || [];
+
+        html += `<div class="syllabus-term-block"><h4><i class="fas ${term.icon}"></i> ${term.label}</h4>`;
+
+        if (rows.length === 0) {
+          html += `<div class="syllabus-empty-note">No syllabus added yet for ${term.label}.</div>`;
+        } else {
+          anyData = true;
+          rows.forEach((row) => {
+            const range = (row.chapterFrom || row.chapterTo)
+              ? ` (Chapter ${escapeHtmlSyllabus(row.chapterFrom || "-")} to ${escapeHtmlSyllabus(row.chapterTo || "-")})`
+              : "";
+            const extraText = row.extra ? ` — ${escapeHtmlSyllabus(row.extra)}` : "";
+            html += `<div class="syllabus-term-item"><strong>${escapeHtmlSyllabus(row.subject)}</strong>${range}${extraText}</div>`;
+          });
+        }
+
+        html += `</div>`;
+
+      });
+
+      if (!anyData) {
+        html += `<p class="syllabus-empty-note"><i class="fas fa-info-circle"></i> Is class ka abhi tak koi syllabus admin ne save nahi kiya.</p>`;
+      }
+
+      html += `</div>`;
+
+      return html;
+
+    }
+
+    async function loadTeacherSyllabus() {
+
+      const resultEl = document.getElementById("teacherSyllabusResult");
+      if (!resultEl) return;
+
+      const teacherData = JSON.parse(localStorage.getItem("loggedInTeacher") || "null");
+
+      if (!teacherData || !teacherData.assignedClasses || teacherData.assignedClasses.length === 0) {
+        resultEl.innerHTML = `<p class="syllabus-empty-note"><i class="fas fa-info-circle"></i> No classes assigned, so no syllabus to show.</p>`;
+        return;
+      }
+
+      // Unique class names jo teacher ko assign hain
+      const classNames = [...new Set(
+        teacherData.assignedClasses
+          .map(item => item.class)
+          .filter(Boolean)
+      )];
+
+      if (classNames.length === 0) {
+        resultEl.innerHTML = `<p class="syllabus-empty-note"><i class="fas fa-info-circle"></i> No classes assigned, so no syllabus to show.</p>`;
+        return;
+      }
+
+      resultEl.innerHTML = "";
+
+      for (const className of classNames) {
+
+        try {
+
+          const response = await fetch(`${API_BASE}/api/syllabus/${encodeURIComponent(className)}`);
+          const result = await response.json();
+
+          if (response.ok && result.success && result.syllabus) {
+            resultEl.insertAdjacentHTML("beforeend", renderClassSyllabusHtml(className, result.syllabus));
+          } else {
+            resultEl.insertAdjacentHTML("beforeend", renderClassSyllabusHtml(className, null));
+          }
+
+        } catch (error) {
+
+          console.error("Load teacher syllabus error:", error);
+          resultEl.insertAdjacentHTML(
+            "beforeend",
+            `<p class="syllabus-empty-note"><i class="fas fa-triangle-exclamation"></i> Class ${escapeHtmlSyllabus(className)} ka syllabus load nahi ho paya.</p>`
+          );
+
+        }
+
+      }
+
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+      loadTeacherSyllabus();
+
+      const resultEl = document.getElementById("teacherSyllabusResult");
+      if (resultEl) {
+        resultEl.addEventListener("click", function(e) {
+          const btn = e.target.closest(".syllabus-download-btn");
+          if (!btn) return;
+          const className = btn.dataset.class;
+          generateSyllabusPdf(className, syllabusDataStore[className] || {});
+        });
+      }
+
+    });
 
   })();
 </script>

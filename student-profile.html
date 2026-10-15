@@ -706,6 +706,104 @@
             }
         }
 
+    
+        /* ===== FEE RECORD ===== */
+        .fee-section {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem 1.8rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            border: 1px solid rgba(245, 138, 46, 0.06);
+            margin-bottom: 1.5rem;
+        }
+        .fee-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+        .fee-stat {
+            background: #fcfaf7;
+            border: 1px solid #f0e2d2;
+            border-radius: 14px;
+            padding: 0.8rem 1rem;
+        }
+        .fee-stat span {
+            display: block;
+            font-size: 0.72rem;
+            color: #b09a7e;
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+        }
+        .fee-stat strong {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2d1f0c;
+        }
+        .fee-stat.paid strong { color: #2b7a3a; }
+        .fee-stat.due strong { color: #b53b2e; }
+        .fee-stat.clear strong { color: #2b7a3a; }
+        .fee-list-wrapper {
+            max-height: 420px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+        .fee-row {
+            background: #fcfaf7;
+            border: 1px solid #f0e2d2;
+            border-radius: 14px;
+            padding: 0.8rem 1rem;
+        }
+        .fee-row-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .fee-row-top .fee-month {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        .fee-row-top .fee-date {
+            font-size: 0.75rem;
+            color: #b09a7e;
+        }
+        .fee-row-amounts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #6b5a44;
+        }
+        .fee-row-amounts b { color: #2d1f0c; }
+        .fee-row-amounts .due-amt { color: #b53b2e; }
+        .fee-row-amounts .paid-amt { color: #2b7a3a; }
+        .fee-extra {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.6rem;
+        }
+        .fee-chip {
+            background: #fcf3e8;
+            color: #a8641a;
+            border-radius: 30px;
+            padding: 0.1rem 0.6rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        @media (max-width: 800px) {
+            .fee-section { padding: 1.2rem 1.2rem; }
+            .fee-summary { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 400px) {
+            .fee-summary { grid-template-columns: 1fr; }
+        }
+
     </style>
 
 </head>
@@ -900,6 +998,21 @@
         </div>
     </div>
 
+        <!-- ===== FEE RECORD ===== -->
+    <div class="fee-section">
+        <div class="section-title">
+            <i class="fas fa-indian-rupee-sign"></i>
+            Fee Record
+            <span class="title-badge">Payments</span>
+        </div>
+        <div id="feeRecord">
+            <div class="no-results">
+                <i class="fas fa-spinner fa-spin"></i>
+                Loading fee records...
+            </div>
+        </div>
+    </div>
+
     <!-- ===== CONTACT DETAILS ===== -->
     <div class="profile-card">
         <div class="section-title">
@@ -1016,6 +1129,9 @@ if (!studentJSON) {
 
     // LOAD ATTENDANCE (BADGE)
     loadAttendanceBadge(student.studentId);
+
+    // LOAD FEE RECORD
+    loadFeeRecord(student.studentId);
 }
 
 // =================================================
@@ -1310,6 +1426,137 @@ async function loadAttendanceBadge(studentId) {
         console.error("Attendance badge error:", error);
         container.innerHTML = `
             <span class="attendance-stat"><i class="fas fa-exclamation-triangle"></i> Error</span>
+        `;
+    }
+}
+
+// =================================================
+// FETCH STUDENT FEE RECORD + BALANCE
+// =================================================
+
+function formatRupees(value) {
+    return "\u20B9" + (Number(value) || 0).toLocaleString("en-IN");
+}
+
+async function loadFeeRecord(studentId) {
+    const container = document.getElementById("feeRecord");
+    if (!container) return;
+
+    try {
+        const response = await fetch(`${API}/api/payments/student/${encodeURIComponent(studentId)}`);
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Unable to load fee record.");
+        }
+
+        // Server sends oldest -> newest
+        const payments = data.payments || [];
+
+        if (!payments.length) {
+            container.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-receipt"></i>
+                    No fee payments recorded yet.
+                </div>
+            `;
+            return;
+        }
+
+        // Totals
+        let totalBilled = 0;
+        let totalPaid = 0;
+
+        payments.forEach(p => {
+            totalBilled += Number(p.monthlyFee) || 0;
+            totalPaid += Number(p.amount) || 0;
+        });
+
+        // The latest payment's dueAmount is the running balance calculated
+        // by the server (previous due + monthly fee - paid).
+        const latest = payments[payments.length - 1];
+        const balanceDue = Number(latest.dueAmount) || 0;
+
+        const extraLabels = {
+            registrationFee: "Registration",
+            conveyanceFee: "Conveyance",
+            bookFee: "Books",
+            stationaryFee: "Stationary",
+            examFee: "Exam",
+            redCrossFee: "Red Cross",
+            scoutFee: "Scout",
+            tieBalance: "Tie",
+            beltBalance: "Belt",
+            shirtPantBalance: "Shirt/Pant"
+        };
+
+        let extraTotal = 0;
+
+        const rows = payments.slice().reverse().map(p => {
+            const fees = p.additionalFees || {};
+
+            const chips = Object.keys(extraLabels)
+                .filter(key => Number(fees[key]) > 0)
+                .map(key => {
+                    extraTotal += Number(fees[key]);
+                    return `<span class="fee-chip">${extraLabels[key]}: ${formatRupees(fees[key])}</span>`;
+                })
+                .join("");
+
+            const dateText = p.paymentDate
+                ? new Date(p.paymentDate).toLocaleDateString("en-IN")
+                : "-";
+
+            const modeText = escapeHtml(p.paymentMode || "Cash") +
+                (p.transactionId ? " \u00B7 " + escapeHtml(p.transactionId) : "");
+
+            const due = Number(p.dueAmount) || 0;
+
+            return `
+                <div class="fee-row">
+                    <div class="fee-row-top">
+                        <span class="fee-month">${escapeHtml(p.month)}</span>
+                        <span class="fee-date">${dateText} \u00B7 ${modeText}</span>
+                    </div>
+                    <div class="fee-row-amounts">
+                        <span>Monthly Fee: <b>${formatRupees(p.monthlyFee)}</b></span>
+                        <span>Paid: <b class="paid-amt">${formatRupees(p.amount)}</b></span>
+                        <span>Balance after this payment: <b class="${due > 0 ? "due-amt" : "paid-amt"}">${formatRupees(due)}</b></span>
+                    </div>
+                    ${chips ? `<div class="fee-extra">${chips}</div>` : ""}
+                </div>
+            `;
+        }).join("");
+
+        container.innerHTML = `
+            <div class="fee-summary">
+                <div class="fee-stat">
+                    <span>Total Monthly Fee</span>
+                    <strong>${formatRupees(totalBilled)}</strong>
+                </div>
+                <div class="fee-stat paid">
+                    <span>Total Paid</span>
+                    <strong>${formatRupees(totalPaid)}</strong>
+                </div>
+                <div class="fee-stat ${balanceDue > 0 ? "due" : "clear"}">
+                    <span>Balance Due</span>
+                    <strong>${balanceDue > 0 ? formatRupees(balanceDue) : "No Dues"}</strong>
+                </div>
+                <div class="fee-stat">
+                    <span>Additional Fees Paid</span>
+                    <strong>${formatRupees(extraTotal)}</strong>
+                </div>
+            </div>
+            <div class="fee-list-wrapper">${rows}</div>
+        `;
+
+    } catch (error) {
+        console.error("Fee record error:", error);
+        container.innerHTML = `
+            <div class="no-results">
+                <i class="fas fa-exclamation-triangle"></i>
+                Unable to load fee record.
+            </div>
         `;
     }
 }

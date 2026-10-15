@@ -980,6 +980,109 @@
                 margin: 0 auto;
             }
         }
+
+        /* ================================================== */
+        /* SEARCH BAR + FULL RECORD DOWNLOAD + EDIT MODAL      */
+        /* ================================================== */
+
+        .history-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1 1 260px;
+            min-width: 220px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #b09a7e;
+            pointer-events: none;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.7rem 2.4rem 0.7rem 2.5rem;
+            border: 1.5px solid #f0e2d2;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            outline: none;
+            background: #fffdf9;
+            font-family: inherit;
+        }
+
+        .search-box input:focus {
+            border-color: #f58a2e;
+            box-shadow: 0 0 0 3px rgba(245, 138, 46, 0.15);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: #f0e2d2;
+            color: #4d3e2b;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+        }
+
+        .search-count {
+            font-size: 0.8rem;
+            color: #b09a7e;
+            white-space: nowrap;
+        }
+
+        .btn-full-record {
+            background: linear-gradient(135deg, #f58a2e, #e0661a);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(245, 138, 46, 0.3);
+        }
+
+        .btn-full-record:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .edit-modal {
+            max-width: 760px;
+        }
+
+        .edit-modal-body {
+            padding: 1.25rem 1.5rem 0.5rem;
+        }
+
+        .edit-note {
+            font-size: 0.78rem;
+            color: #8a6d3b;
+            background: #fff6e5;
+            border: 1px solid #f7e0b0;
+            border-radius: 12px;
+            padding: 0.6rem 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .edit-section-title {
+            grid-column: 1 / -1;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #b09a7e;
+            margin-top: 0.4rem;
+        }
     </style>
 </head>
 
@@ -1046,6 +1149,22 @@
                         (click a row to view / download invoice)
                     </span>
                 </div>
+                <div class="history-toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="paymentSearch" autocomplete="off"
+                               placeholder="Search fee: month, date (02/10/2026), mode, status, amount, fee head...">
+                        <button type="button" class="search-clear" id="searchClearBtn" title="Clear">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <span class="search-count" id="searchCount"></span>
+                    <button type="button" class="btn-action btn-full-record" id="downloadFullRecordBtn"
+                            onclick="downloadFullRecordPDF()">
+                        <i class="fas fa-file-download"></i> Download Full Fee Record
+                    </button>
+                </div>
+
                 <div class="table-wrap">
                     <table>
                         <thead>
@@ -1282,6 +1401,123 @@
         <i class="fas fa-download"></i> Download PDF
     </button>
 </div>
+
+    </div>
+</div>
+
+
+<!-- ================================================== -->
+<!-- EDIT PAYMENT OVERLAY                                -->
+<!-- ================================================== -->
+<div class="invoice-overlay" id="editOverlay">
+    <div class="invoice-modal edit-modal">
+
+        <div class="invoice-modal-header">
+            <h2><i class="fas fa-edit"></i> Edit Fee Transaction</h2>
+            <button class="invoice-close-btn" onclick="closeEditPayment()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="edit-modal-body">
+            <div class="edit-note">
+                Is transaction ki saari details badal sakte hain. Agar is month ki Monthly Fee pehle hi
+                kisi aur transaction me charge ho chuki hai to yahan Monthly Fee <b>0</b> rakhein,
+                warna wo dobara add ho jayegi. Save karne par Due automatically dobara calculate hoga.
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label><i class="fas fa-money-bill"></i> Monthly Fee</label>
+                    <input type="number" id="edit_monthlyFee" min="0">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-rupee-sign"></i> Amount Paid</label>
+                    <input type="number" id="edit_amount" min="0">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt"></i> Month</label>
+                    <select id="edit_month">
+                        <option value="">Select Month</option>
+                        <option>January</option><option>February</option><option>March</option>
+                        <option>April</option><option>May</option><option>June</option>
+                        <option>July</option><option>August</option><option>September</option>
+                        <option>October</option><option>November</option><option>December</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-day"></i> Payment Date</label>
+                    <input type="text" id="edit_paymentDate" placeholder="DD/MM/YYYY" maxlength="10"
+                           inputmode="numeric" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-credit-card"></i> Payment Mode</label>
+                    <select id="edit_paymentMode">
+                        <option>Cash</option>
+                        <option>Online</option>
+                        <option>UPI</option>
+                        <option>Bank Transfer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-hashtag"></i> R.T.E Exam Fee</label>
+                    <input type="text" id="edit_transactionId" placeholder="RTE Exam Fee">
+                </div>
+
+                <div class="edit-section-title">Extra Fees</div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-id-card"></i> Registration Fee</label>
+                        <input type="number" id="edit_registrationFee" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-bus"></i> Ptm no attendance fee</label>
+                        <input type="number" id="edit_conveyanceFee" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-book"></i> Book Fee</label>
+                        <input type="number" id="edit_bookFee" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-pencil"></i> Late Fine Fee</label>
+                        <input type="number" id="edit_stationaryFee" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-file-alt"></i> Exam Fee</label>
+                        <input type="number" id="edit_examFee" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-heart"></i> Diary Fee</label>
+                        <input type="number" id="edit_redCrossFee" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-users"></i> Old Balance</label>
+                        <input type="number" id="edit_scoutFee" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tshirt"></i> Tie Balance</label>
+                        <input type="number" id="edit_tieBalance" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tshirt"></i> Belt Balance</label>
+                        <input type="number" id="edit_beltBalance" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tshirt"></i> Shirt/Pant Balance</label>
+                        <input type="number" id="edit_shirtPantBalance" min="0" value="0">
+                    </div>
+            </div>
+        </div>
+
+        <div class="invoice-modal-actions">
+            <button class="btn-download" style="background:#f0e2d2 !important;color:#4d3e2b !important;box-shadow:none !important;"
+                    onclick="closeEditPayment()">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button class="btn-download" id="saveEditBtn" onclick="saveEditedPayment()">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+        </div>
 
     </div>
 </div>
@@ -1838,8 +2074,32 @@ async function loadPayments() {
                     // ROW
                     // ==================================================
 
+                    // ---- searchable text for the search box ----
+                    const _d = payment.paymentDate ? new Date(payment.paymentDate) : null;
+                    const _p2 = n => String(n).padStart(2, "0");
+                    const _dateNum = _d
+                        ? `${_p2(_d.getDate())}/${_p2(_d.getMonth() + 1)}/${_d.getFullYear()}`
+                        : "";
+                    const _dateLong = _d
+                        ? _d.toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })
+                        : "";
+
+                    const searchText = [
+                        payment.month,
+                        _dateNum,
+                        _dateLong,
+                        payment.paymentMode,
+                        status,
+                        monthlyFee,
+                        paid,
+                        due,
+                        extraFeesTotal,
+                        extraFeeParts.join(" "),
+                        payment.transactionId
+                    ].join(" ").toLowerCase().replace(/"/g, "&quot;");
+
                     return `
-                        <tr class="payment-row">
+                        <tr class="payment-row" data-search="${searchText}">
 
                             <td>
                                 <strong>
@@ -1930,6 +2190,28 @@ async function loadPayments() {
                                     style="
                                         padding:4px 10px;
                                         font-size:12px;
+                                        background:#2f6fdb;
+                                        color:white;
+                                        border:none;
+                                        border-radius:30px;
+                                        cursor:pointer;
+                                    "
+                                    onclick="
+                                        event.stopPropagation();
+                                        openEditPayment(${index})
+                                    "
+                                    title="Edit Payment">
+
+                                    <i class="fas fa-edit"></i>
+
+                                </button>
+
+
+                                <button
+                                    class="btn-action"
+                                    style="
+                                        padding:4px 10px;
+                                        font-size:12px;
                                         background:#b53b2e;
                                         color:white;
                                         border:none;
@@ -1954,6 +2236,7 @@ async function loadPayments() {
                 }
             ).join("");
 
+        applyPaymentFilter();
 
     } catch (error) {
 
@@ -2267,7 +2550,7 @@ function showToast(message) {
             <tr>
 
                 <td
-                    colspan="8"
+                    colspan="9"
                     class="no-records"
                 >
 
@@ -2646,12 +2929,7 @@ if (!isoPaymentDate) {
     // SET TODAY'S DATE
     // ==========================================
 
-    document.getElementById(
-        "paymentDate"
-    ).value =
-        new Date()
-            .toISOString()
-            .split("T")[0];
+    document.getElementById("paymentDate").value = getTodayFormatted();
 
 
     // ==========================================
@@ -3475,6 +3753,578 @@ function sendWhatsAppFromInvoice() {
 
 
 
+
+
+    // ==========================================================
+    // SEARCH — filters the payment table rows live
+    // (every word typed must match somewhere in the row)
+    // ==========================================================
+
+    function applyPaymentFilter() {
+
+        const input = document.getElementById("paymentSearch");
+        const countEl = document.getElementById("searchCount");
+        const clearBtn = document.getElementById("searchClearBtn");
+        const tbody = document.getElementById("paymentTable");
+
+        if (!input || !tbody) return;
+
+        const query = input.value.trim().toLowerCase();
+        const tokens = query ? query.split(/\s+/) : [];
+
+        clearBtn.style.display = query ? "block" : "none";
+
+        const rows = tbody.querySelectorAll("tr.payment-row");
+
+        // remove old "no match" row
+        const oldNoMatch = document.getElementById("noMatchRow");
+        if (oldNoMatch) oldNoMatch.remove();
+
+        let visible = 0;
+
+        rows.forEach(row => {
+            const text = row.getAttribute("data-search") || "";
+            const match = tokens.every(t => text.includes(t));
+            row.style.display = match ? "" : "none";
+            if (match) visible++;
+        });
+
+        if (rows.length && tokens.length && visible === 0) {
+            const tr = document.createElement("tr");
+            tr.id = "noMatchRow";
+            tr.innerHTML = `<td colspan="9" class="no-records">
+                <i class="fas fa-search"></i> No fee record matches "${query.replace(/</g, "&lt;")}"</td>`;
+            tbody.appendChild(tr);
+        }
+
+        countEl.textContent = tokens.length && rows.length
+            ? `${visible} of ${rows.length} records`
+            : "";
+    }
+
+    document.getElementById("paymentSearch").addEventListener("input", applyPaymentFilter);
+
+    document.getElementById("searchClearBtn").addEventListener("click", function () {
+        const input = document.getElementById("paymentSearch");
+        input.value = "";
+        applyPaymentFilter();
+        input.focus();
+    });
+
+
+    // ==========================================================
+    // EDIT A SUBMITTED PAYMENT (transaction)
+    // ==========================================================
+
+    let editingPaymentId = null;
+
+    const EDIT_FEE_KEYS = [
+        "registrationFee", "conveyanceFee", "bookFee", "stationaryFee", "examFee",
+        "redCrossFee", "scoutFee", "tieBalance", "beltBalance", "shirtPantBalance"
+    ];
+
+    document.getElementById("edit_paymentDate").addEventListener("input", function () {
+        let digits = this.value.replace(/\D/g, "").slice(0, 8);
+        let formatted = digits;
+        if (digits.length > 4) {
+            formatted = digits.slice(0, 2) + "/" + digits.slice(2, 4) + "/" + digits.slice(4);
+        } else if (digits.length > 2) {
+            formatted = digits.slice(0, 2) + "/" + digits.slice(2);
+        }
+        this.value = formatted;
+    });
+
+    function openEditPayment(index) {
+
+        const payment = currentPayments[index];
+        if (!payment) return;
+
+        editingPaymentId = payment._id;
+
+        // raw values stored in DB (NOT the inherited display fee)
+        document.getElementById("edit_monthlyFee").value = Number(payment.monthlyFee) || 0;
+        document.getElementById("edit_amount").value = Number(payment.amount) || 0;
+        document.getElementById("edit_month").value = payment.month || "";
+        document.getElementById("edit_paymentMode").value = payment.paymentMode || "Cash";
+        document.getElementById("edit_transactionId").value = payment.transactionId || "";
+
+        if (payment.paymentDate) {
+            const d = new Date(payment.paymentDate);
+            const p2 = n => String(n).padStart(2, "0");
+            document.getElementById("edit_paymentDate").value =
+                `${p2(d.getDate())}/${p2(d.getMonth() + 1)}/${d.getFullYear()}`;
+        } else {
+            document.getElementById("edit_paymentDate").value = getTodayFormatted();
+        }
+
+        const fees = payment.additionalFees || {};
+        EDIT_FEE_KEYS.forEach(key => {
+            document.getElementById("edit_" + key).value = Number(fees[key]) || 0;
+        });
+
+        document.getElementById("editOverlay").classList.add("active");
+    }
+
+    function closeEditPayment() {
+        document.getElementById("editOverlay").classList.remove("active");
+        editingPaymentId = null;
+    }
+
+    document.getElementById("editOverlay").addEventListener("click", function (e) {
+        if (e.target === this) closeEditPayment();
+    });
+
+    async function saveEditedPayment() {
+
+        if (!editingPaymentId) return;
+
+        const monthlyFee = Number(document.getElementById("edit_monthlyFee").value) || 0;
+        const amount = Number(document.getElementById("edit_amount").value) || 0;
+        const month = document.getElementById("edit_month").value;
+        const isoDate = convertToISODate(document.getElementById("edit_paymentDate").value);
+
+        if (monthlyFee < 0 || amount < 0) {
+            alert("Fee / amount cannot be negative.");
+            return;
+        }
+
+        if (!month) {
+            alert("Please select a month.");
+            return;
+        }
+
+        if (!isoDate) {
+            alert("Please enter a valid date in DD/MM/YYYY format.");
+            return;
+        }
+
+        const additionalFees = {};
+        EDIT_FEE_KEYS.forEach(key => {
+            additionalFees[key] = Math.max(Number(document.getElementById("edit_" + key).value) || 0, 0);
+        });
+
+        const body = {
+            monthlyFee,
+            amount,
+            month,
+            paymentDate: isoDate,
+            paymentMode: document.getElementById("edit_paymentMode").value,
+            transactionId: document.getElementById("edit_transactionId").value,
+            additionalFees
+        };
+
+        const btn = document.getElementById("saveEditBtn");
+        const originalHTML = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+
+        try {
+
+            const response = await fetch(`${API_URL}/api/payments/${editingPaymentId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                alert("❌ " + (data.message || "Unable to update payment."));
+            } else {
+                closeEditPayment();
+                await loadPayments();
+                alert("✅ Fee transaction updated successfully!");
+            }
+
+        } catch (error) {
+            console.error("Edit payment error:", error);
+            alert("Unable to update payment. Please try again.");
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+    }
+
+
+    // ==========================================================
+    // DOWNLOAD COMPLETE FEE RECORD (one click, one PDF)
+    //
+    // Student details + summary + EVERY transaction with all its
+    // details (monthly fee, previous balance, each extra fee head,
+    // RTE fee, paid, running due, mode, status) + fee-head totals.
+    // Always includes ALL records, even if the search box is filtered.
+    // ==========================================================
+
+    async function downloadFullRecordPDF() {
+
+        if (!studentData || !currentPayments.length) {
+            alert("Is student ka koi fee record nahi mila.");
+            return;
+        }
+
+        const btn = document.getElementById("downloadFullRecordBtn");
+        const originalHTML = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Generating...`;
+
+        try {
+
+            // logo is optional — PDF is still generated if it can't load
+            let logo = null;
+            try {
+                logo = await new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = reject;
+                    img.src = "./images/logo.png";
+                });
+            } catch (e) { logo = null; }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: "pt", format: "a4", orientation: "landscape" });
+
+            const pageW = doc.internal.pageSize.getWidth();
+            const pageH = doc.internal.pageSize.getHeight();
+            const mx = 30;
+            const bottomLimit = pageH - 40;
+
+            const C = {
+                dark: [30, 30, 30],
+                red: [200, 40, 40],
+                green: [43, 122, 58],
+                amber: [230, 126, 34],
+                line: [210, 210, 220],
+                muted: [130, 130, 145],
+                headBg: [200, 40, 40],
+                zebra: [250, 246, 240]
+            };
+
+            const rs = v => "Rs. " + (Number(v) || 0).toLocaleString("en-IN");
+            const p2 = n => String(n).padStart(2, "0");
+            const fmtDate = v => {
+                if (!v) return "-";
+                const d = new Date(v);
+                return `${p2(d.getDate())}/${p2(d.getMonth() + 1)}/${d.getFullYear()}`;
+            };
+
+            // ---------- all transactions through the SAME calculator ----------
+            const infos = currentPayments.map(p => ({ p, info: buildInvoiceData(p) }));
+
+            const totalCharged = infos.reduce((s, x) => s + x.info.newChargeThisSlip, 0);
+            const totalPaid = infos.reduce((s, x) => s + x.info.paid, 0);
+            const finalDue = infos[infos.length - 1].info.due;
+
+            // ---------- HEADER ----------
+            let y = 38;
+
+            if (logo) {
+                try { doc.addImage(logo, "PNG", mx, y - 24, 44, 44); } catch (e) {}
+            }
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.setTextColor(...C.red);
+            doc.text("SUN SHINE JUNIOR HIGH SCHOOL", pageW / 2, y, { align: "center" });
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(...C.dark);
+            y += 14;
+            doc.text("20 Futa Road, Mohaila Garhi Nai Aabadi Pilkhuwa Hapur, Uttar Pradesh-245304", pageW / 2, y, { align: "center" });
+            y += 11;
+            doc.text("Mobile No. - +91 87917-64372 | 93895-17220  |  sunshinejuniorhighschool.com", pageW / 2, y, { align: "center" });
+
+            y += 20;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(13);
+            doc.setTextColor(...C.dark);
+            doc.text("COMPLETE FEE RECORD", pageW / 2, y, { align: "center" });
+
+            y += 8;
+            doc.setDrawColor(...C.red);
+            doc.setLineWidth(1);
+            doc.line(mx, y, pageW - mx, y);
+
+            // ---------- STUDENT DETAILS ----------
+            y += 18;
+
+            const last = infos[infos.length - 1].info;
+            const details = [
+                ["Student Name", studentData.studentName || "-"],
+                ["Student ID", studentData.studentId || "-"],
+                ["Class / Section", `${last.studentClass} / ${last.studentSection}`],
+                ["Roll No", last.studentRoll],
+                ["Admission No", last.studentAdmission],
+                ["Father's Name", last.studentFather],
+                ["Phone", last.studentPhone],
+                ["Total Transactions", String(infos.length)]
+            ];
+
+            const colW = (pageW - mx * 2) / 4;
+
+            details.forEach((item, i) => {
+                const cx = mx + (i % 4) * colW;
+                const cy = y + Math.floor(i / 4) * 28;
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8);
+                doc.setTextColor(...C.muted);
+                doc.text(item[0].toUpperCase(), cx, cy);
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10);
+                doc.setTextColor(...C.dark);
+                doc.text(doc.splitTextToSize(String(item[1]), colW - 10)[0], cx, cy + 12);
+            });
+
+            y += 2 * 28 + 4;
+
+            // ---------- SUMMARY BOXES ----------
+            const boxes = [
+                ["Total Charged", rs(totalCharged), C.dark],
+                ["Total Paid", rs(totalPaid), C.green],
+                ["Balance Due", rs(finalDue), finalDue > 0 ? C.red : C.green]
+            ];
+
+            const boxGap = 12;
+            const boxW = (pageW - mx * 2 - boxGap * 2) / 3;
+
+            boxes.forEach((b, i) => {
+                const bx = mx + i * (boxW + boxGap);
+                doc.setDrawColor(...C.line);
+                doc.setFillColor(252, 249, 244);
+                doc.roundedRect(bx, y, boxW, 42, 6, 6, "FD");
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8);
+                doc.setTextColor(...C.muted);
+                doc.text(b[0].toUpperCase(), bx + 12, y + 15);
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(15);
+                doc.setTextColor(...b[2]);
+                doc.text(b[1], bx + 12, y + 34);
+            });
+
+            y += 60;
+
+            // ---------- TRANSACTION TABLE ----------
+            const cols = [
+                { h: "#", w: 22, a: "center" },
+                { h: "Date", w: 58 },
+                { h: "Month", w: 56 },
+                { h: "Monthly Fee", w: 58, a: "right" },
+                { h: "Prev. Balance", w: 60, a: "right" },
+                { h: "Extra Fees (itemised)", w: 196 },
+                { h: "Total Charge", w: 62, a: "right" },
+                { h: "Paid", w: 58, a: "right" },
+                { h: "Due", w: 58, a: "right" },
+                { h: "Mode", w: 54 },
+                { h: "Status", w: 40 }
+            ];
+
+            const tableW = cols.reduce((s, c) => s + c.w, 0);
+            const scale = (pageW - mx * 2) / tableW;
+            cols.forEach(c => { c.w = c.w * scale; });
+
+            let colX = [];
+            (function () {
+                let x = mx;
+                cols.forEach(c => { colX.push(x); x += c.w; });
+            })();
+
+            const cellX = (i) => {
+                const c = cols[i];
+                if (c.a === "right") return colX[i] + c.w - 4;
+                if (c.a === "center") return colX[i] + c.w / 2;
+                return colX[i] + 4;
+            };
+
+            function drawTableHeader() {
+                doc.setFillColor(...C.headBg);
+                doc.rect(mx, y, pageW - mx * 2, 20, "F");
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(8);
+                doc.setTextColor(255, 255, 255);
+                cols.forEach((c, i) => {
+                    doc.text(c.h, cellX(i), y + 13, { align: c.a || "left" });
+                });
+                y += 20;
+            }
+
+            function newPage() {
+                doc.addPage();
+                y = 40;
+                drawTableHeader();
+            }
+
+            if (y + 60 > bottomLimit) {
+                doc.addPage();
+                y = 40;
+            }
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.setTextColor(...C.dark);
+            doc.text("Transaction History", mx, y);
+            y += 8;
+
+            drawTableHeader();
+
+            infos.forEach((x, idx) => {
+
+                const info = x.info;
+
+                const extraParts = info.extraFees.map(f => `${f.label}: ${rs(f.value)}`);
+                const extraText = extraParts.length ? extraParts.join(", ") : "-";
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8);
+
+                const extraLines = doc.splitTextToSize(extraText, cols[5].w - 8);
+                const rowH = Math.max(extraLines.length, 1) * 10 + 8;
+
+                if (y + rowH > bottomLimit) newPage();
+
+                if (idx % 2 === 0) {
+                    doc.setFillColor(...C.zebra);
+                    doc.rect(mx, y, pageW - mx * 2, rowH, "F");
+                }
+
+                const ty = y + 12;
+
+                doc.setTextColor(...C.dark);
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8);
+
+                doc.text(String(idx + 1), cellX(0), ty, { align: "center" });
+                doc.text(fmtDate(x.p.paymentDate), cellX(1), ty);
+                doc.text(info.month, cellX(2), ty);
+                doc.text(rs(info.monthlyFee) + (info.monthlyFeeChargedThisSlip ? "" : "*"), cellX(3), ty, { align: "right" });
+                doc.text(rs(info.previousDue), cellX(4), ty, { align: "right" });
+                doc.text(extraLines, cellX(5), ty);
+                doc.text(rs(info.newChargeThisSlip), cellX(6), ty, { align: "right" });
+
+                doc.setTextColor(...C.green);
+                doc.setFont("helvetica", "bold");
+                doc.text(rs(info.paid), cellX(7), ty, { align: "right" });
+
+                doc.setTextColor(...(info.due > 0 ? C.red : C.green));
+                doc.text(rs(info.due), cellX(8), ty, { align: "right" });
+
+                doc.setTextColor(...C.dark);
+                doc.setFont("helvetica", "normal");
+                doc.text(info.paymentMode, cellX(9), ty);
+
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(...(info.status === "Paid" ? C.green : info.status === "Partial" ? C.amber : C.red));
+                doc.text(info.status, cellX(10), ty);
+
+                y += rowH;
+            });
+
+            // ---------- TOTALS ROW ----------
+            if (y + 26 > bottomLimit) newPage();
+
+            doc.setDrawColor(...C.dark);
+            doc.setLineWidth(0.8);
+            doc.line(mx, y, pageW - mx, y);
+
+            y += 14;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.setTextColor(...C.dark);
+            doc.text("TOTAL", cellX(5), y);
+            doc.text(rs(totalCharged), cellX(6), y, { align: "right" });
+            doc.setTextColor(...C.green);
+            doc.text(rs(totalPaid), cellX(7), y, { align: "right" });
+            doc.setTextColor(...(finalDue > 0 ? C.red : C.green));
+            doc.text(rs(finalDue), cellX(8), y, { align: "right" });
+
+            y += 12;
+            doc.setFont("helvetica", "italic");
+            doc.setFontSize(7.5);
+            doc.setTextColor(...C.muted);
+            doc.text("* Monthly fee already charged on an earlier transaction of the same month (shown for reference, not charged again).", mx, y);
+
+            // ---------- FEE HEAD TOTALS ----------
+            const headTotals = {};
+            let monthlyTotal = 0;
+
+            infos.forEach(x => {
+                monthlyTotal += x.info.monthlyFeeChargeAmount;
+                x.info.extraFees.forEach(f => {
+                    headTotals[f.label] = (headTotals[f.label] || 0) + f.value;
+                });
+            });
+
+            const headRows = [["Monthly Tuition Fee", monthlyTotal], ...Object.entries(headTotals)];
+
+            y += 22;
+
+            const needed = 22 + Math.ceil(headRows.length / 3) * 16;
+            if (y + needed > bottomLimit) {
+                doc.addPage();
+                y = 40;
+            }
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.setTextColor(...C.dark);
+            doc.text("Fee Head Totals", mx, y);
+            y += 16;
+
+            const hw = (pageW - mx * 2) / 3;
+
+            headRows.forEach((r, i) => {
+                const hx = mx + (i % 3) * hw;
+                const hy = y + Math.floor(i / 3) * 16;
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9);
+                doc.setTextColor(...C.dark);
+                doc.text(r[0], hx, hy);
+                doc.setFont("helvetica", "bold");
+                doc.text(rs(r[1]), hx + hw - 20, hy, { align: "right" });
+            });
+
+            // ---------- FOOTER ON EVERY PAGE ----------
+            const generatedOn = new Date().toLocaleString("en-IN", {
+                day: "2-digit", month: "short", year: "numeric",
+                hour: "2-digit", minute: "2-digit"
+            });
+
+            const pages = doc.getNumberOfPages();
+
+            for (let i = 1; i <= pages; i++) {
+                doc.setPage(i);
+                doc.setDrawColor(...C.line);
+                doc.setLineWidth(0.5);
+                doc.line(mx, pageH - 30, pageW - mx, pageH - 30);
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(7.5);
+                doc.setTextColor(...C.muted);
+                doc.text(
+                    `System-generated fee record - ${studentData.studentName || ""} (${studentData.studentId || ""}) - Generated on ${generatedOn}`,
+                    mx, pageH - 18
+                );
+                doc.text(`Page ${i} of ${pages}`, pageW - mx, pageH - 18, { align: "right" });
+            }
+
+            const fileName =
+                "Fee_Record_" +
+                (studentData.studentName || "Student").replace(/\s+/g, "_") +
+                "_" + (studentData.studentId || "") + ".pdf";
+
+            doc.save(fileName);
+
+        } catch (err) {
+            console.error("Full record PDF error:", err);
+            alert("Unable to generate fee record PDF.");
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+    }
 
     // ==========================================
     // START

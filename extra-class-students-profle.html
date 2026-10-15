@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sunshine · Student Profile</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            background: #f7f3ed;
+            color: #2d1f0c;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        /* ===== HEADER ===== */
+        .page-header {
+            background: white;
+            border-radius: 28px;
+            padding: 1.1rem 1.8rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            border: 1px solid rgba(245, 138, 46, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d1f0c;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .page-header h1 i {
+            color: #f58a2e;
+            background: #fcf3e8;
+            padding: 0.3rem 0.6rem;
+            border-radius: 16px;
+            font-size: 1.1rem;
+        }
+
+        .btn-action {
+            padding: 0.5rem 1.1rem;
+            border: none;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: #f0e2d2;
+            color: #4d3e2b;
+        }
+
+        .btn-secondary:hover { background: #e6d5c0; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f58a2e, #f9b042);
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 138, 46, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(245, 138, 46, 0.3);
+        }
+
+        .btn-delete-action {
+            background: linear-gradient(135deg, #b53b2e, #d9584a);
+            color: white;
+            box-shadow: 0 4px 12px rgba(181, 59, 46, 0.2);
+        }
+
+        .btn-delete-action:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(181, 59, 46, 0.3);
+        }
+
+        /* ===== PROFILE CARD ===== */
+        .profile-card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.6rem 1.8rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            border: 1px solid rgba(245, 138, 46, 0.06);
+        }
+
+        .profile-top {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.4rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 2px solid #fcf3e8;
+        }
+
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #fcf3e8, #f9dbb8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f58a2e;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .profile-top h2 {
+            font-size: 1.25rem;
+            color: #2d1f0c;
+        }
+
+        .profile-top p {
+            font-size: 0.85rem;
+            color: #8a765e;
+            margin-top: 0.15rem;
+        }
+
+        .form-section {
+            margin-bottom: 1.3rem;
+        }
+
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-section .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #f58a2e;
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-bottom: 0.35rem;
+            border-bottom: 2px solid #fcf3e8;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.7rem 1.1rem;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            font-size: 0.66rem;
+            font-weight: 700;
+            color: #5d4b35;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .field label i { color: #f58a2e; font-size: 0.62rem; }
+
+        .field .value {
+            padding: 0.5rem 0.8rem;
+            background: #fcfaf7;
+            border: 1.5px solid #f0e2d2;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: #1f160c;
+            font-weight: 500;
+            min-height: 1.3em;
+            word-break: break-word;
+        }
+
+        .actions-row {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 1.4rem;
+        }
+
+        .actions-row .btn-action {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .loading, .error-box {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: #b09a7e;
+        }
+
+        .loading i { font-size: 1.6rem; color: #f58a2e; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 700px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 1rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .field.full { grid-column: 1; }
+            .actions-row { flex-direction: column; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1><i class="fas fa-id-badge"></i> Student Profile</h1>
+        <button class="btn-action btn-secondary" onclick="goToList()">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </button>
+    </div>
+
+    <div class="profile-card" id="profileCard">
+        <div class="loading"><i class="fas fa-circle-notch"></i></div>
+    </div>
+
+</div>
+
+<script>
+
+const API_URL = "https://sunshine-swp6.onrender.com"; // Change this to your server URL if needed
+
+const params = new URLSearchParams(window.location.search);
+const classId = params.get("classId");
+const studentIndex = params.get("index");
+const studentId = params.get("id");
+
+let currentClassName = "Extra Class";
+let currentIndex = null;
+
+function goToList() {
+    window.location.href = `extra-class-students.html?classId=${encodeURIComponent(classId)}`;
+}
+
+function formatDOB(value) {
+    if (!value) return "-";
+    const s = String(value).trim();
+    const pad = n => String(n).padStart(2, "0");
+
+    let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (m) return `${pad(m[3])}/${pad(m[2])}/${m[1]}`;
+
+    m = s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/);
+    if (m) return `${pad(m[1])}/${pad(m[2])}/${m[3]}`;
+
+    const parsed = new Date(s);
+    if (!isNaN(parsed.getTime())) {
+        return `${pad(parsed.getDate())}/${pad(parsed.getMonth() + 1)}/${parsed.getFullYear()}`;
+    }
+    return s;
+}
+
+function escapeHTML(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function valueField(icon, label, value, full) {
+    return `
+        <div class="field${full ? " full" : ""}">
+            <label><i class="fas ${icon}"></i> ${label}</label>
+            <div class="value">${escapeHTML(value || "-")}</div>
+        </div>
+    `;
+}
+
+function renderProfile(student) {
+    // NOTE: Father Occupation intentionally left out here to keep this
+    // page short enough that it never needs to scroll.
+    const basicFields = [
+        valueField("fa-user", "Student Name", student.name),
+        valueField("fa-school", "Class", student.studentClass),
+        valueField("fa-calendar", "Date of Birth", formatDOB(student.dob)),
+        valueField("fa-user-tie", "Father Name", student.fatherName),
+        valueField("fa-user", "Mother Name", student.motherName),
+        valueField("fa-venus-mars", "Gender", student.gender),
+        valueField("fa-layer-group", "Caste", student.caste),
+        valueField("fa-tag", "Category", student.category),
+        valueField("fa-phone", "Mobile Number", student.phone),
+        valueField("fa-phone-alt", "Alternate Phone", student.alternatePhone),
+        valueField("fa-sort-numeric-up", "S.R Number", student.srNumber),
+        valueField("fa-sort-numeric-up", "Roll Number", student.rollNumber),
+        valueField("fa-id-card", "Admission Number", student.admissionNumber),
+        valueField("fa-file-invoice", "PEN Number", student.penNumber),
+        valueField("fa-id-card", "Aadhaar Number", student.aadharNumber),
+        valueField("fa-envelope", "Email", student.email),
+        valueField("fa-home", "Address", student.address, true)
+    ].join("");
+
+    const resultFields = [
+        valueField("fa-check-circle", "Result", student.result),
+        valueField("fa-star", "Grade", student.grade),
+        valueField("fa-chart-line", "Attendance %", student.attendance),
+        valueField("fa-graduation-cap", "Scholarship", student.scholarship),
+        valueField("fa-truck", "Transport", student.transport),
+        valueField("fa-comment", "Remarks", student.remarks, true)
+    ].join("");
+
+    document.getElementById("profileCard").innerHTML = `
+        <div class="profile-top">
+            <div class="profile-avatar"><i class="fas fa-user-graduate"></i></div>
+            <div>
+                <h2>${escapeHTML(student.name || "Unnamed Student")}</h2>
+                <p><i class="fas fa-school"></i> ${escapeHTML(currentClassName)}${student.studentClass ? " · Class " + escapeHTML(student.studentClass) : ""}</p>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="section-title"><i class="fas fa-id-card"></i> Basic Details</div>
+            <div class="form-grid">${basicFields}</div>
+        </div>
+
+        <div class="form-section">
+            <div class="section-title"><i class="fas fa-check-circle"></i> Result Summary</div>
+            <div class="form-grid">${resultFields}</div>
+        </div>
+
+        <div class="actions-row">
+            <button class="btn-action btn-primary" onclick="editThisStudent()">
+                <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn-action btn-delete-action" onclick="deleteThisStudent()">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+    `;
+}
+
+function editThisStudent() {
+    window.location.href = `extra-class-students.html?classId=${encodeURIComponent(classId)}&edit=${currentIndex}`;
+}
+
+async function deleteThisStudent() {
+    const confirmed = confirm("Delete this student? This cannot be undone.");
+    if (!confirmed) return;
+
+    try {
+        const response = await fetch(`${API_URL}/api/extra-classes/${classId}/students/${studentId || currentIndex}`, {
+            method: "DELETE"
+        });
+        const data = await response.json();
+
+        if (!data.success) {
+            alert(data.message || "Unable to delete student.");
+            return;
+        }
+
+        alert("Student deleted successfully.");
+        goToList();
+
+    } catch (error) {
+        console.error(error);
+        alert("Unable to delete student.");
+    }
+}
+
+async function loadProfile() {
+    if (!classId) {
+        document.getElementById("profileCard").innerHTML = `
+            <div class="error-box"><i class="fas fa-exclamation-triangle"></i> Class ID missing.</div>
+        `;
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/api/extra-classes/${classId}`);
+        const data = await response.json();
+
+        if (!data.success) {
+            document.getElementById("profileCard").innerHTML = `
+                <div class="error-box"><i class="fas fa-exclamation-triangle"></i> ${escapeHTML(data.message || "Unable to load class.")}</div>
+            `;
+            return;
+        }
+
+        const extraClass = data.class || data.extraClass || data.data;
+        currentClassName = extraClass.className || extraClass.name || "Extra Class";
+
+        const studentsList = extraClass.students || [];
+        let student = null;
+
+        if (studentId) {
+            currentIndex = studentsList.findIndex(s => s._id === studentId);
+            student = currentIndex >= 0 ? studentsList[currentIndex] : null;
+        }
+
+        if (!student && studentIndex !== null) {
+            currentIndex = Number(studentIndex);
+            student = studentsList[currentIndex] || null;
+        }
+
+        if (!student) {
+            document.getElementById("profileCard").innerHTML = `
+                <div class="error-box"><i class="fas fa-user-slash"></i> Student not found.</div>
+            `;
+            return;
+        }
+
+        renderProfile(student);
+
+    } catch (error) {
+        console.error(error);
+        document.getElementById("profileCard").innerHTML = `
+            <div class="error-box"><i class="fas fa-exclamation-triangle"></i> Unable to load student profile.</div>
+        `;
+    }
+}
+
+loadProfile();
+
+</script>
+
+</body>
+</html>

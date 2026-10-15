@@ -323,6 +323,17 @@
 
         .class-box .subject-select {
             margin-top: .45rem;
+            width: 100%;
+            padding: .55rem .5rem;
+            border: 1px solid #e2d5c5;
+            border-radius: 9px;
+            background: #fffdf9;
+            outline: none;
+            color: #3d2e1b;
+        }
+
+        .class-box .subject-select:focus {
+            border-color: #f58a2e;
         }
 
         .class-box .select-label {
@@ -495,6 +506,10 @@
                 <i class="fas fa-sync"></i>
                 Refresh
             </button>
+            <a class="btn btn-secondary" href="timetable-view.html" target="_blank">
+                <i class="fas fa-sync"></i>
+              View Timetable
+            </a>
 
             <button class="btn btn-secondary" onclick="downloadPDF()">
                 <i class="fas fa-file-pdf"></i>
@@ -687,24 +702,6 @@ let timetableId = null;
 
 let teachers = [];
 
-/* ================= SUBJECTS ================= */
-const subjects = [
-    "Hindi",
-    "English",
-    "Mathematics",
-    "Science",
-    "Social Science",
-    "EVS",
-    "Computer",
-    "General Knowledge",
-    "Sanskrit",
-    "Drawing",
-    "Physical Education",
-    "Moral Education"
-];
-
-/* ================= SEASON ================= */
-
 /* ================= FORMAT TIME (HH:mm) ================= */
 
 function formatTimeValue(value) {
@@ -789,8 +786,6 @@ function changeSeason(season) {
     loadTimetable();
 }
 
-
-/* ================= ADD LECTURE ================= */
 
 /* ================= ADD LECTURE ================= */
 
@@ -1071,31 +1066,16 @@ function renderLecture(lecture, index) {
 
                 <span class="select-label">Subject</span>
 
-                <select
+                <input
+                    type="text"
                     class="subject-select"
+                    placeholder="Type subject"
+                    value="${escapeHtml(classData.subject)}"
                     onchange="updateSubject(
                         ${index},
                         '${className}',
                         this.value
                     )">
-
-                    <option value="">
-                        Select Subject
-                    </option>
-
-                    ${subjects.map(subject => `
-
-                        <option
-                            value="${escapeHtml(subject)}"
-                            ${classData.subject === subject ? "selected" : ""}>
-
-                            ${escapeHtml(subject)}
-
-                        </option>
-
-                    `).join("")}
-
-                </select>
 
             </div>
 

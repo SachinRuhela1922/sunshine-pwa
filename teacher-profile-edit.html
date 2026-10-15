@@ -235,7 +235,7 @@
             margin-bottom: .8rem;
         }
 
-        .class-input-row input {
+        .class-input-row select {
             flex: 1;
         }
 
@@ -250,6 +250,11 @@
             padding: 0 1rem;
 
             cursor: pointer;
+        }
+
+        .add-class-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
         }
 
         .class-tags {
@@ -456,192 +461,85 @@
             <div class="form-grid">
 
                 <div class="form-group">
-
                     <label>Teacher ID</label>
-
-                    <input
-                        type="text"
-                        id="teacherId"
-                        disabled
-                    >
-
+                    <input type="text" id="teacherId" disabled>
                 </div>
 
-
                 <div class="form-group">
-
                     <label>Employee ID</label>
-
-                    <input
-                        type="text"
-                        id="employeeId"
-                        required
-                    >
-
+                    <input type="text" id="employeeId" required>
                 </div>
 
-
                 <div class="form-group">
-
                     <label>Teacher Name</label>
-
-                    <input
-                        type="text"
-                        id="name"
-                        required
-                    >
-
+                    <input type="text" id="name" required>
                 </div>
 
-
                 <div class="form-group">
-
                     <label>Father Name</label>
-
-                    <input
-                        type="text"
-                        id="fatherName"
-                    >
-
+                    <input type="text" id="fatherName">
                 </div>
 
                 <div class="form-group">
-
                     <label>Department</label>
-
-                    <input
-                        type="text"
-                        id="department"
-                    >
-
+                    <input type="text" id="department">
                 </div>
 
                 <div class="form-group">
-
                     <label>Mother Name</label>
-
-                    <input
-                        type="text"
-                        id="motherName"
-                    >
-
+                    <input type="text" id="motherName">
                 </div>
 
+                <div class="form-group">
+                    <label>Husband Name</label>
+                    <input type="text" id="husbandName">
+                </div>
 
                 <div class="form-group">
-
                     <label>Email</label>
-
-                    <input
-                        type="email"
-                        id="email"
-                        required
-                    >
-
+                    <input type="email" id="email" required>
                 </div>
 
-
                 <div class="form-group">
-
                     <label>Phone</label>
-
-                    <input
-                        type="text"
-                        id="phone"
-                        required
-                    >
-
+                    <input type="text" id="phone" required>
                 </div>
 
-
                 <div class="form-group">
-
                     <label>Gender</label>
-
                     <select id="gender">
-
                         <option value="">Select Gender</option>
-
-                        <option value="Male">
-                            Male
-                        </option>
-
-                        <option value="Female">
-                            Female
-                        </option>
-
-                        <option value="Other">
-                            Other
-                        </option>
-
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
                     </select>
-
                 </div>
 
-
                 <div class="form-group">
-
                     <label>Qualification</label>
-
-                    <input
-                        type="text"
-                        id="qualification"
-                    >
-
+                    <input type="text" id="qualification">
                 </div>
 
-
                 <div class="form-group">
-
                     <label>Joining Date</label>
-
-                    <input
-                        type="date"
-                        id="joiningDate"
-                    >
-
+                    <input type="date" id="joiningDate">
                 </div>
 
-
                 <div class="form-group">
-
                     <label>Role</label>
-
                     <select id="role">
-
-                        <option value="teacher">
-                            Teacher
-                        </option>
-
-                        <option value="admin">
-                            Admin
-                        </option>
-
+                        <option value="teacher">Teacher</option>
+                        <option value="admin">Admin</option>
                     </select>
-
                 </div>
 
-
                 <div class="form-group">
-
                     <label>Status</label>
-
                     <select id="status">
-
-                        <option value="active">
-                            Active
-                        </option>
-
-                        <option value="inactive">
-                            Inactive
-                        </option>
-
-                        <option value="on-leave">
-                            On Leave
-                        </option>
-
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="on-leave">On Leave</option>
                     </select>
-
                 </div>
 
             </div>
@@ -654,42 +552,32 @@
         <div class="card">
 
             <div class="section-title">
-
                 <i class="fas fa-chalkboard"></i>
-
                 Assigned Classes
-
             </div>
-
 
             <div class="classes-box">
 
                 <div class="class-input-row">
 
-                    <input
-                        type="text"
-                        id="classInput"
-                        placeholder="Example: Class 8"
-                    >
+                    <select id="classSelect">
+                        <option value="">Loading classes...</option>
+                    </select>
 
                     <button
                         type="button"
                         class="add-class-btn"
+                        id="addClassBtn"
                         onclick="addClass()"
+                        disabled
                     >
-
                         <i class="fas fa-plus"></i>
                         Add
-
                     </button>
 
                 </div>
 
-
-                <div
-                    id="classTags"
-                    class="class-tags"
-                ></div>
+                <div id="classTags" class="class-tags"></div>
 
             </div>
 
@@ -701,18 +589,11 @@
         <div class="card">
 
             <div class="section-title">
-
                 <i class="fas fa-lock"></i>
-
                 Permissions
-
             </div>
 
-
-            <div
-                id="permissionsGrid"
-                class="permissions-grid"
-            ></div>
+            <div id="permissionsGrid" class="permissions-grid"></div>
 
         </div>
 
@@ -722,73 +603,35 @@
         <div class="card">
 
             <div class="section-title">
-
                 <i class="fas fa-address-card"></i>
-
                 Additional Profile
-
             </div>
-
 
             <div class="form-grid">
 
                 <div class="form-group full">
-
                     <label>Address</label>
-
-                    <textarea
-                        id="profileAddress"
-                        placeholder="Teacher address"
-                    ></textarea>
-
+                    <textarea id="profileAddress" placeholder="Teacher address"></textarea>
                 </div>
 
-
                 <div class="form-group">
-
                     <label>City</label>
-
-                    <input
-                        type="text"
-                        id="profileCity"
-                    >
-
+                    <input type="text" id="profileCity">
                 </div>
 
-
                 <div class="form-group">
-
                     <label>State</label>
-
-                    <input
-                        type="text"
-                        id="profileState"
-                    >
-
+                    <input type="text" id="profileState">
                 </div>
 
-
                 <div class="form-group">
-
                     <label>Date of Birth</label>
-
-                    <input
-                        type="date"
-                        id="profileDob"
-                    >
-
+                    <input type="date" id="profileDob">
                 </div>
 
-
                 <div class="form-group">
-
                     <label>Emergency Contact</label>
-
-                    <input
-                        type="text"
-                        id="profileEmergency"
-                    >
-
+                    <input type="text" id="profileEmergency">
                 </div>
 
             </div>
@@ -802,27 +645,13 @@
 
             <div class="form-actions">
 
-                <button
-                    type="button"
-                    class="btn btn-secondary"
-                    onclick="goBack()"
-                >
-
+                <button type="button" class="btn btn-secondary" onclick="goBack()">
                     Cancel
-
                 </button>
 
-
-                <button
-                    type="submit"
-                    class="btn btn-primary"
-                    id="saveBtn"
-                >
-
+                <button type="submit" class="btn btn-primary" id="saveBtn">
                     <i class="fas fa-save"></i>
-
                     Save Changes
-
                 </button>
 
             </div>
@@ -837,7 +666,7 @@
 <script>
 
 const API_URL =
-    "https://sunshine-swp6.onrender.com";
+    "https://sunshine-swp6.onrender.com"; // Change this to your actual API base URL
 
 const params =
     new URLSearchParams(window.location.search);
@@ -849,6 +678,11 @@ const teacherMongoId =
 let assignedClasses = [];
 
 let teacherData = null;
+
+// Class names that come from the backend (/api/classes)
+let allClassNames = [];
+
+let classesLoadState = "loading"; // loading | ready | error
 
 
 /* ==========================================
@@ -888,7 +722,195 @@ if (!teacherMongoId) {
 
 } else {
 
+    loadClasses();
+
     loadTeacher();
+
+}
+
+
+/* ==========================================
+   LOAD CLASSES FROM BACKEND (NO HARDCODING)
+========================================== */
+
+// "1", "10" -> "Class 1", "Class 10"; any other name is shown as it is
+function getClassDisplayName(className) {
+
+    return /^\d+$/.test(String(className).trim())
+        ? `Class ${className}`
+        : className;
+
+}
+
+
+// Non-numeric names first (Nursery, LKG, UKG, then the rest A-Z), numeric classes after
+function sortClassNames(a, b) {
+
+    const preferred = ["nursery", "lkg", "ukg"];
+
+    const aNum = /^\d+$/.test(a);
+    const bNum = /^\d+$/.test(b);
+
+    if (aNum && bNum) return Number(a) - Number(b);
+    if (aNum) return 1;
+    if (bNum) return -1;
+
+    const ai = preferred.indexOf(a.toLowerCase());
+    const bi = preferred.indexOf(b.toLowerCase());
+
+    if (ai !== -1 && bi !== -1) return ai - bi;
+    if (ai !== -1) return -1;
+    if (bi !== -1) return 1;
+
+    return a.localeCompare(b, undefined, { numeric: true });
+
+}
+
+
+async function loadClasses() {
+
+    try {
+
+        const response =
+            await fetch(`${API_URL}/api/classes`);
+
+        const result =
+            await response.json();
+
+        if (!response.ok || !result.success) {
+
+            throw new Error(
+                result.message ||
+                "Unable to load classes."
+            );
+
+        }
+
+        allClassNames =
+            (result.classes || [])
+                .map(c => String(c.name || "").trim())
+                .filter(Boolean)
+                .sort(sortClassNames);
+
+        classesLoadState = "ready";
+
+    } catch (error) {
+
+        console.error("Load classes error:", error);
+
+        classesLoadState = "error";
+
+    }
+
+    renderClassOptions();
+
+}
+
+
+// Teacher model stores: { class: String, sections: [String], subjects: [String] }
+function normalizeClassEntry(cls) {
+
+    if (cls && typeof cls === "object") {
+
+        return {
+            class: String(cls.class || cls.name || "").trim(),
+            sections: Array.isArray(cls.sections) ? cls.sections : [],
+            subjects: Array.isArray(cls.subjects) ? cls.subjects : []
+        };
+
+    }
+
+    return {
+        class: String(cls || "").trim(),
+        sections: [],
+        subjects: []
+    };
+
+}
+
+
+// Name of one assigned class entry
+function getAssignedClassName(cls) {
+
+    if (typeof cls === "string") return cls.trim();
+
+    if (cls && typeof cls === "object") {
+        return String(cls.class || cls.name || "").trim();
+    }
+
+    return String(cls || "").trim();
+
+}
+
+
+// Fills the dropdown with classes that are not assigned yet
+function renderClassOptions() {
+
+    const select =
+        document.getElementById("classSelect");
+
+    const addBtn =
+        document.getElementById("addClassBtn");
+
+    if (classesLoadState === "loading") {
+
+        select.innerHTML =
+            '<option value="">Loading classes...</option>';
+
+        addBtn.disabled = true;
+
+        return;
+
+    }
+
+    if (classesLoadState === "error") {
+
+        select.innerHTML =
+            '<option value="">Unable to load classes</option>';
+
+        addBtn.disabled = true;
+
+        return;
+
+    }
+
+    const assignedNames =
+        assignedClasses.map(getAssignedClassName);
+
+    const available =
+        allClassNames.filter(
+            name => !assignedNames.includes(name)
+        );
+
+    if (!allClassNames.length) {
+
+        select.innerHTML =
+            '<option value="">No classes found</option>';
+
+        addBtn.disabled = true;
+
+        return;
+
+    }
+
+    if (!available.length) {
+
+        select.innerHTML =
+            '<option value="">All classes already assigned</option>';
+
+        addBtn.disabled = true;
+
+        return;
+
+    }
+
+    select.innerHTML =
+        '<option value="">Select Class</option>' +
+        available.map(name =>
+            `<option value="${escapeHTML(name)}">${escapeHTML(getClassDisplayName(name))}</option>`
+        ).join("");
+
+    addBtn.disabled = false;
 
 }
 
@@ -979,11 +1001,15 @@ function populateForm(teacher) {
 
     document.getElementById("fatherName").value =
         teacher.fatherName || "";
+
     document.getElementById("department").value =
         teacher.department || "";
 
     document.getElementById("motherName").value =
         teacher.motherName || "";
+
+    document.getElementById("husbandName").value =
+        teacher.husbandName || "";
 
     document.getElementById("email").value =
         teacher.email || "";
@@ -1018,31 +1044,9 @@ function populateForm(teacher) {
     ) {
 
         assignedClasses =
-            teacher.assignedClasses.map(
-                cls => {
-
-                    if (
-                        typeof cls === "string"
-                    ) {
-
-                        return cls;
-
-                    }
-
-                    if (
-                        typeof cls === "object"
-                        &&
-                        cls !== null
-                    ) {
-
-                        return cls;
-
-                    }
-
-                    return String(cls);
-
-                }
-            );
+            teacher.assignedClasses
+                .map(normalizeClassEntry)
+                .filter(c => c.class);
 
     } else {
 
@@ -1112,6 +1116,9 @@ function renderClasses() {
             "classTags"
         );
 
+    // keep the dropdown in sync (assigned classes are removed from it)
+    renderClassOptions();
+
 
     if (!assignedClasses.length) {
 
@@ -1136,14 +1143,16 @@ function renderClasses() {
                     typeof cls === "string"
                 ) {
 
-                    text = cls;
+                    text = getClassDisplayName(cls);
 
                 } else {
 
                     text =
-                        cls.class ||
-                        cls.name ||
-                        "Class";
+                        getClassDisplayName(
+                            cls.class ||
+                            cls.name ||
+                            "Class"
+                        );
 
                     if (
                         Array.isArray(
@@ -1190,25 +1199,42 @@ function renderClasses() {
 
 function addClass() {
 
-    const input =
+    const select =
         document.getElementById(
-            "classInput"
+            "classSelect"
         );
 
     const value =
-        input.value.trim();
+        select.value.trim();
 
 
     if (!value) {
+
+        alert("Please select a class first.");
 
         return;
 
     }
 
 
-    assignedClasses.push(value);
+    // no duplicates
+    if (
+        assignedClasses
+            .map(getAssignedClassName)
+            .includes(value)
+    ) {
 
-    input.value = "";
+        return;
+
+    }
+
+
+    // same shape the Teacher model expects
+    assignedClasses.push({
+        class: value,
+        sections: [],
+        subjects: []
+    });
 
     renderClasses();
 
@@ -1378,6 +1404,7 @@ document.getElementById(
                     document.getElementById(
                         "fatherName"
                     ).value.trim(),
+
                 department:
                     document.getElementById(
                         "department"
@@ -1386,6 +1413,11 @@ document.getElementById(
                 motherName:
                     document.getElementById(
                         "motherName"
+                    ).value.trim(),
+
+                husbandName:
+                    document.getElementById(
+                        "husbandName"
                     ).value.trim(),
 
                 email:
@@ -1424,7 +1456,7 @@ document.getElementById(
                     ).value,
 
                 assignedClasses:
-                    assignedClasses,
+                    assignedClasses.map(normalizeClassEntry),
 
                 permissions:
                     permissions,
@@ -1463,8 +1495,8 @@ document.getElementById(
             if (!response.ok) {
 
                 throw new Error(
-                    result.message ||
-                    "Unable to update teacher."
+                    (result.message || "Unable to update teacher.") +
+                    (result.error ? "\n\nServer says: " + result.error : "")
                 );
 
             }
@@ -1567,28 +1599,6 @@ function goBack() {
         `teacher-profile-view.html?id=${encodeURIComponent(teacherMongoId)}`;
 
 }
-
-
-/* ENTER TO ADD CLASS */
-
-document.getElementById(
-    "classInput"
-).addEventListener(
-    "keydown",
-    function(e) {
-
-        if (
-            e.key === "Enter"
-        ) {
-
-            e.preventDefault();
-
-            addClass();
-
-        }
-
-    }
-);
 
 </script>
 

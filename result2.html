@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sunshine · Student Results</title>
     <!-- html2pdf library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -32,7 +38,7 @@
             background: white;
             border-radius: 32px;
             padding: 1.2rem 2rem;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.02);
             border: 1px solid rgba(245, 138, 46, 0.06);
             display: flex;
             align-items: center;
@@ -98,47 +104,6 @@
 
         .btn-secondary:hover {
             background: #e6d5c0;
-        }
-
-        /* ===== TEACHER BADGE ===== */
-        .teacher-badge-container {
-            text-align: center;
-            margin: -0.5rem 0 1.5rem;
-        }
-
-        .teacher-badge-container .badge {
-            background: linear-gradient(135deg, #1a5276, #2e86c1);
-            color: white;
-            padding: 0.4rem 1.5rem;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 4px 12px rgba(26, 82, 118, 0.15);
-        }
-
-        .teacher-badge-container .badge i {
-            color: #85c1e9;
-        }
-
-        .teacher-badge-container .back-link {
-            display: block;
-            margin-top: 0.4rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .teacher-badge-container .back-link a {
-            color: #f58a2e;
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-
-        .teacher-badge-container .back-link a:hover {
-            color: #d97d22;
-            text-decoration: underline;
         }
 
         /* ===== BANNER ===== */
@@ -290,12 +255,69 @@
             padding: 1.8rem 1.2rem;
             text-align: center;
             cursor: pointer;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.02);
             border: 1px solid rgba(245, 138, 46, 0.06);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
+
+        /* ===== STUDENT SEARCH ===== */
+.student-search-box {
+    background: white;
+    border: 1px solid rgba(245, 138, 46, 0.12);
+    border-radius: 18px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.03);
+}
+
+.student-search-box > i {
+    color: #f58a2e;
+    font-size: 1rem;
+}
+
+.student-search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.9rem;
+    color: #2d1f0c;
+}
+
+.student-search-box input::placeholder {
+    color: #b09a7e;
+}
+
+.student-search-box button {
+    border: none;
+    background: #fcf3e8;
+    color: #f58a2e;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.student-search-box button:hover {
+    background: #f58a2e;
+    color: white;
+}
+
+.student-search-info {
+    font-size: 0.78rem;
+    color: #8a765e;
+    margin: -0.5rem 0 1rem;
+    display: none;
+}
 
         .class-card::before {
             content: '';
@@ -378,7 +400,7 @@
             border-radius: 24px;
             padding: 1.2rem 1.5rem;
             margin-bottom: 1rem;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.02);
             border: 1px solid rgba(245, 138, 46, 0.06);
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -450,14 +472,14 @@
             border-radius: 24px;
             padding: 1.5rem 1.8rem;
             margin-bottom: 1.2rem;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.02);
             border: 1px solid rgba(245, 138, 46, 0.06);
             transition: all 0.3s;
         }
 
         .result-card:hover {
             border-color: rgba(245, 138, 46, 0.15);
-            box-shadow: 0 8px 35px rgba(0,0,0,0.04);
+            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.04);
         }
 
         .result-card .card-header {
@@ -533,6 +555,13 @@
             background: #fcf9f4;
         }
 
+        .marks-table tfoot td {
+            background: #fcf3e8 !important;
+            font-weight: 700;
+            color: #2d1f0c;
+            border-top: 2px solid #f58a2e;
+        }
+
         /* ===== RESULT SUMMARY ===== */
         .result-summary {
             display: flex;
@@ -574,6 +603,60 @@
             font-weight: 700;
             font-size: 0.85rem;
             display: inline-block;
+        }
+
+        .grade-badge.Aplus {
+            background: #1a5a1a;
+        }
+
+        .grade-badge.A {
+            background: #2a7a2a;
+        }
+
+        .grade-badge.B {
+            background: #8a7a2a;
+        }
+
+        .grade-badge.C {
+            background: #8a6a2a;
+        }
+
+        .grade-badge.D {
+            background: #8a5a2a;
+        }
+
+        .grade-badge.E {
+            background: #8a4a2a;
+        }
+
+        .grade-badge.F {
+            background: #8a2a2a;
+        }
+
+        .division-badge {
+            background: #4a2d8a;
+            color: white;
+            padding: 0.15rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        .division-badge.first {
+            background: #1a5a1a;
+        }
+
+        .division-badge.second {
+            background: #8a7a2a;
+        }
+
+        .division-badge.third {
+            background: #8a5a2a;
+        }
+
+        .division-badge.fail {
+            background: #8a2a2a;
         }
 
         /* ===== EDIT BUTTON ===== */
@@ -682,7 +765,7 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             display: none;
             align-items: center;
             justify-content: center;
@@ -703,7 +786,7 @@
             overflow-y: auto;
             border-radius: 28px;
             padding: 2rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             animation: modalIn 0.3s ease;
         }
 
@@ -712,6 +795,7 @@
                 opacity: 0;
                 transform: translateY(20px) scale(0.98);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -735,7 +819,7 @@
 
         .edit-row {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-columns: 2fr 1fr 1fr 0.5fr;
             gap: 0.8rem;
             align-items: center;
             background: #fcfaf7;
@@ -765,6 +849,42 @@
         .edit-row input:focus {
             border-color: #f58a2e;
             box-shadow: 0 0 0 3px rgba(245, 138, 46, 0.06);
+        }
+
+        .edit-division-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 0.8rem;
+            align-items: center;
+            background: #f3edfb;
+            padding: 0.7rem 0.8rem;
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+            border: 1.5px solid #d9c8f5;
+        }
+
+        .edit-division-row label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #2d1f0c;
+        }
+
+        .edit-division-row select {
+            width: 100%;
+            padding: 0.45rem 0.6rem;
+            border: 1.5px solid #d9c8f5;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            background: white;
+            outline: none;
+            font-weight: 600;
+            color: #2d1f0c;
+            transition: all 0.2s;
+        }
+
+        .edit-division-row select:focus {
+            border-color: #4a2d8a;
+            box-shadow: 0 0 0 3px rgba(74, 45, 138, 0.08);
         }
 
         .modal-actions {
@@ -830,7 +950,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .loading-state p {
@@ -863,100 +985,6 @@
             color: #b09a7e;
         }
 
-        /* ===== PDF WRAPPER ===== */
-        .pdf-wrapper {
-            background: white;
-            padding: 30px;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            max-width: 1000px;
-            margin: 0 auto;
-            box-sizing: border-box;
-        }
-        .pdf-wrapper * {
-            box-sizing: border-box;
-        }
-        .pdf-wrapper h1 {
-            color: #2c3e50;
-            text-align: center;
-            border-bottom: 3px solid #f58a2e;
-            padding-bottom: 10px;
-        }
-        .pdf-wrapper .student-info {
-            background: #f8f9fa;
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 5px solid #f58a2e;
-        }
-        .pdf-wrapper .exam-block {
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            background: white;
-            page-break-inside: avoid;
-            break-inside: avoid;
-        }
-        .pdf-wrapper .exam-title {
-            background: #f58a2e;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 8px;
-            margin: -15px -20px 15px -20px;
-            font-weight: 600;
-        }
-        .pdf-wrapper table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
-        }
-        .pdf-wrapper table th {
-            background: #34495e;
-            color: white;
-            padding: 8px;
-            border: 1px solid #ddd;
-        }
-        .pdf-wrapper table td {
-            padding: 8px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-        .pdf-wrapper .grade-chart {
-            margin-top: 20px;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            padding: 15px;
-            background: #fafafa;
-            page-break-inside: avoid;
-            break-inside: avoid;
-        }
-        .pdf-wrapper .grade-chart th {
-            background: #34495e;
-            color: white;
-        }
-        .pdf-wrapper .summary-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin: 10px 0;
-            font-weight: 500;
-        }
-        .pdf-wrapper .grade-tag {
-            background: #2c3e50;
-            color: white;
-            padding: 2px 14px;
-            border-radius: 20px;
-            display: inline-block;
-        }
-        .pdf-wrapper .footer {
-            text-align: center;
-            color: #999;
-            font-size: 12px;
-            margin-top: 30px;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
-
         /* ===== FOOTER ===== */
         .footer-note {
             margin-top: 2.5rem;
@@ -978,61 +1006,81 @@
             body {
                 padding: 1rem;
             }
+
             .page-header {
                 padding: 1rem 1.2rem;
                 flex-direction: column;
                 align-items: flex-start;
             }
+
             .page-header h1 {
                 font-size: 1.2rem;
             }
+
             .banner {
                 padding: 1rem 1.2rem;
                 flex-direction: column;
                 text-align: center;
             }
+
             .banner .banner-info {
                 flex-direction: column;
                 text-align: center;
             }
+
             .banner .banner-icon {
                 width: 44px;
                 height: 44px;
                 font-size: 1.3rem;
             }
+
             .banner .banner-details h2 {
                 font-size: 1rem;
             }
+
             .class-grid {
                 grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
                 gap: 0.8rem;
             }
+
             .student-card {
                 flex-direction: column;
                 align-items: flex-start;
             }
+
             .student-card .student-info {
                 width: 100%;
             }
+
             .result-card {
                 padding: 1rem 1.2rem;
             }
+
             .result-card .card-header {
                 flex-direction: column;
                 align-items: flex-start;
             }
+
             .result-summary {
                 flex-direction: column;
                 gap: 0.5rem;
             }
+
             .edit-row {
                 grid-template-columns: 1fr;
                 gap: 0.4rem;
             }
+
+            .edit-division-row {
+                grid-template-columns: 1fr;
+                gap: 0.4rem;
+            }
+
             .modal-box {
                 padding: 1.2rem;
                 margin: 0.5rem;
             }
+
             .section-header {
                 flex-direction: column;
                 align-items: flex-start;
@@ -1044,200 +1092,283 @@
                 font-size: 0.7rem;
                 padding: 0.3rem 0.7rem;
             }
+
             .class-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 0.6rem;
             }
+
             .class-card {
                 padding: 1.2rem 0.8rem;
             }
+
             .class-card h4 {
                 font-size: 0.95rem;
             }
+
             .student-card .student-info .details .meta {
                 flex-direction: column;
                 gap: 0.2rem;
             }
+
             .action-bar {
                 flex-direction: column;
             }
+
             .action-bar button {
                 width: 100%;
                 justify-content: center;
             }
+
             .modal-actions {
                 flex-direction: column;
             }
+
             .modal-actions button {
                 width: 100%;
                 justify-content: center;
             }
-            .teacher-badge-container .badge {
-                font-size: 0.75rem;
-                padding: 0.3rem 1rem;
-            }
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <!-- ===== HEADER ===== -->
-    <div class="page-header">
-        <div>
-            <h1>
-                <i class="fas fa-graduation-cap"></i>
-                Student Results
-            </h1>
-            <div class="header-sub">
-                <i class="fas fa-edit"></i>
-                View student performance
+        <!-- ===== HEADER ===== -->
+        <div class="page-header">
+            <div>
+                <h1>
+                    <i class="fas fa-graduation-cap"></i>
+                    Student Results
+                </h1>
+                <div class="header-sub">
+                    <i class="fas fa-edit"></i>
+                    View and manage student results
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn-action btn-secondary" onclick="history.back()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
             </div>
         </div>
-        <div class="actions">
-            <button class="btn-action btn-secondary" onclick="history.back()">
-                <i class="fas fa-arrow-left"></i> Back
-            </button>
-        </div>
-    </div>
 
-    <!-- ===== TEACHER BADGE ===== -->
-    <div id="teacherViewBadge" class="teacher-badge-container hidden">
-        <div class="badge">
-            <i class="fas fa-lock"></i> Teacher View — Read Only
-        </div>
-        <div class="back-link">
-            <a href="teacher.html"><i class="fas fa-arrow-left"></i> Back to Teacher Dashboard</a>
-        </div>
-    </div>
-
-    <!-- ===== BANNER ===== -->
-    <div class="banner">
-        <div class="banner-info">
-            <div class="banner-icon">
-                <i class="fas fa-file-alt"></i>
+        <!-- ===== BANNER ===== -->
+        <div class="banner">
+            <div class="banner-info">
+                <div class="banner-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="banner-details">
+                    <h2>Student Results Dashboard</h2>
+                    <p><i class="fas fa-info-circle"></i> Browse classes and view student performance</p>
+                </div>
             </div>
-            <div class="banner-details">
-                <h2>Student Results Dashboard</h2>
-                <p><i class="fas fa-info-circle"></i> Browse classes and view student performance</p>
+            <div class="banner-badge">
+                <i class="fas fa-clock"></i> Academic Year 2026-27
             </div>
         </div>
-        <div class="banner-badge">
-            <i class="fas fa-clock"></i> Academic Year 2026-27
-        </div>
-    </div>
 
-    <!-- ===== CLASSES SECTION ===== -->
-    <div id="classesSection" class="section">
-        <div class="section-header">
-            <h3>
-                <i class="fas fa-school"></i> Select Class
-                <span class="count-badge" id="classCount">0</span>
-            </h3>
-            <span class="hint">
-                <i class="fas fa-hand-pointer"></i> Click a class to view students
-            </span>
+        <!-- ===== CLASSES SECTION ===== -->
+        <div id="classesSection" class="section">
+            <div class="section-header">
+                <h3>
+                    <i class="fas fa-school"></i> Select Class
+                    <span class="count-badge" id="classCount">0</span>
+                </h3>
+                <span class="hint">
+                    <i class="fas fa-hand-pointer"></i> Click a class to view students
+                </span>
+            </div>
+            <div id="classes" class="class-grid"></div>
         </div>
-        <div id="classes" class="class-grid"></div>
-    </div>
 
-    <!-- ===== STUDENTS SECTION ===== -->
-    <div id="studentsSection" class="section hidden">
-        <button class="btn-back" onclick="showClasses()">
-            <i class="fas fa-arrow-left"></i> Back to Classes
-        </button>
-        <div class="section-header">
-            <h3 id="classTitle">
-                <i class="fas fa-users"></i> Students
-            </h3>
-            <span class="hint">
-                <i class="fas fa-hand-pointer"></i> Click a student to view results
-            </span>
-        </div>
-        <div id="students"></div>
-    </div>
-
-    <!-- ===== RESULT SECTION ===== -->
-    <div id="resultSection" class="section hidden">
-        <div class="action-bar">
-            <button class="btn-back" onclick="showStudents()">
-                <i class="fas fa-arrow-left"></i> Back to Students
+        <!-- ===== STUDENTS SECTION ===== -->
+        <div id="studentsSection" class="section hidden">
+            <button class="btn-back" onclick="showClasses()">
+                <i class="fas fa-arrow-left"></i> Back to Classes
             </button>
-            <button class="btn-pdf" id="pdfBtn" onclick="downloadResultPDF()">
-                <i class="fas fa-file-pdf"></i> Download PDF
-            </button>
-        </div>
-        <div id="result"></div>
-    </div>
+            <div class="section-header">
+    <h3 id="classTitle">
+        <i class="fas fa-users"></i> Students
+    </h3>
 
-    <!-- ===== FOOTER ===== -->
-    <div class="footer-note">
-        <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
-        <span><i class="fas fa-lock"></i> secure · results management</span>
-    </div>
-
+    <span class="hint">
+        <i class="fas fa-hand-pointer"></i> Click a student to view results
+    </span>
 </div>
 
-<!-- ===== EDIT MARKS MODAL ===== -->
-<div class="modal-overlay" id="editModal">
-    <div class="modal-box">
-        <h2 id="editModalTitle">
-            <i class="fas fa-edit"></i> Edit Marks
-        </h2>
-        <div id="editRows"></div>
-        <div class="modal-actions">
-            <button class="btn-cancel-modal" onclick="closeEditModal()">
-                <i class="fas fa-times"></i> Cancel
-            </button>
-            <button class="btn-save-modal" id="saveMarksBtn" onclick="saveMarks()">
-                <i class="fas fa-save"></i> Save Changes
-            </button>
-        </div>
-    </div>
+<div class="student-search-box">
+    <i class="fas fa-search"></i>
+
+    <input
+        type="text"
+        id="studentSearch"
+        placeholder="Search by name, ID, roll no, father/mother name, mobile..."
+        oninput="filterStudents()"
+        autocomplete="off"
+    />
+
+    <button
+        type="button"
+        id="clearStudentSearch"
+        onclick="clearStudentSearch()"
+        title="Clear search"
+    >
+        <i class="fas fa-times"></i>
+    </button>
 </div>
 
-<script>
-const API_URL = "https://sunshine-swp6.onrender.com/api/exam-marks";
+<div id="studentSearchInfo" class="student-search-info"></div>
 
-let allExamMarks = [];
-let selectedClass = "";
-let selectedStudent = "";
-let currentStudentResults = [];
-window.editingExam = null;
+<div id="students"></div>
+        </div>
 
-// ======================== TEACHER VIEW-ONLY MODE ========================
-const loggedInTeacher = (function () {
-    try {
-        return JSON.parse(localStorage.getItem("loggedInTeacher"));
-    } catch (e) {
-        return null;
-    }
-})();
+        <!-- ===== RESULT SECTION ===== -->
+        <div id="resultSection" class="section hidden">
+            <div class="action-bar">
+                <button class="btn-back" onclick="showStudents()">
+                    <i class="fas fa-arrow-left"></i> Back to Students
+                </button>
+                <button class="btn-pdf" id="pdfBtn" onclick="downloadResultPDF()">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </button>
+            </div>
+            <div id="result"></div>
+        </div>
 
-const isTeacherView = !!loggedInTeacher;
+        <!-- ===== FOOTER ===== -->
+        <div class="footer-note">
+            <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
+            <span><i class="fas fa-lock"></i> secure · results management</span>
+        </div>
 
-const teacherAllowedClasses = (isTeacherView && Array.isArray(loggedInTeacher.assignedClasses))
-    ? loggedInTeacher.assignedClasses.map(c => String(c.class))
-    : null;
+    </div>
 
-function isClassAllowedForTeacher(className) {
-    if (!isTeacherView) return true;
-    if (!teacherAllowedClasses) return false;
-    return teacherAllowedClasses.includes(String(className));
+    <!-- ===== EDIT MARKS MODAL ===== -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <h2 id="editModalTitle">
+                <i class="fas fa-edit"></i> Edit Marks
+            </h2>
+            <div class="edit-division-row">
+                <label><i class="fas fa-award" style="color:#4a2d8a;margin-right:0.3rem;"></i> Division</label>
+                <select id="editDivision">
+                    <option value="">-- Select Division --</option>
+                    <option value="Ist Division">Ist Division</option>
+                    <option value="IInd Division">IInd Division</option>
+                    <option value="IIIrd Division">IIIrd Division</option>
+                    <option value="Fail">Fail</option>
+                    <option value="Pass">Pass</option>
+                </select>
+            </div>
+            <div id="editRows"></div>
+            <div class="modal-actions">
+                <button class="btn-cancel-modal" onclick="closeEditModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="btn-save-modal" id="saveMarksBtn" onclick="saveMarks()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://sunshine-swp6.onrender.com/api/exam-marks";
+const STUDENTS_API_URL = "https://sunshine-swp6.onrender.com/api/students";
+
+        let allExamMarks = [];
+        let selectedClass = "";
+        let selectedStudent = "";
+        let currentStudentResults = [];
+        window.editingExam = null;
+
+        // ======================== FETCH ========================
+       // ======================== STUDENT DATA HELPERS ========================
+function pickName(person) {
+    if (!person) return "";
+    if (typeof person === "string") return person;
+    return person.name || person.fullName || person.fatherName || person.motherName || "";
+}
+
+// Phone: flat fields, father/mother/guardian/contact ke andar, ya kahin bhi nested
+function pickPhone(s) {
+    if (!s) return "";
+    const direct = [
+        s.phone, s.mobile, s.mobileNumber, s.phoneNumber, s.contactNumber,
+        s.father?.phone, s.father?.mobile, s.father?.mobileNumber, s.father?.contact, s.father?.phoneNumber,
+        s.mother?.phone, s.mother?.mobile, s.mother?.mobileNumber, s.mother?.contact, s.mother?.phoneNumber,
+        s.guardian?.phone, s.guardian?.mobile,
+        s.contact?.phone, s.contact?.mobile, s.contact?.primary,
+        s.alternatePhone
+    ].find(v => v !== undefined && v !== null && String(v).trim() !== "");
+    if (direct) return String(direct);
+
+    // Last fallback: poore object me phone/mobile/contact naam ki key dhoondo
+    let found = "";
+    (function scan(obj, depth) {
+        if (!obj || typeof obj !== "object" || depth > 3 || found) return;
+        for (const key of Object.keys(obj)) {
+            const val = obj[key];
+            if (/phone|mobile|contact/i.test(key) && (typeof val === "string" || typeof val === "number")
+                && String(val).replace(/\D/g, "").length >= 8) {
+                found = String(val);
+                return;
+            }
+            if (val && typeof val === "object") scan(val, depth + 1);
+            if (found) return;
+        }
+    })(s, 0);
+    return found;
 }
 
 // ======================== FETCH ========================
 async function loadData(silent) {
     try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        console.log("ExamMarks loaded:", data);
+        const [marksRes, studentsRes] = await Promise.all([
+            fetch(API_URL),
+            fetch(STUDENTS_API_URL).catch(() => null)
+        ]);
+
+        const data = await marksRes.json();
         allExamMarks = data.examMarks || data.data || data;
         if (!Array.isArray(allExamMarks)) {
             console.error("Unexpected data format:", data);
             allExamMarks = [];
         }
+
+        let studentList = [];
+        try {
+            if (studentsRes && studentsRes.ok) {
+                const sData = await studentsRes.json();
+                studentList = sData.students || sData.data || (Array.isArray(sData) ? sData : []);
+            }
+        } catch (e) {
+            console.warn("Students fetch failed:", e);
+        }
+        console.log("Students loaded:", studentList.length, "| sample:", studentList[0]);
+
+        const byMongoId = new Map(studentList.map(s => [String(s._id), s]));
+        const byStudentId = new Map(studentList.filter(s => s.studentId).map(s => [String(s.studentId), s]));
+
+        allExamMarks = allExamMarks.map(item => {
+            const s = byMongoId.get(String(item.studentMongoId))
+                   || byStudentId.get(String(item.studentId))
+                   || {};
+            return {
+                ...item,
+                fatherName: item.fatherName || pickName(s.father) || s.fatherName || "",
+                motherName: item.motherName || pickName(s.mother) || s.motherName || "",
+                phone: item.phone || pickPhone(s) || "",
+                dob: item.dob || s.dob || "",
+                rollNumber: item.rollNumber || s.rollNumber || "",
+                admissionNumber: item.admissionNumber || s.admissionNumber || ""
+            };
+        });
+
         if (!silent) showClasses();
     } catch (error) {
         console.error("Load error:", error);
@@ -1250,20 +1381,39 @@ async function loadData(silent) {
         `;
     }
 }
+        // ======================== GRADE HELPER ========================
+        function getGrade(percentage) {
+            if (percentage >= 90) return { grade: "A+", remark: "Outstanding" };
+            if (percentage >= 80) return { grade: "A", remark: "Excellent" };
+            if (percentage >= 70) return { grade: "B", remark: "Very Good" };
+            if (percentage >= 60) return { grade: "C", remark: "Good" };
+            if (percentage >= 50) return { grade: "D", remark: "Average" };
+            if (percentage >= 40) return { grade: "E", remark: "Pass" };
+            return { grade: "F", remark: "Fail" };
+        }
 
-// ======================== GRADE HELPER ========================
-function getGrade(percentage) {
-    if (percentage >= 90) return { grade: "A+", remark: "Outstanding" };
-    if (percentage >= 80) return { grade: "A", remark: "Excellent" };
-    if (percentage >= 70) return { grade: "B", remark: "Very Good" };
-    if (percentage >= 60) return { grade: "C", remark: "Good" };
-    if (percentage >= 50) return { grade: "D", remark: "Average" };
-    if (percentage >= 40) return { grade: "E", remark: "Pass" };
-    return { grade: "F", remark: "Fail" };
-}
+        // ======================== DIVISION HELPER ========================
+        // Standard UP-board style division cutoffs. Used only as a suggestion —
+        // the actual division stored comes from the manually-selected dropdown.
+        function getSuggestedDivision(percentage) {
+            if (percentage >= 60) return "Ist Division";
+            if (percentage >= 45) return "IInd Division";
+            if (percentage >= 33) return "IIIrd Division";
+            return "Fail";
+        }
 
-function getGradeTableHTML() {
-    return `
+        function divisionBadgeClass(division) {
+            const d = String(division || "").toLowerCase();
+            if (d.startsWith("ist") || d.startsWith("1st") || d.startsWith("first")) return "first";
+            if (d.startsWith("iind") || d.startsWith("2nd") || d.startsWith("second")) return "second";
+            if (d.startsWith("iiird") || d.startsWith("3rd") || d.startsWith("third")) return "third";
+            if (d.startsWith("fail")) return "fail";
+            if (d.startsWith("pass")) return "pass";
+            return "";
+        }
+
+        function getGradeTableHTML() {
+            return `
         <div class="grade-table">
             <table style="width:100%;">
                 <thead><tr><th>Percentage</th><th>Grade</th><th>Remark</th></tr></thead>
@@ -1279,136 +1429,244 @@ function getGradeTableHTML() {
             </table>
         </div>
     `;
-}
+        }
 
-// ======================== NAVIGATION ========================
-function showClasses() {
-    document.getElementById("classesSection").classList.remove("hidden");
-    document.getElementById("studentsSection").classList.add("hidden");
-    document.getElementById("resultSection").classList.add("hidden");
+        // ======================== NAVIGATION ========================
+        function showClasses() {
+            document.getElementById("classesSection").classList.remove("hidden");
+            document.getElementById("studentsSection").classList.add("hidden");
+            document.getElementById("resultSection").classList.add("hidden");
 
-    const container = document.getElementById("classes");
-    container.innerHTML = "";
-    let classes = [...new Set(allExamMarks.map(item => item.className).filter(Boolean))];
+            const container = document.getElementById("classes");
+            container.innerHTML = "";
+            const classes = [...new Set(allExamMarks.map(item => item.className).filter(Boolean))];
+            document.getElementById("classCount").textContent = classes.length;
 
-    if (isTeacherView) {
-        classes = classes.filter(c => isClassAllowedForTeacher(c));
-    }
-
-    document.getElementById("classCount").textContent = classes.length;
-
-    if (classes.length === 0) {
-        container.innerHTML = `
+            if (classes.length === 0) {
+                container.innerHTML = `
             <div class="empty-state" style="grid-column:1/-1;">
                 <i class="fas fa-users-slash"></i>
-                <h4>${isTeacherView ? 'No Classes Assigned' : 'No Classes Found'}</h4>
-                <p>${isTeacherView ? 'You have not been assigned any classes.' : 'No exam results available for any class.'}</p>
+                <h4>No Classes Found</h4>
+                <p>No exam results available for any class.</p>
             </div>
         `;
-        return;
-    }
-    classes.forEach(className => {
-        const div = document.createElement("div");
-        div.className = "class-card";
-        div.innerHTML = `
+                return;
+            }
+            classes.forEach(className => {
+                const div = document.createElement("div");
+                div.className = "class-card";
+                div.innerHTML = `
             <div class="card-icon"><i class="fas fa-school"></i></div>
             <h4>${escapeHtml(className)}</h4>
             <div class="class-sub"><i class="fas fa-user-graduate"></i> View Students</div>
             <div class="arrow-hint"><i class="fas fa-arrow-right"></i> Select</div>
         `;
-        div.onclick = () => showStudents(className);
-        container.appendChild(div);
-    });
-}
+                div.onclick = () => showStudents(className);
+                container.appendChild(div);
+            });
+        }
 
-function showStudents(className) {
-    if (className) selectedClass = className;
+        function showStudents(className) {
+            if (className) selectedClass = className;
+            document.getElementById("classesSection").classList.add("hidden");
+            document.getElementById("studentsSection").classList.remove("hidden");
+            document.getElementById("resultSection").classList.add("hidden");
+            document.getElementById("classTitle").innerHTML = `<i class="fas fa-users"></i> Class ${escapeHtml(selectedClass)} · Students`;
 
-    if (isTeacherView && !isClassAllowedForTeacher(selectedClass)) {
-        alert("🔒 Aap sirf apni assigned class ka result dekh sakte hain.");
-        showClasses();
-        return;
+            // Reset the search box whenever a class is opened fresh
+            const searchInput = document.getElementById("studentSearch");
+            if (searchInput) searchInput.value = "";
+            const searchInfo = document.getElementById("studentSearchInfo");
+            if (searchInfo) searchInfo.style.display = "none";
+
+            renderStudents();
+        }
+
+        // Called on every keystroke in the search box (oninput="filterStudents()")
+        function filterStudents() {
+            renderStudents();
+        }
+
+        // Called by the little clear (x) button next to the search box
+        function clearStudentSearch() {
+            const searchInput = document.getElementById("studentSearch");
+            if (searchInput) searchInput.value = "";
+            renderStudents();
+            if (searchInput) searchInput.focus();
+        }
+
+
+        function renderStudents() {
+    const container = document.getElementById("students");
+    const searchInput = document.getElementById("studentSearch");
+    const searchInfo = document.getElementById("studentSearchInfo");
+
+    const searchTerm = (searchInput?.value || "").trim().toLowerCase();
+
+    container.innerHTML = "";
+
+    const studentsMap = new Map();
+
+    allExamMarks
+        .filter(item => item.className === selectedClass)
+        .forEach(item => {
+            const id = item.studentMongoId;
+
+            if (!studentsMap.has(id)) {
+                studentsMap.set(id, item);
+            }
+        });
+
+    let students = Array.from(studentsMap.values());
+
+    // Search across multiple student details
+    if (searchTerm) {
+        students = students.filter(student => {
+            const searchableText = [
+                student.studentName,
+                student.studentId,
+                student.rollNumber,
+                student.fatherName,
+                student.motherName,
+                student.className,
+                student.admissionNumber,
+                student.phone,
+                student.mobile
+            ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+            return searchableText.includes(searchTerm);
+        });
     }
 
-    document.getElementById("classesSection").classList.add("hidden");
-    document.getElementById("studentsSection").classList.remove("hidden");
-    document.getElementById("resultSection").classList.add("hidden");
-    document.getElementById("classTitle").innerHTML = `<i class="fas fa-users"></i> Class ${escapeHtml(selectedClass)} · Students`;
+    // Search result count
+    if (searchInfo) {
+        if (searchTerm) {
+            searchInfo.style.display = "block";
+            searchInfo.innerHTML =
+                `<i class="fas fa-search"></i> ${students.length} student${students.length !== 1 ? "s" : ""} found`;
+        } else {
+            searchInfo.style.display = "none";
+        }
+    }
 
-    const container = document.getElementById("students");
-    container.innerHTML = "";
-    const studentsMap = new Map();
-    allExamMarks.filter(item => item.className === selectedClass).forEach(item => {
-        const id = item.studentMongoId;
-        if (!studentsMap.has(id)) studentsMap.set(id, item);
-    });
-    if (studentsMap.size === 0) {
+    if (students.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-user-slash"></i>
-                <h4>No Students Found</h4>
-                <p>No students have results in this class.</p>
+                <h4>${searchTerm ? "No Students Found" : "No Students Found"}</h4>
+                <p>
+                    ${
+                        searchTerm
+                            ? `No student matches "${escapeHtml(searchTerm)}".`
+                            : "No students have results in this class."
+                    }
+                </p>
             </div>
         `;
         return;
     }
-    studentsMap.forEach(student => {
-        const initials = (student.studentName || 'S').charAt(0).toUpperCase();
+
+    students.forEach(student => {
+        const initials = (student.studentName || "S")
+            .charAt(0)
+            .toUpperCase();
+
         const div = document.createElement("div");
         div.className = "student-card";
+
         div.innerHTML = `
             <div class="student-info">
-                <div class="avatar">${initials}</div>
-                <div class="details">
-                    <h4>${escapeHtml(student.studentName || "-")}</h4>
-                    <div class="meta">
-                        <span><i class="fas fa-id-badge"></i> ${escapeHtml(student.studentId || "-")}</span>
-                        <span><i class="fas fa-sort-numeric-up"></i> Roll: ${escapeHtml(student.rollNumber || "-")}</span>
-                        <span><i class="fas fa-user-tie"></i> ${escapeHtml(student.fatherName || "-")}</span>
-                        <span><i class="fas fa-hashtag"></i> Adm: ${escapeHtml(student.admissionNumber || "-")}</span>
-                    </div>
+
+                <div class="avatar">
+                    ${escapeHtml(initials)}
                 </div>
+
+                <div class="details">
+
+                    <h4>
+                        ${escapeHtml(student.studentName || "-")}
+                    </h4>
+
+                    <div class="meta">
+
+                        <span>
+                            <i class="fas fa-id-badge"></i>
+                            ${escapeHtml(student.studentId || "-")}
+                        </span>
+
+                        <span>
+                            <i class="fas fa-sort-numeric-up"></i>
+                            Roll: ${escapeHtml(student.rollNumber || "-")}
+                        </span>
+
+                        <span>
+                            <i class="fas fa-user-tie"></i>
+                            Father: ${escapeHtml(student.fatherName || "-")}
+                        </span>
+
+                        <span>
+                            <i class="fas fa-female"></i>
+                            Mother: ${escapeHtml(student.motherName || "-")}
+                        </span>
+
+                        <span>
+                            <i class="fas fa-phone"></i>
+                            ${escapeHtml(student.phone || student.mobile || "-")}
+                        </span>
+
+                    </div>
+
+                </div>
+
             </div>
-            <div class="student-arrow"><i class="fas fa-chevron-right"></i></div>
+
+            <div class="student-arrow">
+                <i class="fas fa-chevron-right"></i>
+            </div>
         `;
+
         div.onclick = () => showResult(student.studentMongoId);
+
         container.appendChild(div);
     });
 }
 
-// ======================== SHOW RESULT ========================
-function showResult(studentMongoId) {
-    document.getElementById("classesSection").classList.add("hidden");
-    document.getElementById("studentsSection").classList.add("hidden");
-    document.getElementById("resultSection").classList.remove("hidden");
+        // ======================== SHOW RESULT ========================
+        function showResult(studentMongoId) {
+            document.getElementById("classesSection").classList.add("hidden");
+            document.getElementById("studentsSection").classList.add("hidden");
+            document.getElementById("resultSection").classList.remove("hidden");
 
-    const container = document.getElementById("result");
-    container.innerHTML = `
+            const container = document.getElementById("result");
+            container.innerHTML = `
         <div class="loading-state">
             <i class="fas fa-circle-notch"></i>
             <p>Loading result...</p>
         </div>
     `;
 
-    const studentResults = allExamMarks.filter(
-        item => item.studentMongoId === studentMongoId && item.className === selectedClass
-    );
+            const studentResults = allExamMarks.filter(
+                item => item.studentMongoId === studentMongoId && item.className === selectedClass
+            );
 
-    if (studentResults.length === 0) {
-        container.innerHTML = `
+            if (studentResults.length === 0) {
+                container.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-file-alt"></i>
                 <h4>No Result Found</h4>
                 <p>This student has no exam results yet.</p>
             </div>
         `;
-        return;
-    }
+                return;
+            }
 
-    currentStudentResults = studentResults;
-    const student = studentResults[0];
+            currentStudentResults = studentResults;
+            const student = studentResults[0];
 
-    let html = `
+            let html = `
         <div class="result-card" id="studentInfoCard">
             <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
                 <div style="width:56px;height:56px;border-radius:50%;background:#fcf3e8;color:#f58a2e;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:700;">
@@ -1428,13 +1686,14 @@ function showResult(studentMongoId) {
         </div>
     `;
 
-    studentResults.forEach((exam, examIndex) => {
-        const subjectCount = (exam.marks || []).length;
-        const gradeInfo = getGrade(exam.percentage || 0);
-        const editButtonHtml = isTeacherView
-            ? ""
-            : `<button class="btn-edit-result" onclick="openEditModal(${examIndex})"><i class="fas fa-edit"></i> Edit Marks</button>`;
-        html += `
+            studentResults.forEach((exam, examIndex) => {
+                const subjectCount = (exam.marks || []).length;
+                const gradeInfo = getGrade(exam.percentage || 0);
+                const gradeClass = gradeInfo.grade === 'A+' ? 'Aplus' : gradeInfo.grade;
+                const divisionValue = exam.division || getSuggestedDivision(exam.percentage || 0);
+                const divisionClass = divisionBadgeClass(divisionValue);
+
+                html += `
             <div class="result-card exam-card" data-examindex="${examIndex}">
                 <div class="card-header">
                     <h3>
@@ -1442,30 +1701,45 @@ function showResult(studentMongoId) {
                         ${escapeHtml(exam.exam)}
                         <span class="subject-count"><i class="fas fa-book"></i> ${subjectCount} subject${subjectCount !== 1 ? 's' : ''}</span>
                     </h3>
-                    ${editButtonHtml}
+                    
                 </div>
                 <div class="table-wrapper">
                     <table class="marks-table">
                         <thead><tr><th><i class="fas fa-book-open"></i> Subject</th><th><i class="fas fa-arrow-up"></i> Max Marks</th><th><i class="fas fa-arrow-down"></i> Obtained</th></tr></thead>
                         <tbody>
         `;
-        (exam.marks || []).forEach(mark => {
+                let examTotalMax = 0;
+                let examTotalObtained = 0;
+                let examHasAbsent = false;
+                (exam.marks || []).forEach(mark => {
 
-    const obtained =
-        String(mark.status || "").toUpperCase() === "ABSENT"
-            ? "AB"
-            : (mark.obtainedMarks ?? 0);
+                    const isAbsentRow = String(mark.status || "").toUpperCase() === "ABSENT";
+                    const obtained = isAbsentRow ? "AB" : (mark.obtainedMarks ?? 0);
 
-    html += `
+                    examTotalMax += Number(mark.maxMarks) || 0;
+                    if (isAbsentRow) {
+                        examHasAbsent = true;
+                    } else {
+                        examTotalObtained += Number(mark.obtainedMarks) || 0;
+                    }
+
+                    html += `
         <tr>
             <td>${escapeHtml(mark.subjectName || "-")}</td>
             <td>${mark.maxMarks ?? 0}</td>
             <td>${obtained}</td>
         </tr>
     `;
-});
-        html += `
+                });
+                html += `
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td><i class="fas fa-calculator"></i> Total</td>
+                                <td>${examTotalMax}</td>
+                                <td>${examTotalObtained}${examHasAbsent ? "*" : ""}</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
                 <div class="result-summary">
@@ -1479,24 +1753,27 @@ function showResult(studentMongoId) {
                     </div>
                     <div class="summary-item">
                         <span class="label"><i class="fas fa-check-circle"></i> Result:</span>
-                        <span class="value">${escapeHtml(exam.result || "-")} <span class="grade-badge" style="background:#2d1f0c;">${gradeInfo.grade}</span></span>
+                        <span class="value">${escapeHtml(exam.result || "-")} <span class="grade-badge ${gradeClass}">${gradeInfo.grade}</span></span>
                     </div>
                     <div class="summary-item">
                         <span class="label"><i class="fas fa-comment"></i> Remark:</span>
                         <span class="value" style="font-weight:500;">${gradeInfo.remark}</span>
                     </div>
+                    <div class="summary-item">
+                        <span class="label"><i class="fas fa-award"></i> Division:</span>
+                        <span class="value"><span class="division-badge ${divisionClass}">${escapeHtml(divisionValue)}</span></span>
+                    </div>
                 </div>
             </div>
         `;
-    });
+            });
 
-    html += `<div class="result-card"><h3 style="font-size:1rem;color:#2d1f0c;margin-bottom:0.5rem;"><i class="fas fa-chart-bar" style="color:#f58a2e;"></i> Grade Chart</h3>${getGradeTableHTML()}</div>`;
+            html += `<div class="result-card"><h3 style="font-size:1rem;color:#2d1f0c;margin-bottom:0.5rem;"><i class="fas fa-chart-bar" style="color:#f58a2e;"></i> Grade Chart</h3>${getGradeTableHTML()}</div>`;
 
-    container.innerHTML = html;
-}
+            container.innerHTML = html;
+        }
 
-// ======================== PDF GENERATION ========================
-async function downloadResultPDF() {
+        async function downloadResultPDF() {
 
     // =========================================================
     // BASIC VALIDATION
@@ -1507,7 +1784,6 @@ async function downloadResultPDF() {
     }
 
     const student = currentStudentResults[0];
-
     if (!student) {
         alert("No student data found.");
         return;
@@ -1528,11 +1804,8 @@ async function downloadResultPDF() {
     // CHECK AUTOTABLE
     // =========================================================
     const testDoc = new jsPDF();
-
     if (typeof testDoc.autoTable !== "function") {
-        alert(
-            "jspdf-autotable is not loaded. Make sure it is included AFTER jsPDF."
-        );
+        alert("jspdf-autotable is not loaded. Make sure it is included AFTER jsPDF.");
         console.error("jspdf-autotable plugin missing.");
         return;
     }
@@ -1540,12 +1813,11 @@ async function downloadResultPDF() {
     // =========================================================
     // BUTTON STATE
     // =========================================================
-    const pdfBtn = document.querySelector(".pdf-btn");
-    const originalButtonText = pdfBtn ? pdfBtn.textContent : "";
-
+    const pdfBtn = document.getElementById("pdfBtn");
+    const originalButtonText = pdfBtn ? pdfBtn.innerHTML : "";
     if (pdfBtn) {
         pdfBtn.disabled = true;
-        pdfBtn.textContent = "⏳ Generating PDF...";
+        pdfBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
     }
 
     try {
@@ -1553,30 +1825,18 @@ async function downloadResultPDF() {
         // =====================================================
         // HELPERS
         // =====================================================
-
         function normalizeExamName(name) {
-            return String(name || "")
-                .toLowerCase()
-                .replace(/\s+/g, " ")
-                .trim();
+            return String(name || "").toLowerCase().replace(/\s+/g, " ").trim();
         }
 
         function normalizeSubjectName(name) {
-            return String(name || "")
-                .toLowerCase()
-                .replace(/\s+/g, " ")
-                .trim();
+            return String(name || "").toLowerCase().replace(/\s+/g, " ").trim();
         }
 
         function safeValue(value, fallback = "N/A") {
-            if (
-                value === undefined ||
-                value === null ||
-                String(value).trim() === ""
-            ) {
+            if (value === undefined || value === null || String(value).trim() === "") {
                 return fallback;
             }
-
             return String(value);
         }
 
@@ -1589,45 +1849,39 @@ async function downloadResultPDF() {
 
         function pdfFormatDate(value) {
             if (!value) return "N/A";
-
             const d = new Date(value);
-
             if (isNaN(d.getTime())) {
                 return String(value);
             }
-
             const day = String(d.getDate()).padStart(2, "0");
-
             const months = [
                 "Jan", "Feb", "Mar", "Apr",
                 "May", "Jun", "Jul", "Aug",
                 "Sep", "Oct", "Nov", "Dec"
             ];
-
             return `${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
         }
 
         function loadImageSafe(src) {
             return new Promise(resolve => {
-
                 const img = new Image();
-
                 img.onload = () => resolve(img);
-
                 img.onerror = () => {
                     console.warn("Could not load image:", src);
                     resolve(null);
                 };
-
                 img.src = src;
             });
         }
 
         // =====================================================
-        // LOAD IMAGES
+        // LOAD IMAGES (tophead.png removed — header now manual)
         // =====================================================
-
-        const [logo, leftStamp, rightStamp] = await Promise.all([
+        const [
+            logo,
+            leftStamp,
+            rightStamp
+        ] = await Promise.all([
             loadImageSafe("./images/logo.png"),
             loadImageSafe("./images/stamp2.png"),
             loadImageSafe("./images/stamp1.png")
@@ -1636,7 +1890,6 @@ async function downloadResultPDF() {
         // =====================================================
         // CREATE A4 PDF
         // =====================================================
-
         const doc = new jsPDF({
             orientation: "portrait",
             unit: "mm",
@@ -1646,77 +1899,45 @@ async function downloadResultPDF() {
 
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
-
         const marginLeft = 10;
         const marginRight = 10;
         const marginBottom = 9;
-
-        const contentWidth =
-            pageWidth - marginLeft - marginRight;
+        const contentWidth = pageWidth - marginLeft - marginRight;
 
         // =====================================================
         // COLLECT EXAMS
         // =====================================================
-
         const rawExamNames = [];
-
         currentStudentResults.forEach(exam => {
-
             const examName = String(exam.exam || "Exam").trim();
-
-            if (
-                !rawExamNames.some(
-                    e =>
-                        normalizeExamName(e) ===
-                        normalizeExamName(examName)
-                )
-            ) {
+            if (!rawExamNames.some(e => normalizeExamName(e) === normalizeExamName(examName))) {
                 rawExamNames.push(examName);
             }
         });
 
         const preferredOrder = [
-            "unit 1",
-            "unit 2",
-            "half yearly",
-            "half-yearly",
-            "halfyearly",
-            "unit 3",
-            "unit 4",
-            "annual",
-            "final"
+            "unit 1", "unit 2", "half yearly", "half-yearly",
+            "halfyearly", "unit 3", "unit 4", "annual", "final"
         ];
 
         function examOrderIndex(name) {
-
             const key = normalizeExamName(name);
-
             const index = preferredOrder.indexOf(key);
-
             return index === -1 ? 999 : index;
         }
 
         const examOrder = [...rawExamNames].sort((a, b) => {
-
             const ai = examOrderIndex(a);
             const bi = examOrderIndex(b);
-
-            if (ai !== bi) {
-                return ai - bi;
-            }
-
-            return rawExamNames.indexOf(a) -
-                rawExamNames.indexOf(b);
+            if (ai !== bi) return ai - bi;
+            return rawExamNames.indexOf(a) - rawExamNames.indexOf(b);
         });
 
         function isHalfYearly(name) {
-            return /half\s*yearly|half-yearly|halfyearly/i.test(
-                String(name || "")
-            );
+            return /half\s*yearly|half-yearly|halfyearly/i.test(String(name || ""));
         }
 
         function isAnnual(name) {
-
             return (
                 /^annual$/i.test(String(name || "").trim()) ||
                 /^final$/i.test(String(name || "").trim())
@@ -1726,69 +1947,37 @@ async function downloadResultPDF() {
         // =====================================================
         // BUILD SUBJECT MAP
         // =====================================================
-
         const subjectMap = {};
-
         currentStudentResults.forEach(exam => {
-
-            const examName =
-                String(exam.exam || "Exam").trim();
-
-            const examKey =
-                normalizeExamName(examName);
-
+            const examName = String(exam.exam || "Exam").trim();
+            const examKey = normalizeExamName(examName);
             (exam.marks || []).forEach(mark => {
-
-                const displaySubject =
-                    String(mark.subjectName || "N/A").trim();
-
-                const subjectKey =
-                    normalizeSubjectName(displaySubject);
-
+                const displaySubject = String(mark.subjectName || "N/A").trim();
+                const subjectKey = normalizeSubjectName(displaySubject);
                 if (!subjectMap[subjectKey]) {
-
                     subjectMap[subjectKey] = {
                         displayName: displaySubject,
                         exams: {}
                     };
                 }
-
                 const maxMarks =
-                    mark.maxMarks !== undefined &&
-                    mark.maxMarks !== null &&
-                    mark.maxMarks !== ""
+                    mark.maxMarks !== undefined && mark.maxMarks !== null && mark.maxMarks !== ""
                         ? Number(mark.maxMarks)
                         : "-";
 
-                const isAbsent =
-    String(mark.status || "").toUpperCase() === "ABSENT";
-
-const obtainedMarks =
-    isAbsent
-        ? "AB"
-        : (
-            mark.obtainedMarks !== undefined &&
-            mark.obtainedMarks !== null &&
-            mark.obtainedMarks !== ""
-                ? Number(mark.obtainedMarks)
-                : "-"
-        );
+                const isAbsent = String(mark.status || "").toUpperCase() === "ABSENT";
+                const obtainedMarks = isAbsent
+                    ? "AB"
+                    : (mark.obtainedMarks !== undefined && mark.obtainedMarks !== null && mark.obtainedMarks !== ""
+                        ? Number(mark.obtainedMarks)
+                        : "-");
 
                 subjectMap[subjectKey].exams[examKey] = {
-
-    max: Number.isFinite(maxMarks)
-        ? maxMarks
-        : "-",
-
-    obtained: isAbsent
-        ? "AB"
-        : (
-            Number.isFinite(obtainedMarks)
-                ? obtainedMarks
-                : "-"
-        )
-
-};
+                    max: Number.isFinite(maxMarks) ? maxMarks : "-",
+                    obtained: isAbsent
+                        ? "AB"
+                        : (Number.isFinite(obtainedMarks) ? obtainedMarks : "-")
+                };
             });
         });
 
@@ -1797,93 +1986,49 @@ const obtainedMarks =
         // =====================================================
         // FIND TERMS
         // =====================================================
-
-        const halfYearlyIndex =
-            examOrder.findIndex(isHalfYearly);
-
-        const annualIndex =
-            examOrder.findIndex(isAnnual);
+        const halfYearlyIndex = examOrder.findIndex(isHalfYearly);
+        const annualIndex = examOrder.findIndex(isAnnual);
 
         let term1Exams = [];
         let term2Exams = [];
 
         if (halfYearlyIndex >= 0) {
-
-            term1Exams =
-                examOrder.slice(
-                    0,
-                    halfYearlyIndex + 1
-                );
+            term1Exams = examOrder.slice(0, halfYearlyIndex + 1);
         }
-
         if (annualIndex >= 0) {
-
-            term2Exams =
-                examOrder.slice(
-                    halfYearlyIndex >= 0
-                        ? halfYearlyIndex + 1
-                        : 0,
-                    annualIndex + 1
-                );
+            term2Exams = examOrder.slice(
+                halfYearlyIndex >= 0 ? halfYearlyIndex + 1 : 0,
+                annualIndex + 1
+            );
         }
-
-        if (
-            term1Exams.length === 0 &&
-            term2Exams.length === 0
-        ) {
-
-            const mid =
-                Math.ceil(examOrder.length / 2);
-
-            term1Exams =
-                examOrder.slice(0, mid);
-
-            term2Exams =
-                examOrder.slice(mid);
+        if (term1Exams.length === 0 && term2Exams.length === 0) {
+            const mid = Math.ceil(examOrder.length / 2);
+            term1Exams = examOrder.slice(0, mid);
+            term2Exams = examOrder.slice(mid);
         }
 
         // =====================================================
         // GROUP SUM
         // =====================================================
-
         function groupSum(subjectKey, examNames) {
-
             let max = 0;
             let obtained = 0;
-
             let hasMax = false;
             let hasObtained = false;
 
             examNames.forEach(examName => {
+                const examKey = normalizeExamName(examName);
+                const subjectData = subjectMap[subjectKey];
+                if (!subjectData || !subjectData.exams) return;
 
-                const examKey =
-                    normalizeExamName(examName);
-
-                const subjectData =
-                    subjectMap[subjectKey];
-
-                if (
-                    !subjectData ||
-                    !subjectData.exams
-                ) {
-                    return;
-                }
-
-                const mark =
-                    subjectData.exams[examKey];
-
-                if (!mark) {
-                    return;
-                }
+                const mark = subjectData.exams[examKey];
+                if (!mark) return;
 
                 if (typeof mark.max === "number") {
-
                     max += mark.max;
                     hasMax = true;
                 }
-
                 if (typeof mark.obtained === "number") {
-
                     obtained += mark.obtained;
                     hasObtained = true;
                 }
@@ -1891,1696 +2036,790 @@ const obtainedMarks =
 
             return {
                 max: hasMax ? max : "-",
-                obtained: hasObtained
-                    ? obtained
-                    : "-"
+                obtained: hasObtained ? obtained : "-"
             };
         }
 
         // =====================================================
         // FINAL SUBJECT TOTALS
         // =====================================================
-
         const subjectFinalTotals = {};
-
         let grandTotalMax = 0;
         let grandTotalObtained = 0;
-
         let hasGrandMax = false;
         let hasGrandObtained = false;
 
         subjects.forEach(subjectKey => {
-
-            const term1Total =
-                groupSum(
-                    subjectKey,
-                    term1Exams
-                );
-
-            const term2Total =
-                groupSum(
-                    subjectKey,
-                    term2Exams
-                );
+            const term1Total = groupSum(subjectKey, term1Exams);
+            const term2Total = groupSum(subjectKey, term2Exams);
 
             let finalMax = 0;
             let finalObtained = 0;
-
             let hasFinalMax = false;
             let hasFinalObtained = false;
 
-            if (
-                typeof term1Total.max === "number"
-            ) {
-
+            if (typeof term1Total.max === "number") {
                 finalMax += term1Total.max;
                 hasFinalMax = true;
             }
-
-            if (
-                typeof term2Total.max === "number"
-            ) {
-
+            if (typeof term2Total.max === "number") {
                 finalMax += term2Total.max;
                 hasFinalMax = true;
             }
-
-            if (
-                typeof term1Total.obtained === "number"
-            ) {
-
-                finalObtained +=
-                    term1Total.obtained;
-
+            if (typeof term1Total.obtained === "number") {
+                finalObtained += term1Total.obtained;
                 hasFinalObtained = true;
             }
-
-            if (
-                typeof term2Total.obtained === "number"
-            ) {
-
-                finalObtained +=
-                    term2Total.obtained;
-
+            if (typeof term2Total.obtained === "number") {
+                finalObtained += term2Total.obtained;
                 hasFinalObtained = true;
             }
 
             subjectFinalTotals[subjectKey] = {
-
                 term1: term1Total,
-
                 term2: term2Total,
-
                 final: {
-
-                    max: hasFinalMax
-                        ? finalMax
-                        : "-",
-
-                    obtained: hasFinalObtained
-                        ? finalObtained
-                        : "-"
+                    max: hasFinalMax ? finalMax : "-",
+                    obtained: hasFinalObtained ? finalObtained : "-"
                 }
             };
 
             if (hasFinalMax) {
-
                 grandTotalMax += finalMax;
                 hasGrandMax = true;
             }
-
             if (hasFinalObtained) {
-
-                grandTotalObtained +=
-                    finalObtained;
-
+                grandTotalObtained += finalObtained;
                 hasGrandObtained = true;
             }
         });
 
-        const totalMarks =
-            hasGrandMax
-                ? grandTotalMax
-                : 0;
-
-        const totalMarksObtained =
-            hasGrandObtained
-                ? grandTotalObtained
-                : 0;
-
-        const overallPercentage =
-            totalMarks > 0
-                ? (totalMarksObtained / totalMarks) * 100
-                : 0;
+        const totalMarks = hasGrandMax ? grandTotalMax : 0;
+        const totalMarksObtained = hasGrandObtained ? grandTotalObtained : 0;
+        const overallPercentage = totalMarks > 0 ? (totalMarksObtained / totalMarks) * 100 : 0;
 
         // =====================================================
         // GRADE / REMARK / DIVISION
         // =====================================================
-
         function getGrade(p) {
-
             if (p >= 90) return "A+";
             if (p >= 80) return "A";
             if (p >= 70) return "B";
             if (p >= 60) return "C";
             if (p >= 50) return "D";
             if (p >= 40) return "E";
-
             return "F";
         }
 
         function getRemark(p) {
-
             if (p >= 90) return "Outstanding";
             if (p >= 80) return "Excellent";
             if (p >= 70) return "Very Good";
             if (p >= 60) return "Good";
             if (p >= 50) return "Average";
             if (p >= 40) return "Pass";
-
             return "Fail";
         }
 
         function getDivision(p) {
-
             if (p >= 60) return "First Division";
             if (p >= 45) return "Second Division";
             if (p >= 33) return "Third Division";
-
             return "Fail";
         }
 
-        const grade =
-            getGrade(overallPercentage);
+        const grade = getGrade(overallPercentage);
+        const remark = getRemark(overallPercentage);
+        const latestExam = currentStudentResults[currentStudentResults.length - 1];
+        const overallDivision = latestExam && latestExam.division
+            ? latestExam.division
+            : getDivision(overallPercentage);
 
-        const remark =
-            getRemark(overallPercentage);
+        // =========================================================
+        // BACKGROUND WATERMARK LOGO
+        // =========================================================
+        function drawBackgroundLogo() {
+            if (!logo) return;
+            const logoWidth = 220;
+            const logoHeight = 290;
+            const logoX = (pageWidth - logoWidth) / 2;
+            const logoY = (pageHeight - logoHeight) / 2;
 
-        const latestExam =
-            currentStudentResults[
-                currentStudentResults.length - 1
-            ];
-
-        const overallDivision =
-            latestExam &&
-            latestExam.division
-                ? latestExam.division
-                : getDivision(overallPercentage);
+            if (typeof doc.saveGraphicsState === "function") {
+                doc.saveGraphicsState();
+            }
+            if (typeof doc.setGState === "function") {
+                doc.setGState(new doc.GState({ opacity: 0.1 }));
+            }
+            doc.addImage(logo, "PNG", logoX, logoY, logoWidth, logoHeight);
+            if (typeof doc.restoreGraphicsState === "function") {
+                doc.restoreGraphicsState();
+            }
+        }
 
         // =====================================================
-        // HEADER
+        // HEADER (fully manual — no tophead image)
         // =====================================================
-
         function drawHeader() {
 
-            const logoX = marginLeft;
-            const logoY = 8;
-            const logoSize = 26;
+    drawBackgroundLogo();
 
-            if (logo) {
+    const headerTop = 4;
+    const logoSize = 28;
+    const logoX = marginLeft;
+    const logoY = headerTop;
+    const logoCenterX = logoX + logoSize / 2;
+    const logoCenterY = logoY + logoSize / 2;
 
-                doc.addImage(
-                    logo,
-                    "PNG",
-                    logoX,
-                    logoY,
-                    logoSize,
-                    logoSize
-                );
-            }
+    // ============================
+    // LOGO (LEFT SIDE, NO CIRCLE)
+    // ============================
+    if (logo) {
+        doc.addImage(
+            logo,
+            "PNG",
+            logoX,
+            logoY,
+            logoSize,
+            logoSize
+        );
+    }
 
-            const textX =
-                logoX + logoSize + 6;
+    // ============================
+    // TITLE AREA (RIGHT OF LOGO, CENTERED IN REMAINING SPACE)
+    // ============================
+    const titleAreaX = logoX + logoSize + 3;
+    const titleAreaWidth = (pageWidth - marginRight) - titleAreaX;
+    const titleCenterX = titleAreaX + titleAreaWidth / 2;
 
-            doc.setFont(
-                "helvetica",
-                "bold"
-            );
+    let textY = headerTop + 12;
 
-            doc.setFontSize(25);
+    // SCHOOL NAME - BIG, DARK RED FILL + BLACK OUTLINE
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(27);
+    doc.setTextColor(178, 24, 24);
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.35);
 
-            doc.setTextColor(
-                90,
-                0,
-                0
-            );
-
-            doc.text(
-                "SUN SHINE JUNIOR HIGH SCHOOL",
-                textX,
-                14
-            );
-
-            doc.setFontSize(8);
-
-            doc.setTextColor(
-                60,
-                60,
-                60
-            );
-
-            doc.text(
-                "20 Futa Road, Mohalla Garhi Nai Aabadi Pilkhuwa Hapur, U.P. - 245304",
-                textX,
-                19
-            );
-
-            doc.text(
-                "Mobile: +91 87917-64372 | 92596-95556",
-                textX,
-                24
-            );
-
-            doc.setTextColor(
-                30,
-                90,
-                160
-            );
-
-            doc.text(
-                "sunshinejuniorhighschool.com",
-                textX,
-                29
-            );
-
-            doc.setDrawColor(
-                180,
-                180,
-                180
-            );
-
-            doc.setLineWidth(0.4);
-
-            doc.line(
-                marginLeft,
-                34,
-                pageWidth - marginRight,
-                34
-            );
-
-            return 37;
+    doc.text(
+        "SUN SHINE JUNIOR HIGH SCHOOL",
+        titleCenterX,
+        textY,
+        {
+            align: "center",
+            renderingMode: "fillThenStroke"
         }
+    );
+
+    // ============================
+    // DECORATIVE DIVIDER
+    // ============================
+    textY += 3.5;
+    const dividerHalfWidth = 30;
+    doc.setDrawColor(178, 24, 24);
+    doc.setLineWidth(0.35);
+    doc.line(titleCenterX - dividerHalfWidth, textY, titleCenterX - 5, textY);
+    doc.line(titleCenterX + 5, textY, titleCenterX + dividerHalfWidth, textY);
+
+    function drawDiamond(cx, cy, size) {
+        doc.setFillColor(178, 24, 24);
+        doc.triangle(cx - size, cy, cx, cy - size, cx + size, cy, "F");
+        doc.triangle(cx - size, cy, cx, cy + size, cx + size, cy, "F");
+    }
+    drawDiamond(titleCenterX, textY, 1.6);
+
+    textY += 6;
+
+    // ============================
+    // ICON HELPERS
+    // ============================
+    function drawPinIcon(cx, cy) {
+        doc.setFillColor(178, 24, 24);
+        doc.circle(cx, cy - 0.6, 1.6, "F");
+        doc.triangle(cx - 1.1, cy, cx + 1.1, cy, cx, cy + 2.2, "F");
+        doc.setFillColor(255, 255, 255);
+        doc.circle(cx, cy - 0.6, 0.6, "F");
+    }
+
+    function drawPhoneIcon(cx, cy) {
+        doc.setFillColor(178, 24, 24);
+        doc.circle(cx - 0.9, cy - 0.9, 1.4, "F");
+        doc.circle(cx + 0.9, cy + 0.9, 1.4, "F");
+        doc.setDrawColor(178, 24, 24);
+        doc.setLineWidth(1.1);
+        doc.line(cx - 0.6, cy - 0.6, cx + 0.6, cy + 0.6);
+    }
+
+    function drawGlobeIcon(cx, cy) {
+        doc.setDrawColor(30, 60, 150);
+        doc.setLineWidth(0.35);
+        doc.circle(cx, cy, 1.8, "S");
+        doc.ellipse(cx, cy, 0.8, 1.8, "S");
+        doc.line(cx - 1.8, cy, cx + 1.8, cy);
+    }
+
+    // ============================
+    // ADDRESS LINE (CENTERED)
+    // ============================
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(20, 20, 20);
+
+    const addressText = "20 Futa Road, Mohalla Garhi Nai Aabadi Pilkhuwa Hapur, U.P - 245304";
+    const addrTextWidth = doc.getTextWidth(addressText);
+    const addrIconX = titleCenterX - addrTextWidth / 2 - 4;
+
+    drawPinIcon(addrIconX, textY - 1);
+    doc.text(addressText, titleCenterX + 2, textY, { align: "center" });
+
+    textY += 5.5;
+
+    // ============================
+    // PHONE + WEBSITE LINE (CENTERED, SIDE BY SIDE)
+    // ============================
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+
+    const phoneText = "Mobile :- +91 87917-64372 | 92596-95556";
+    const websiteText = "sunshinejuniorhighschool.com";
+    const gap = 8;
+
+    const phoneWidth = doc.getTextWidth(phoneText);
+    const websiteWidth = doc.getTextWidth(websiteText);
+    const totalLineWidth = phoneWidth + gap + websiteWidth + 10;
+
+    let lineX = titleCenterX - totalLineWidth / 2;
+
+    drawPhoneIcon(lineX, textY - 1);
+    doc.setTextColor(20, 20, 20);
+    doc.text(phoneText, lineX + 4, textY);
+    lineX += 4 + phoneWidth + 4;
+
+    doc.setDrawColor(150, 150, 150);
+    doc.setLineWidth(0.3);
+    doc.line(lineX, textY - 2.5, lineX, textY + 0.8);
+    lineX += gap - 4;
+
+    drawGlobeIcon(lineX, textY - 1);
+    doc.setTextColor(30, 60, 150);
+    doc.text(websiteText, lineX + 4, textY);
+
+    // ============================
+    // BOTTOM BORDER (RED LINE + BLACK BAR)
+    // ============================
+    textY += 4.5;
+
+    doc.setDrawColor(178, 24, 24);
+    doc.setLineWidth(0.6);
+    doc.line(marginLeft, textY, pageWidth - marginRight, textY);
+
+    textY += 2;
+    doc.setFillColor(20, 20, 20);
+    doc.rect(marginLeft, textY, contentWidth, 2.5, "F");
+
+    return textY + 2.5 + 4;
+}
 
         // =====================================================
         // FOOTER
         // =====================================================
-
         function drawFooter(pageNumber) {
-
-            const footerY =
-                pageHeight - 6;
-
-            doc.setDrawColor(
-                190,
-                190,
-                190
-            );
-
+            const footerY = pageHeight - 6;
+            doc.setDrawColor(190, 190, 190);
             doc.setLineWidth(0.3);
-
-            doc.line(
-                marginLeft,
-                pageHeight - 10,
-                pageWidth - marginRight,
-                pageHeight - 10
-            );
-
-            doc.setFont(
-                "helvetica",
-                "bold"
-            );
-
+            doc.line(marginLeft, pageHeight - 10, pageWidth - marginRight, pageHeight - 10);
+            doc.setFont("helvetica", "bold");
             doc.setFontSize(7);
-
-            doc.setTextColor(
-                120,
-                120,
-                120
-            );
-
-            doc.text(
-                "Sun Shine Junior High School",
-                marginLeft,
-                footerY
-            );
-
-            doc.text(
-                `Page ${pageNumber}`,
-                pageWidth - marginRight,
-                footerY,
-                {
-                    align: "right"
-                }
-            );
+            doc.setTextColor(120, 120, 120);
+            doc.text("Sun Shine Junior High School", marginLeft, footerY);
+            doc.text(`Page ${pageNumber}`, pageWidth - marginRight, footerY, { align: "right" });
         }
 
         // =====================================================
         // PAGE BREAK HELPER
         // =====================================================
-
-        function ensureSpace(
-            currentYRef,
-            requiredHeight
-        ) {
-
-            if (
-                currentYRef +
-                requiredHeight >
-                pageHeight -
-                marginBottom -
-                7
-            ) {
-
+        function ensureSpace(currentYRef, requiredHeight) {
+            if (currentYRef + requiredHeight > pageHeight - marginBottom - 7) {
                 doc.addPage();
-
-                const pageNumber =
-                    doc.internal.getNumberOfPages();
-
+                const pageNumber = doc.internal.getNumberOfPages();
                 drawHeader();
                 drawFooter(pageNumber);
-
                 return 37;
             }
-
             return currentYRef;
         }
 
         // =====================================================
         // PAGE 1
         // =====================================================
+        let currentY = drawHeader() + 4;
 
-        let currentY =
-            drawHeader() +4;
-
-        // =====================================================
-        // MAIN TITLE - SMALLER
-        // =====================================================
-
-        doc.setFont(
-            "helvetica",
-            "bold"
-        );
-
+        // MAIN TITLE
+        doc.setFont("helvetica", "bold");
         doc.setFontSize(10.5);
-
-        doc.setTextColor(
-            30,
-            45,
-            60
-        );
-
-        doc.text(
-            "ASSESSMENT SHEET FOR ACADEMIC SESSION 2026-27",
-            pageWidth / 2,
-            currentY,
-            {
-                align: "center"
-            }
-        );
-
-        // REDUCED GAP
+        doc.setTextColor(30, 45, 60);
+        doc.text("ASSESSMENT SHEET FOR ACADEMIC SESSION 2026-27", pageWidth / 2, currentY, { align: "center" });
         currentY += 4;
 
-        // =====================================================
         // SUBTITLE
-        // =====================================================
-
-        doc.setFont(
-            "helvetica",
-            "italic"
-        );
-
+        doc.setFont("helvetica", "italic");
         doc.setFontSize(7.5);
-
-        doc.setTextColor(
-            70,
-            70,
-            70
-        );
-
-        doc.text(
-            '"Empowering Young Minds for a Brighter Future"',
-            pageWidth / 2,
-            currentY,
-            {
-                align: "center"
-            }
-        );
-
-        // REDUCED GAP
+        doc.setTextColor(70, 70, 70);
+        doc.text('"Empowering Young Minds for a Brighter Future"', pageWidth / 2, currentY, { align: "center" });
         currentY += 4;
 
-        // =====================================================
         // STUDENT PROFILE TITLE
-        // =====================================================
-
-        doc.setFillColor(
-            240,
-            230,
-            211
-        );
-
-        doc.setDrawColor(
-            30,
-            42,
-            58
-        );
-
+        doc.setFillColor(240, 230, 211);
+        doc.setDrawColor(30, 42, 58);
         doc.setLineWidth(0.5);
-
-        doc.rect(
-            marginLeft,
-            currentY,
-            contentWidth,
-            6,
-            "FD"
-        );
-
-        doc.setFont(
-            "helvetica",
-            "bold"
-        );
-
+        doc.rect(marginLeft, currentY, contentWidth, 6, "FD");
+        doc.setFont("helvetica", "bold");
         doc.setFontSize(9);
-
-        doc.setTextColor(
-            30,
-            42,
-            58
-        );
-
-        doc.text(
-            "STUDENT PROFILE",
-            pageWidth / 2,
-            currentY + 4.1,
-            {
-                align: "center"
-            }
-        );
-
+        doc.setTextColor(30, 42, 58);
+        doc.text("STUDENT PROFILE", pageWidth / 2, currentY + 4.1, { align: "center" });
         currentY += 6;
 
-        // =====================================================
-        // STUDENT DETAILS - COMPACT COLUMNS
-        // =====================================================
-
+        // STUDENT DETAILS TABLE
         doc.autoTable({
-
             startY: currentY,
-
-            margin: {
-                left: marginLeft,
-                right: marginRight
-            },
-
+            margin: { left: marginLeft, right: marginRight },
             theme: "grid",
-
             body: [
-
-                [
-                    "Roll No.",
-                    safeValue(
-                        student.rollNumber ||
-                        student.studentId
-                    ),
-                    "Student Name",
-                    safeValue(
-                        student.studentName
-                    )
-                ],
-
-                [
-                    "Class",
-                    safeValue(
-                        student.className
-                    ),
-                    "Session",
-                    "2026-27"
-                ],
-
-                [
-                    "Father Name",
-                    safeValue(
-                        student.fatherName
-                    ),
-                    "Mother Name",
-                    safeValue(
-                        student.motherName
-                    )
-                ],
-
-                [
-                    "D.O.B",
-                    pdfFormatDate(
-                        student.dob
-                    ),
-                    "Contact",
-                    safeValue(
-                        student.phone ||
-                        student.mobile
-                    )
-                ]
+                ["Roll No.", safeValue(student.rollNumber || student.studentId), "Student Name", safeValue(student.studentName)],
+                ["Class", safeValue(student.className), "Session", "2026-27"],
+                ["Father Name", safeValue(student.fatherName), "Mother Name", safeValue(student.motherName)],
+                ["D.O.B", pdfFormatDate(student.dob), "Contact", safeValue(student.phone || student.mobile)]
             ],
-
             styles: {
-
                 font: "helvetica",
-
-                // FONT KEPT SAME
                 fontSize: 7.8,
-
                 fontStyle: "bold",
-
-                textColor: [
-                    35,
-                    35,
-                    35
-                ],
-
-                // COMPACT ROWS
+                textColor: [35, 35, 35],
                 cellPadding: 1.25,
-
                 valign: "middle"
             },
-
             columnStyles: {
-
-                // SMALLER LABEL COLUMNS
-                0: {
-                    cellWidth: 22,
-                    fillColor: [
-                        248,
-                        244,
-                        238
-                    ]
-                },
-
-                // SMALLER DATA COLUMN
-                1: {
-                    cellWidth: 55
-                },
-
-                // SMALLER LABEL COLUMN
-                2: {
-                    cellWidth: 22,
-                    fillColor: [
-                        248,
-                        244,
-                        238
-                    ]
-                },
-
-                // REMAINING SPACE
-                3: {
-                    cellWidth:
-                        contentWidth -
-                        22 -
-                        55 -
-                        22
-                }
+                0: { cellWidth: 22, fillColor: [248, 244, 238] },
+                1: { cellWidth: 55 },
+                2: { cellWidth: 22, fillColor: [248, 244, 238] },
+                3: { cellWidth: contentWidth - 22 - 55 - 22 }
             }
         });
 
-        // SMALL GAP AFTER STUDENT TABLE
-        currentY =
-            doc.lastAutoTable.finalY + 2;
+        currentY = doc.lastAutoTable.finalY + 2;
 
-        // =====================================================
         // ACADEMIC PERFORMANCE TITLE
-        // =====================================================
-
-        doc.setFillColor(
-            240,
-            230,
-            211
-        );
-
-        doc.setDrawColor(
-            30,
-            42,
-            58
-        );
-
-        doc.rect(
-            marginLeft,
-            currentY,
-            contentWidth,
-            6,
-            "FD"
-        );
-
-        doc.setFont(
-            "helvetica",
-            "bold"
-        );
-
+        doc.setFillColor(240, 230, 211);
+        doc.setDrawColor(30, 42, 58);
+        doc.rect(marginLeft, currentY, contentWidth, 6, "FD");
+        doc.setFont("helvetica", "bold");
         doc.setFontSize(9.5);
-
-        doc.setTextColor(
-            30,
-            42,
-            58
-        );
-
-        doc.text(
-            "ACADEMIC PERFORMANCE REPORT",
-            pageWidth / 2,
-            currentY + 4.1,
-            {
-                align: "center"
-            }
-        );
-
+        doc.setTextColor(30, 42, 58);
+        doc.text("ACADEMIC PERFORMANCE REPORT", pageWidth / 2, currentY + 4.1, { align: "center" });
         currentY += 6;
 
-        // =====================================================
         // ACADEMIC TABLE HEADERS
-        // =====================================================
-
-        const academicHeadTop = [
-            {
-                content: "Subject",
-                rowSpan: 2
-            }
-        ];
-
+        const academicHeadTop = [{ content: "Subject", rowSpan: 2 }];
         const academicHeadBottom = [];
 
         examOrder.forEach(examName => {
-
-            academicHeadTop.push({
-                content: examName,
-                colSpan: 2
-            });
-
-            academicHeadBottom.push(
-                "M.M",
-                "M.O"
-            );
+            academicHeadTop.push({ content: examName, colSpan: 2 });
+            academicHeadBottom.push("M.M", "M.O");
 
             if (isHalfYearly(examName)) {
-
-                academicHeadTop.push({
-                    content: "Term 1 Total",
-                    colSpan: 2
-                });
-
-                academicHeadBottom.push(
-                    "M.M",
-                    "M.O"
-                );
+                academicHeadTop.push({ content: "Term 1 Total", colSpan: 2 });
+                academicHeadBottom.push("M.M", "M.O");
             }
-
             if (isAnnual(examName)) {
-
-                academicHeadTop.push({
-                    content: "Term 2 Total",
-                    colSpan: 2
-                });
-
-                academicHeadBottom.push(
-                    "M.M",
-                    "M.O"
-                );
-
-                academicHeadTop.push({
-                    content: "Grand Total",
-                    colSpan: 2
-                });
-
-                academicHeadBottom.push(
-                    "M.M",
-                    "M.O"
-                );
+                academicHeadTop.push({ content: "Term 2 Total", colSpan: 2 });
+                academicHeadBottom.push("M.M", "M.O");
+                academicHeadTop.push({ content: "Grand Total", colSpan: 2 });
+                academicHeadBottom.push("M.M", "M.O");
             }
         });
 
         if (halfYearlyIndex < 0) {
-
-            academicHeadTop.push({
-                content: "Term 1 Total",
-                colSpan: 2
-            });
-
-            academicHeadBottom.push(
-                "M.M",
-                "M.O"
-            );
+            academicHeadTop.push({ content: "Term 1 Total", colSpan: 2 });
+            academicHeadBottom.push("M.M", "M.O");
         }
-
         if (annualIndex < 0) {
-
-            academicHeadTop.push({
-                content: "Term 2 Total",
-                colSpan: 2
-            });
-
-            academicHeadBottom.push(
-                "M.M",
-                "M.O"
-            );
-
-            academicHeadTop.push({
-                content: "Grand Total",
-                colSpan: 2
-            });
-
-            academicHeadBottom.push(
-                "M.M",
-                "M.O"
-            );
+            academicHeadTop.push({ content: "Term 2 Total", colSpan: 2 });
+            academicHeadBottom.push("M.M", "M.O");
+            academicHeadTop.push({ content: "Grand Total", colSpan: 2 });
+            academicHeadBottom.push("M.M", "M.O");
         }
 
-        // =====================================================
         // ACADEMIC BODY
-        // =====================================================
-
         const academicBody = [];
-
         subjects.forEach(subjectKey => {
-
-            const subjectData =
-                subjectMap[subjectKey];
-
-            const totals =
-                subjectFinalTotals[subjectKey];
-
-            const row = [
-                subjectData.displayName
-            ];
+            const subjectData = subjectMap[subjectKey];
+            const totals = subjectFinalTotals[subjectKey];
+            const row = [subjectData.displayName];
 
             examOrder.forEach(examName => {
+                const examKey = normalizeExamName(examName);
+                const mark = subjectData.exams && subjectData.exams[examKey] ? subjectData.exams[examKey] : null;
 
-                const examKey =
-                    normalizeExamName(
-                        examName
-                    );
-
-                const mark =
-                    subjectData.exams &&
-                    subjectData.exams[examKey]
-                        ? subjectData.exams[examKey]
-                        : null;
-
-                row.push(
-                    mark
-                        ? mark.max
-                        : "-",
-
-                    mark
-                        ? mark.obtained
-                        : "-"
-                );
+                row.push(mark ? mark.max : "-", mark ? mark.obtained : "-");
 
                 if (isHalfYearly(examName)) {
-
-                    row.push(
-                        totals.term1.max,
-                        totals.term1.obtained
-                    );
+                    row.push(totals.term1.max, totals.term1.obtained);
                 }
-
                 if (isAnnual(examName)) {
-
-                    row.push(
-                        totals.term2.max,
-                        totals.term2.obtained,
-                        totals.final.max,
-                        totals.final.obtained
-                    );
+                    row.push(totals.term2.max, totals.term2.obtained, totals.final.max, totals.final.obtained);
                 }
             });
 
             if (halfYearlyIndex < 0) {
-
-                row.push(
-                    totals.term1.max,
-                    totals.term1.obtained
-                );
+                row.push(totals.term1.max, totals.term1.obtained);
             }
-
             if (annualIndex < 0) {
-
-                row.push(
-                    totals.term2.max,
-                    totals.term2.obtained,
-                    totals.final.max,
-                    totals.final.obtained
-                );
+                row.push(totals.term2.max, totals.term2.obtained, totals.final.max, totals.final.obtained);
             }
 
             academicBody.push(row);
         });
 
-        // =====================================================
+        // ===== SUBJECT TOTAL ROW (sum of every subject, per exam column) =====
+        // Adds one row at the bottom of the Academic Performance table showing
+        // the combined M.M / M.O for ALL subjects — for every column: Unit 1,
+        // Unit 2, Half Yearly, Term 1 Total, Unit 3, Unit 4, Annual, Term 2
+        // Total, and Grand Total.
+        const academicColumnCount = academicBody.length > 0 ? academicBody[0].length : 1;
+        const totalRow = ["TOTAL"];
+        for (let col = 1; col < academicColumnCount; col++) {
+            let colSum = 0;
+            let colHasValue = false;
+            academicBody.forEach(row => {
+                const cellVal = row[col];
+                if (typeof cellVal === "number" && Number.isFinite(cellVal)) {
+                    colSum += cellVal;
+                    colHasValue = true;
+                }
+            });
+            totalRow.push(colHasValue ? colSum : "-");
+        }
+        const totalRowIndex = academicBody.length; // index of the row we're about to add
+        academicBody.push(totalRow);
+
         // ACADEMIC COLUMN WIDTHS
-        // =====================================================
-
-        const totalColumns =
-            academicBody.length > 0
-                ? academicBody[0].length
-                : 1;
-
-        // SUBJECT COLUMN
+        const totalColumns = academicBody.length > 0 ? academicBody[0].length : 1;
         const subjectWidth = 27;
-
-        const smallWidth =
-            (contentWidth - subjectWidth) /
-            Math.max(
-                totalColumns - 1,
-                1
-            );
+        const smallWidth = (contentWidth - subjectWidth) / Math.max(totalColumns - 1, 1);
 
         const academicColumnStyles = {
-
-            0: {
-                cellWidth: subjectWidth,
-                halign: "left",
-                fontStyle: "bold"
-            }
+            0: { cellWidth: subjectWidth, halign: "left", fontStyle: "bold" }
         };
-
-        for (
-            let i = 1;
-            i < totalColumns;
-            i++
-        ) {
-
-            academicColumnStyles[i] = {
-
-                cellWidth:
-                    Math.max(
-                        5.2,
-                        smallWidth
-                    ),
-
-                halign: "center"
-            };
+        for (let i = 1; i < totalColumns; i++) {
+            academicColumnStyles[i] = { cellWidth: Math.max(5.2, smallWidth), halign: "center" };
         }
 
-        // =====================================================
         // ACADEMIC TABLE
-        // =====================================================
-
         doc.autoTable({
-
             startY: currentY,
-
-            margin: {
-                left: marginLeft,
-                right: marginRight,
-                top: 40,
-                bottom: 11
-            },
-
-            head: [
-                academicHeadTop,
-                academicHeadBottom
-            ],
-
+            margin: { left: marginLeft, right: marginRight, top: 40, bottom: 11 },
+            head: [academicHeadTop, academicHeadBottom],
             body: academicBody,
-
             theme: "grid",
-
             styles: {
-
                 font: "helvetica",
-
-                fontSize:
-                    totalColumns > 14
-                        ? 5.7
-                        : totalColumns > 10
-                            ? 6.3
-                            : 7.2,
-
+                fontSize: totalColumns > 14 ? 5.7 : totalColumns > 10 ? 6.3 : 7.2,
                 fontStyle: "bold",
-
-                textColor: [
-                    30,
-                    30,
-                    30
-                ],
-
-                // CONTROLLED HEIGHT
-                cellPadding:
-                    totalColumns > 14
-                        ? 1.35
-                        : 1.7,
-
+                textColor: [30, 30, 30],
+                cellPadding: totalColumns > 14 ? 1.35 : 1.7,
                 valign: "middle",
-
                 halign: "center",
-
-                lineColor: [
-                    30,
-                    42,
-                    58
-                ],
-
+                lineColor: [30, 42, 58],
                 lineWidth: 0.25
             },
-
             headStyles: {
-
-                fillColor: [
-                    232,
-                    221,
-                    208
-                ],
-
-                textColor: [
-                    20,
-                    30,
-                    40
-                ],
-
+                fillColor: [232, 221, 208],
+                textColor: [20, 30, 40],
                 fontStyle: "bold",
-
                 halign: "center",
-
                 valign: "middle",
-
-                lineColor: [
-                    30,
-                    42,
-                    58
-                ],
-
+                lineColor: [30, 42, 58],
                 lineWidth: 0.3
             },
-
-            alternateRowStyles: {
-                fillColor: [
-                    252,
-                    250,
-                    247
-                ]
-            },
-
-            columnStyles:
-                academicColumnStyles,
-
+            alternateRowStyles: { fillColor: [252, 250, 247] },
+            columnStyles: academicColumnStyles,
             didParseCell: function (data) {
-
-                if (
-                    data.section === "body" &&
-                    data.column.index === 0
-                ) {
-
-                    data.cell.styles.fillColor = [
-                        252,
-                        250,
-                        247
-                    ];
+                if (data.section === "body") {
+                    if (data.row.index === totalRowIndex) {
+                        // Highlight the bottom "TOTAL" row distinctly
+                        data.cell.styles.fillColor = [232, 221, 208];
+                        data.cell.styles.textColor = [20, 30, 40];
+                        data.cell.styles.fontStyle = "bold";
+                        data.cell.styles.lineWidth = 0.4;
+                        if (data.column.index === 0) {
+                            data.cell.styles.halign = "left";
+                        }
+                    } else if (data.column.index === 0) {
+                        data.cell.styles.fillColor = [252, 250, 247];
+                    }
                 }
             },
-
             didDrawPage: function () {
-
-                const pageNumber =
-                    doc.internal.getNumberOfPages();
-
+                const pageNumber = doc.internal.getNumberOfPages();
                 drawHeader();
                 drawFooter(pageNumber);
             }
         });
 
-        currentY =
-            doc.lastAutoTable.finalY + 2;
+        currentY = doc.lastAutoTable.finalY + 2;
 
-        // =====================================================
         // FINAL RESULT SUMMARY
-        // =====================================================
-
-        currentY =
-            ensureSpace(
-                currentY,
-                30
-            );
-
-        doc.setFillColor(
-            240,
-            230,
-            211
-        );
-
-        doc.setDrawColor(
-            30,
-            42,
-            58
-        );
-
-        doc.rect(
-            marginLeft,
-            currentY,
-            contentWidth,
-            6,
-            "FD"
-        );
-
-        doc.setFont(
-            "helvetica",
-            "bold"
-        );
-
+        currentY = ensureSpace(currentY, 30);
+        doc.setFillColor(240, 230, 211);
+        doc.setDrawColor(30, 42, 58);
+        doc.rect(marginLeft, currentY, contentWidth, 6, "FD");
+        doc.setFont("helvetica", "bold");
         doc.setFontSize(9.5);
-
-        doc.setTextColor(
-            30,
-            42,
-            58
-        );
-
-        doc.text(
-            "FINAL RESULT SUMMARY",
-            pageWidth / 2,
-            currentY + 4.1,
-            {
-                align: "center"
-            }
-        );
-
+        doc.setTextColor(30, 42, 58);
+        doc.text("FINAL RESULT SUMMARY", pageWidth / 2, currentY + 4.1, { align: "center" });
         currentY += 6;
 
-        // =====================================================
-        // FINAL RESULT SUMMARY TABLE
-        // =====================================================
-
         doc.autoTable({
-
             startY: currentY,
-
-            margin: {
-                left: marginLeft,
-                right: marginRight
-            },
-
+            margin: { left: marginLeft, right: marginRight },
             theme: "grid",
-
             body: [
-
-                [
-                    "Total Marks",
-                    totalMarks,
-                    "Total Marks Obtained",
-                    totalMarksObtained
-                ],
-
-                [
-                    "Percentage",
-                    `${overallPercentage.toFixed(2)}%`,
-                    "Grade",
-                    grade
-                ],
-
-                [
-                    "Performance",
-                    remark,
-                    "Division",
-                    overallDivision
-                ]
+                ["Total Marks", totalMarks, "Total Marks Obtained", totalMarksObtained],
+                ["Percentage", `${overallPercentage.toFixed(2)}%`, "Grade", grade],
+                ["Performance", remark, "Division", overallDivision]
             ],
-
             styles: {
-
                 font: "helvetica",
-
-                // FONT UNCHANGED
                 fontSize: 8.5,
-
                 fontStyle: "bold",
-
-                textColor: [
-                    30,
-                    30,
-                    30
-                ],
-
-                // COMPACT
+                textColor: [30, 30, 30],
                 cellPadding: 1.6,
-
                 halign: "center",
-
                 valign: "middle"
             },
-
             columnStyles: {
-
-                // SMALLER LABEL
-                0: {
-                    fillColor: [
-                        248,
-                        244,
-                        238
-                    ],
-                    cellWidth:
-                        contentWidth * 0.21
-                },
-
-                // DATA
-                1: {
-                    cellWidth:
-                        contentWidth * 0.29
-                },
-
-                // SMALLER LABEL
-                2: {
-                    fillColor: [
-                        248,
-                        244,
-                        238
-                    ],
-                    cellWidth:
-                        contentWidth * 0.21
-                },
-
-                // DATA
-                3: {
-                    cellWidth:
-                        contentWidth * 0.29
-                }
+                0: { fillColor: [248, 244, 238], cellWidth: contentWidth * 0.21 },
+                1: { cellWidth: contentWidth * 0.29 },
+                2: { fillColor: [248, 244, 238], cellWidth: contentWidth * 0.21 },
+                3: { cellWidth: contentWidth * 0.29 }
             }
         });
 
-        currentY =
-            doc.lastAutoTable.finalY + 2;
+        currentY = doc.lastAutoTable.finalY + 2;
 
-        // =====================================================
-        // GRADE / PERFORMANCE SECTION
-        // COMPACT 4-COLUMN LAYOUT
-        // =====================================================
-
-        currentY =
-            ensureSpace(
-                currentY,
-                48
-            );
-
-        doc.setFillColor(
-            240,
-            230,
-            211
-        );
-
-        doc.setDrawColor(
-            30,
-            42,
-            58
-        );
-
-        doc.rect(
-            marginLeft,
-            currentY,
-            contentWidth,
-            5.5,
-            "FD"
-        );
-
-        doc.setFont(
-            "helvetica",
-            "bold"
-        );
-
+        // GRADE CHART
+        currentY = ensureSpace(currentY, 48);
+        doc.setFillColor(240, 230, 211);
+        doc.setDrawColor(30, 42, 58);
+        doc.rect(marginLeft, currentY, contentWidth, 5.5, "FD");
+        doc.setFont("helvetica", "bold");
         doc.setFontSize(8.5);
-
-        doc.setTextColor(
-            30,
-            42,
-            58
-        );
-
-        doc.text(
-            "GRADE CHART",
-            pageWidth / 2,
-            currentY + 3.8,
-            {
-                align: "center"
-            }
-        );
-
+        doc.setTextColor(30, 42, 58);
+        doc.text("GRADE CHART", pageWidth / 2, currentY + 3.8, { align: "center" });
         currentY += 5.5;
 
-        // =====================================================
-        // GRADE ROWS
-        // =====================================================
-
         const gradeRows = [
-
-            [
-                "90% – 100%",
-                "A+",
-                "Outstanding",
-                grade === "A+"
-                    ? `${overallPercentage.toFixed(2)}%`
-                    : ""
-            ],
-
-            [
-                "80% – 89%",
-                "A",
-                "Excellent",
-                grade === "A"
-                    ? `${overallPercentage.toFixed(2)}%`
-                    : ""
-            ],
-
-            [
-                "70% – 79%",
-                "B",
-                "Very Good",
-                grade === "B"
-                    ? `${overallPercentage.toFixed(2)}%`
-                    : ""
-            ],
-
-            [
-                "60% – 69%",
-                "C",
-                "Good",
-                grade === "C"
-                    ? `${overallPercentage.toFixed(2)}%`
-                    : ""
-            ],
-
-            [
-                "50% – 59%",
-                "D",
-                "Average",
-                grade === "D"
-                    ? `${overallPercentage.toFixed(2)}%`
-                    : ""
-            ],
-
-            [
-                "40% – 49%",
-                "E",
-                "Pass",
-                grade === "E"
-                    ? `${overallPercentage.toFixed(2)}%`
-                    : ""
-            ],
-
-            [
-                "Below 40%",
-                "F",
-                "Fail",
-                grade === "F"
-                    ? `${overallPercentage.toFixed(2)}%`
-                    : ""
-            ]
+            ["90% – 100%", "A+", "Outstanding", grade === "A+" ? `${overallPercentage.toFixed(2)}%` : ""],
+            ["80% – 89%", "A", "Excellent", grade === "A" ? `${overallPercentage.toFixed(2)}%` : ""],
+            ["70% – 79%", "B", "Very Good", grade === "B" ? `${overallPercentage.toFixed(2)}%` : ""],
+            ["60% – 69%", "C", "Good", grade === "C" ? `${overallPercentage.toFixed(2)}%` : ""],
+            ["50% – 59%", "D", "Average", grade === "D" ? `${overallPercentage.toFixed(2)}%` : ""],
+            ["40% – 49%", "E", "Pass", grade === "E" ? `${overallPercentage.toFixed(2)}%` : ""],
+            ["Below 40%", "F", "Fail", grade === "F" ? `${overallPercentage.toFixed(2)}%` : ""]
         ];
 
         doc.autoTable({
-
             startY: currentY,
-
-            margin: {
-                left: marginLeft,
-                right: marginRight
-            },
-
+            margin: { left: marginLeft, right: marginRight },
             theme: "grid",
-
-            head: [[
-                "Percentage",
-                "Grade",
-                "Remark",
-                "Student's Percentage"
-            ]],
-
+            head: [["Percentage", "Grade", "Remark", "Student's Percentage"]],
             body: gradeRows,
-
             styles: {
-
                 font: "helvetica",
-
                 fontSize: 7,
-
                 fontStyle: "bold",
-
-                // VERY COMPACT
                 cellPadding: 1.05,
-
                 halign: "center",
-
                 valign: "middle",
-
-                textColor: [
-                    40,
-                    40,
-                    40
-                ]
+                textColor: [40, 40, 40]
             },
-
             headStyles: {
-
-                fillColor: [
-                    232,
-                    221,
-                    208
-                ],
-
-                textColor: [
-                    20,
-                    30,
-                    40
-                ],
-
+                fillColor: [232, 221, 208],
+                textColor: [20, 30, 40],
                 fontStyle: "bold",
-
                 cellPadding: 1.2
             },
-
-            alternateRowStyles: {
-
-                fillColor: [
-                    252,
-                    250,
-                    247
-                ]
-            }
+            alternateRowStyles: { fillColor: [252, 250, 247] }
         });
 
-        currentY =
-            doc.lastAutoTable.finalY + 2;
+        currentY = doc.lastAutoTable.finalY + 2;
 
-        // =====================================================
         // SIGNATURE / STAMP SECTION
-        // =====================================================
-
-        currentY =
-            ensureSpace(
-                currentY,
-                32
-            );
-
-        doc.setDrawColor(
-            180,
-            180,
-            180
-        );
-
+        currentY = ensureSpace(currentY, 32);
+        doc.setDrawColor(180, 180, 180);
         doc.setLineWidth(0.35);
-
-        doc.line(
-            marginLeft,
-            currentY,
-            pageWidth - marginRight,
-            currentY
-        );
-
+        doc.line(marginLeft, currentY, pageWidth - marginRight, currentY);
         currentY += 3;
-
-        // =====================================================
-        // COMPACT STAMPS
-        // =====================================================
 
         const stampWidth = 26;
         const stampHeight = 20;
-
-        const leftStampX =
-            marginLeft + 8;
-
-        const rightStampX =
-            pageWidth -
-            marginRight -
-            stampWidth -
-            8;
-
-        const stampY =
-            currentY;
+        const leftStampX = marginLeft + 8;
+        const rightStampX = pageWidth - marginRight - stampWidth - 8;
+        const stampY = currentY;
 
         if (leftStamp) {
-
-            doc.addImage(
-                leftStamp,
-                "PNG",
-                leftStampX,
-                stampY,
-                stampWidth,
-                stampHeight
-            );
+            doc.addImage(leftStamp, "PNG", leftStampX, stampY, stampWidth, stampHeight);
         }
-
         if (rightStamp) {
-
-            doc.addImage(
-                rightStamp,
-                "PNG",
-                rightStampX,
-                stampY,
-                stampWidth,
-                stampHeight
-            );
+            doc.addImage(rightStamp, "PNG", rightStampX, stampY, stampWidth, stampHeight);
         }
 
-        // =====================================================
-        // SIGNATURE LINES
-        // =====================================================
-
-        const signatureLineY =
-            stampY +
-            stampHeight +
-            4;
-
-        doc.setDrawColor(
-            50,
-            50,
-            50
-        );
-
+        const signatureLineY = stampY + stampHeight + 4;
+        doc.setDrawColor(50, 50, 50);
         doc.setLineWidth(0.35);
 
-        // LEFT
-        doc.line(
-            leftStampX - 4,
-            signatureLineY,
-            leftStampX + stampWidth + 4,
-            signatureLineY
-        );
+        doc.line(leftStampX - 4, signatureLineY, leftStampX + stampWidth + 4, signatureLineY);
+        const teacherCenter = pageWidth / 2;
+        doc.line(teacherCenter - 24, signatureLineY, teacherCenter + 24, signatureLineY);
+        doc.line(rightStampX - 4, signatureLineY, rightStampX + stampWidth + 4, signatureLineY);
 
-        // CENTER
-        const teacherCenter =
-            pageWidth / 2;
-
-        doc.line(
-            teacherCenter - 24,
-            signatureLineY,
-            teacherCenter + 24,
-            signatureLineY
-        );
-
-        // RIGHT
-        doc.line(
-            rightStampX - 4,
-            signatureLineY,
-            rightStampX + stampWidth + 4,
-            signatureLineY
-        );
-
-        // =====================================================
-        // SIGNATURE LABELS
-        // =====================================================
-
-        doc.setFont(
-            "helvetica",
-            "bold"
-        );
-
+        doc.setFont("helvetica", "bold");
         doc.setFontSize(7);
+        doc.setTextColor(45, 45, 45);
+        doc.text("Director Signature / Stamp", leftStampX + stampWidth / 2, signatureLineY + 4, { align: "center" });
+        doc.text("Class Teacher Signature", teacherCenter, signatureLineY + 4, { align: "center" });
+        doc.text("Principal Signature / Stamp", rightStampX + stampWidth / 2, signatureLineY + 4, { align: "center" });
 
-        doc.setTextColor(
-            45,
-            45,
-            45
-        );
-
-        doc.text(
-            "Director Signature / Stamp",
-            leftStampX +
-                stampWidth / 2,
-            signatureLineY + 4,
-            {
-                align: "center"
-            }
-        );
-
-        doc.text(
-            "Class Teacher Signature",
-            teacherCenter,
-            signatureLineY + 4,
-            {
-                align: "center"
-            }
-        );
-
-        doc.text(
-            "Principal Signature / Stamp",
-            rightStampX +
-                stampWidth / 2,
-            signatureLineY + 4,
-            {
-                align: "center"
-            }
-        );
-
-        // =====================================================
         // FOOTER ON ALL PAGES
-        // =====================================================
-
-        const totalPages =
-            doc.internal.getNumberOfPages();
-
-        for (
-            let page = 1;
-            page <= totalPages;
-            page++
-        ) {
-
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let page = 1; page <= totalPages; page++) {
             doc.setPage(page);
-
             drawFooter(page);
         }
 
-        // =====================================================
         // SAVE PDF
-        // =====================================================
-
-        const studentName =
-            cleanFileName(
-                student.studentName ||
-                "Student"
-            );
-
-        const className =
-            cleanFileName(
-                student.className ||
-                "Class"
-            );
-
-        const fileName =
-            `Result_${studentName}_${className}.pdf`;
-
+        const studentName = cleanFileName(student.studentName || "Student");
+        const className = cleanFileName(student.className || "Class");
+        const fileName = `Result_${studentName}_${className}.pdf`;
         doc.save(fileName);
 
-        // =====================================================
-        // RESET BUTTON
-        // =====================================================
-
         if (pdfBtn) {
-
             pdfBtn.disabled = false;
-
-            pdfBtn.textContent =
-                originalButtonText ||
-                "📄 Download PDF";
+            pdfBtn.innerHTML = originalButtonText || '<i class="fas fa-file-pdf"></i> Download PDF';
         }
 
     } catch (error) {
-
-        console.error(
-            "Result PDF generation error:",
-            error
-        );
-
-        alert(
-            "Could not generate Result PDF.\n\n" +
-            error.message
-        );
-
+        console.error("Result PDF generation error:", error);
+        alert("Could not generate Result PDF.\n\n" + error.message);
         if (pdfBtn) {
-
             pdfBtn.disabled = false;
-
-            pdfBtn.textContent =
-                originalButtonText ||
-                "📄 Download PDF";
+            pdfBtn.innerHTML = originalButtonText || '<i class="fas fa-file-pdf"></i> Download PDF';
         }
     }
 }
+        // ======================== EDIT MODAL ========================
+        function openEditModal(examIndex) {
+            const exam = currentStudentResults[examIndex];
+            if (!exam) { alert("❌ Exam data not found!"); return; }
+            window.editingExam = exam;
+            document.getElementById("editModalTitle").innerHTML = `<i class="fas fa-edit"></i> Edit Marks — ${escapeHtml(exam.exam)}`;
 
-// ======================== EDIT MODAL ========================
-function openEditModal(examIndex) {
-    if (isTeacherView) {
-        alert("🔒 Teachers ko sirf result dekhne ki permission hai, edit karne ki nahi.");
-        return;
-    }
-    const exam = currentStudentResults[examIndex];
-    if (!exam) { alert("❌ Exam data not found!"); return; }
-    window.editingExam = exam;
-    document.getElementById("editModalTitle").innerHTML = `<i class="fas fa-edit"></i> Edit Marks — ${escapeHtml(exam.exam)}`;
-    const rowsContainer = document.getElementById("editRows");
-    const subjects = (exam.marks && exam.marks.length) ? exam.marks : [{ subjectName: "", maxMarks: 0, obtainedMarks: 0 }];
-    rowsContainer.innerHTML = subjects.map((mark, i) => `
+            // Pre-fill division dropdown (manual value if set, else a suggestion based on %)
+            const divisionSelect = document.getElementById("editDivision");
+            const currentDivision = exam.division || getSuggestedDivision(exam.percentage || 0);
+            divisionSelect.value = ["Ist Division", "IInd Division", "IIIrd Division", "Fail"].includes(currentDivision)
+                ? currentDivision
+                : "";
+
+            const rowsContainer = document.getElementById("editRows");
+            const subjects = (exam.marks && exam.marks.length) ? exam.marks : [{ subjectName: "", maxMarks: 0, obtainedMarks: 0 }];
+            rowsContainer.innerHTML = subjects.map((mark, i) => `
         <div class="edit-row">
             <label><i class="fas fa-book" style="color:#f58a2e;margin-right:0.3rem;"></i> ${escapeHtml(mark.subjectName || "Subject " + (i + 1))}</label>
             <input type="number" min="0" id="editMax_${i}" value="${mark.maxMarks ?? 0}" placeholder="Max">
             <input type="number" min="0" id="editObtained_${i}" value="${mark.obtainedMarks ?? 0}" placeholder="Obtained">
+            <span style="font-size:0.7rem;color:#b09a7e;">${i + 1}</span>
         </div>
     `).join("");
-    window.editingExam._editSubjects = subjects.map(m => m.subjectName || "");
-    window.editingExam._examId = exam._id || exam.id;
-    document.getElementById("editModal").classList.add("show");
-}
-
-function closeEditModal() {
-    document.getElementById("editModal").classList.remove("show");
-    window.editingExam = null;
-}
-
-async function saveMarks() {
-    if (isTeacherView) {
-        alert("🔒 Teachers ko marks edit karne ki permission nahi hai.");
-        return;
-    }
-    const exam = window.editingExam;
-    if (!exam) { alert("❌ No exam data found!"); return; }
-    const subjectNames = exam._editSubjects || [];
-    const marks = subjectNames.map((subjectName, i) => ({
-        subjectName: subjectName,
-        maxMarks: Number(document.getElementById(`editMax_${i}`).value) || 0,
-        obtainedMarks: Number(document.getElementById(`editObtained_${i}`).value) || 0
-    }));
-    const saveBtn = document.getElementById("saveMarksBtn");
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-    try {
-        const updateData = {
-            exam: exam.exam,
-            className: exam.className,
-            studentMongoId: exam.studentMongoId,
-            studentId: exam.studentId || "",
-            studentName: exam.studentName || "",
-            rollNumber: exam.rollNumber || "",
-            admissionNumber: exam.admissionNumber || "",
-            fatherName: exam.fatherName || "",
-            motherName: exam.motherName || "",
-            marks: marks
-        };
-        const response = await fetch(`${API_URL}/${exam._examId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updateData)
-        });
-        const data = await response.json();
-        if (!data.success) {
-            alert("❌ " + (data.message || "Unable to update marks."));
-            return;
+            window.editingExam._editSubjects = subjects.map(m => m.subjectName || "");
+            window.editingExam._examId = exam._id || exam.id;
+            document.getElementById("editModal").classList.add("show");
         }
-        alert("✅ Marks updated successfully!");
-        const studentMongoId = exam.studentMongoId;
-        closeEditModal();
-        await loadData(true);
-        setTimeout(() => showResult(studentMongoId), 100);
-    } catch (error) {
-        console.error("❌ Save error:", error);
-        alert("❌ Unable to update marks: " + error.message);
-    } finally {
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
-    }
-}
 
-// ======================== KEYBOARD ESC ========================
-document.addEventListener("keydown", function(e) {
-    if (e.key === "Escape") closeEditModal();
-});
+        function closeEditModal() {
+            document.getElementById("editModal").classList.remove("show");
+            window.editingExam = null;
+        }
 
-// ======================== ESCAPE HTML ========================
-function escapeHtml(value) {
-    return String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+        async function saveMarks() {
+            const exam = window.editingExam;
+            if (!exam) { alert("❌ No exam data found!"); return; }
+            const subjectNames = exam._editSubjects || [];
+            const marks = subjectNames.map((subjectName, i) => ({
+                subjectName: subjectName,
+                maxMarks: Number(document.getElementById(`editMax_${i}`).value) || 0,
+                obtainedMarks: Number(document.getElementById(`editObtained_${i}`).value) || 0
+            }));
+            const division = document.getElementById("editDivision").value || "";
+            const saveBtn = document.getElementById("saveMarksBtn");
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            try {
+                const updateData = {
+                    exam: exam.exam,
+                    className: exam.className,
+                    studentMongoId: exam.studentMongoId,
+                    studentId: exam.studentId || "",
+                    studentName: exam.studentName || "",
+                    rollNumber: exam.rollNumber || "",
+                    admissionNumber: exam.admissionNumber || "",
+                    fatherName: exam.fatherName || "",
+                    motherName: exam.motherName || "",
+                    marks: marks,
+                    division: division
+                };
+                const response = await fetch(`${API_URL}/${exam._examId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updateData)
+                });
+                const data = await response.json();
+                if (!data.success) {
+                    alert("❌ " + (data.message || "Unable to update marks."));
+                    return;
+                }
+                alert("✅ Marks & Division updated successfully!");
+                const studentMongoId = exam.studentMongoId;
+                closeEditModal();
+                await loadData(true);
+                setTimeout(() => showResult(studentMongoId), 100);
+            } catch (error) {
+                console.error("❌ Save error:", error);
+                alert("❌ Unable to update marks: " + error.message);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+            }
+        }
 
-// ======================== START ========================
-if (isTeacherView) {
-    document.getElementById("teacherViewBadge").classList.remove("hidden");
-}
-loadData();
-</script>
+        // ======================== KEYBOARD ESC ========================
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") closeEditModal();
+        });
+
+        // ======================== ESCAPE HTML ========================
+        function escapeHtml(value) {
+            return String(value || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // ======================== START ========================
+        loadData();
+    </script>
 </body>
+
 </html>

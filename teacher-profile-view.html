@@ -705,6 +705,7 @@
 
     // Reset-password panel state
     let resetPanelOpen = false;
+    let pwVisible = false;
 
     // Holds the last successfully fetched teacher record, used by the delete confirm dialog
     let currentTeacher = null;
@@ -753,6 +754,8 @@
     }
 
     function displayTeacher(teacher) {
+        pwVisible = false;
+
         // Update sidebar
         const initials = (teacher.name || 'T').charAt(0).toUpperCase();
         document.getElementById("avatarIcon").innerHTML = initials;
@@ -823,12 +826,20 @@
 
         let profileHTML = '';
         if (teacher.profile && typeof teacher.profile === 'object') {
+            const profileLabels = {
+                dob: 'Date of Birth',
+                emergencyContact: 'Emergency Contact',
+                bloodGroup: 'Blood Group'
+            };
             Object.entries(teacher.profile).forEach(([key, value]) => {
+                if (key === 'profilePhoto') return;
                 if (value) {
+                    const label = profileLabels[key] || formatText(key);
+                    const displayValue = key === 'dob' ? formatDate(value) : value;
                     profileHTML += `
                         <div class="info-item">
-                            <span class="label">${formatText(key)}</span>
-                            <span class="value">${value}</span>
+                            <span class="label">${label}</span>
+                            <span class="value">${displayValue}</span>
                         </div>
                     `;
                 }
@@ -851,6 +862,7 @@
                 <div class="info-item"><span class="label">Father Name</span><span class="value">${teacher.fatherName || '-'}</span></div>
                 <div class="info-item"><span class="label">Department</span><span class="value">${teacher.department || '-'}</span></div>
                 <div class="info-item"><span class="label">Mother Name</span><span class="value">${teacher.motherName || '-'}</span></div>
+                <div class="info-item"><span class="label">Husband Name</span><span class="value">${teacher.husbandName || '-'}</span></div>
                 <div class="info-item"><span class="label">Email</span><span class="value">${teacher.email || '-'}</span></div>
                 <div class="info-item"><span class="label">Phone</span><span class="value">${teacher.phone || '-'}</span></div>
                 <div class="info-item"><span class="label">Gender</span><span class="value">${teacher.gender || '-'}</span></div>
@@ -862,7 +874,10 @@
                     <span class="label"><i class="fas fa-key"></i> Password</span>
                     <span class="value">
                         <div class="password-value">
-                            <span class="pw-text">••••••••</span>
+                            <span class="pw-text" id="pwText">••••••••</span>
+                            <button class="btn-reset-pw" onclick="togglePwVisibility()" id="pwToggleBtn" title="Show/hide password">
+                                <i class="fas fa-eye"></i> Show
+                            </button>
                             <button class="btn-reset-pw" onclick="toggleResetPanel()" title="Reset this teacher's password">
                                 <i class="fas fa-rotate"></i> Reset Password
                             </button>
@@ -901,6 +916,26 @@
     // ==========================================
     // RESET PASSWORD PANEL
     // ==========================================
+
+    function togglePwVisibility() {
+        const pwText = document.getElementById('pwText');
+        const btn = document.getElementById('pwToggleBtn');
+        if (!pwText || !currentTeacher) return;
+
+        pwVisible = !pwVisible;
+
+        if (pwVisible) {
+            pwText.textContent = currentTeacher.password || '(not set)';
+            pwText.style.color = '#2d1f0c';
+            pwText.style.letterSpacing = 'normal';
+            btn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+        } else {
+            pwText.textContent = '••••••••';
+            pwText.style.color = '';
+            pwText.style.letterSpacing = '2px';
+            btn.innerHTML = '<i class="fas fa-eye"></i> Show';
+        }
+    }
 
     function toggleResetPanel() {
         resetPanelOpen = !resetPanelOpen;
@@ -953,6 +988,15 @@
 
             msg.textContent = 'Password reset successfully.';
             msg.className = 'reset-pw-msg success';
+
+            if (currentTeacher) {
+                currentTeacher.password = newPassword;
+            }
+            if (pwVisible) {
+                togglePwVisibility();
+                togglePwVisibility();
+            }
+
             input.value = '';
 
             setTimeout(() => {

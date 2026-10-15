@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sunshine · All Class Syllabus</title>
+
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+  <style>
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
+
+    body {
+      background: #f7f3ed;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .page-header {
+      background: white;
+      border-radius: 32px;
+      padding: 1.2rem 2rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,.02);
+      border: 1px solid rgba(245,138,46,.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .page-header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2d1f0c;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .page-header h1 i {
+      color: #f58a2e;
+      background: #fcf3e8;
+      padding: .3rem .6rem;
+      border-radius: 16px;
+      font-size: 1.2rem;
+    }
+
+    .btn-action {
+      padding: .5rem 1.2rem;
+      border: none;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: .8rem;
+      cursor: pointer;
+      transition: .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      text-decoration: none;
+    }
+
+    .btn-action:hover { transform: scale(1.02); }
+
+    .btn-back {
+      background: #fcf3e8;
+      color: #f58a2e;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg,#f58a2e,#f9b042);
+      color: white;
+    }
+
+    .search-section {
+      background: white;
+      border-radius: 60px;
+      padding: .8rem 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,.02);
+      border: 1px solid rgba(245,138,46,.06);
+    }
+
+    .search-section input {
+      border: none;
+      outline: none;
+      flex: 1;
+      font-size: .9rem;
+      background: transparent;
+    }
+
+    .search-section i { color: #f58a2e; }
+
+    .class-accordion {
+      background: white;
+      border-radius: 24px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,.02);
+      border: 1px solid rgba(245,138,46,.06);
+    }
+
+    .class-accordion-head {
+      padding: 1rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .class-accordion-head h2 {
+      font-size: 1.1rem;
+      color: #2d1f0c;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .class-accordion-head h2 i {
+      color: #f58a2e;
+      background: #fcf3e8;
+      padding: .35rem .55rem;
+      border-radius: 12px;
+      font-size: 1rem;
+    }
+
+    .class-accordion-head .chev {
+      color: #a68a5e;
+      transition: .2s;
+    }
+
+    .class-accordion.open .chev {
+      transform: rotate(180deg);
+    }
+
+    .class-accordion-body {
+      display: none;
+      padding: 0 1.4rem 1.4rem;
+    }
+
+    .class-accordion.open .class-accordion-body {
+      display: block;
+    }
+
+    .term-block {
+      background: #fcf9f4;
+      border: 1px solid #f0e2d2;
+      border-radius: 16px;
+      padding: .9rem 1.1rem;
+      margin-bottom: .7rem;
+    }
+
+    .term-block h4 {
+      font-size: .9rem;
+      color: #2d1f0c;
+      margin-bottom: .5rem;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    .term-block h4 i { color: #f58a2e; }
+
+    .term-item {
+      padding: .4rem 0;
+      border-bottom: 1px dashed #e6d4bb;
+      font-size: .85rem;
+      color: #4a3c26;
+    }
+
+    .term-item:last-child { border-bottom: none; }
+    .term-item strong { color: #2d1f0c; }
+
+    .empty-note {
+      color: #a68a5e;
+      font-size: .8rem;
+      padding: .3rem 0;
+    }
+
+    .loading-state, .no-results {
+      background: white;
+      border-radius: 24px;
+      padding: 3rem 1rem;
+      text-align: center;
+      color: #7f6a4b;
+    }
+
+    .loading-state .spinner {
+      font-size: 2rem;
+      color: #f58a2e;
+      margin-bottom: .8rem;
+    }
+
+    .footer-note {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .6rem;
+      color: #a68a5e;
+      font-size: .8rem;
+      padding: 1.5rem 0.5rem 0;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="page-header">
+    <h1><i class="fas fa-book-open"></i> All Class Syllabus</h1>
+    <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
+      <button type="button" id="downloadAllBtn" class="btn-action btn-primary">
+        <i class="fas fa-file-pdf"></i> Download All (PDF)
+      </button>
+      <a href="javascript:history.back()" class="btn-action btn-back">
+        <i class="fas fa-arrow-left"></i> Back
+      </a>
+    </div>
+  </div>
+
+  <div class="search-section">
+    <i class="fas fa-search"></i>
+    <input type="text" id="searchInput" placeholder="Search class (e.g. 5, Nursery, 10)...">
+  </div>
+
+  <div id="syllabusContainer">
+    <div class="loading-state">
+      <div class="spinner"><i class="fas fa-circle-notch fa-spin"></i></div>
+      <p>Loading syllabus for all classes...</p>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
+    <span><i class="fas fa-lock"></i> secure · syllabus records</span>
+  </div>
+
+</div>
+
+<script>
+
+const API_URL = "https://sunshine-swp6.onrender.com"; // Change this to your actual API URL
+
+const SYLLABUS_TERMS = [
+  { key: "unit1",      label: "Unit 1",      icon: "fa-1" },
+  { key: "unit2",      label: "Unit 2",      icon: "fa-2" },
+  { key: "halfYearly", label: "Half Yearly", icon: "fa-calendar-check" },
+  { key: "unit3",      label: "Unit 3",      icon: "fa-3" },
+  { key: "unit4",      label: "Unit 4",      icon: "fa-4" },
+  { key: "annual",     label: "Annual",      icon: "fa-trophy" }
+];
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function getClassDisplayName(className) {
+  if (!className) return "N/A";
+  if (["Nursery", "LKG", "UKG"].includes(className)) return className;
+  return `Class ${className}`;
+}
+
+// className -> terms data, PDF banane ke liye yahi se uthayenge
+const syllabusDataStore = {};
+
+function buildPivotedSyllabusRows(terms) {
+
+  const subjectOrder = [];
+  const subjectMap = {};
+
+  SYLLABUS_TERMS.forEach((term) => {
+
+    const termRows = (terms && terms[term.key]) ? terms[term.key] : [];
+
+    termRows.forEach((row) => {
+
+      const subj = row.subject || "-";
+
+      if (!subjectMap[subj]) {
+        subjectMap[subj] = {};
+        subjectOrder.push(subj);
+      }
+
+      let cell = (row.chapterFrom || row.chapterTo)
+        ? `Ch ${row.chapterFrom || "-"} to ${row.chapterTo || "-"}`
+        : "-";
+
+      if (row.extra) {
+        cell = (cell === "-") ? row.extra : `${cell} (${row.extra})`;
+      }
+
+      subjectMap[subj][term.key] = cell;
+
+    });
+
+  });
+
+  return subjectOrder.map((subj) => {
+    const row = [subj];
+    SYLLABUS_TERMS.forEach((term) => {
+      row.push(subjectMap[subj][term.key] || "-");
+    });
+    return row;
+  });
+
+}
+
+function generateSyllabusPdf(className, terms) {
+
+  if (!window.jspdf) {
+    alert("PDF library load nahi hui, page reload karke try karo.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape", "pt", "a4");
+
+  let rows = buildPivotedSyllabusRows(terms);
+
+  if (rows.length === 0) {
+    rows = [["-", "-", "-", "-", "-", "-", "-"]];
+  }
+
+  const headers = [["Subject", ...SYLLABUS_TERMS.map(t => t.label)]];
+
+  doc.autoTable({
+    head: headers,
+    body: rows,
+    theme: "grid",
+    startY: 40,
+    margin: { left: 25, right: 25, top: 40, bottom: 25 },
+
+    styles: {
+      font: "helvetica",
+      fontSize: 8.5,
+      cellPadding: 5,
+      textColor: [0, 0, 0],
+      lineColor: [0, 0, 0],
+      lineWidth: 0.5,
+      overflow: "linebreak",
+      valign: "middle"
+    },
+
+    headStyles: {
+      fillColor: [245, 138, 46],
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+      fontSize: 9.5,
+      halign: "center"
+    },
+
+    columnStyles: {
+      0: { cellWidth: 100, fontStyle: "bold" }
+    },
+
+    didDrawPage: function () {
+      doc.setTextColor(0, 0, 0);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.text(`Syllabus - ${getClassDisplayName(className)} [Sunshine School]`, 25, 26);
+
+      const pageNumber = doc.internal.getNumberOfPages();
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.text(`Page ${pageNumber}`, doc.internal.pageSize.getWidth() - 60, 26);
+    }
+  });
+
+  doc.save(`Syllabus_${className}.pdf`);
+
+}
+
+function generateAllSyllabusPdf() {
+
+  const classNames = Object.keys(syllabusDataStore);
+
+  if (classNames.length === 0) {
+    alert("No syllabus data to export.");
+    return;
+  }
+
+  if (!window.jspdf) {
+    alert("PDF library load nahi hui, page reload karke try karo.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape", "pt", "a4");
+
+  const headers = [["Subject", ...SYLLABUS_TERMS.map(t => t.label)]];
+
+  let currentClassLabel = "";
+
+  classNames.forEach((className, idx) => {
+
+    currentClassLabel = getClassDisplayName(className);
+
+    let rows = buildPivotedSyllabusRows(syllabusDataStore[className]);
+
+    if (rows.length === 0) {
+      rows = [["-", "-", "-", "-", "-", "-", "-"]];
+    }
+
+    if (idx > 0) {
+      doc.addPage();
+    }
+
+    doc.autoTable({
+      head: headers,
+      body: rows,
+      theme: "grid",
+      startY: 40,
+      margin: { left: 25, right: 25, top: 40, bottom: 25 },
+
+      styles: {
+        font: "helvetica",
+        fontSize: 8.5,
+        cellPadding: 5,
+        textColor: [0, 0, 0],
+        lineColor: [0, 0, 0],
+        lineWidth: 0.5,
+        overflow: "linebreak",
+        valign: "middle"
+      },
+
+      headStyles: {
+        fillColor: [245, 138, 46],
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+        fontSize: 9.5,
+        halign: "center"
+      },
+
+      columnStyles: {
+        0: { cellWidth: 100, fontStyle: "bold" }
+      },
+
+      didDrawPage: function () {
+        doc.setTextColor(0, 0, 0);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(13);
+        doc.text(`Syllabus - ${currentClassLabel} [Sunshine School]`, 25, 26);
+
+        const pageNumber = doc.internal.getNumberOfPages();
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.text(`Page ${pageNumber}`, doc.internal.pageSize.getWidth() - 60, 26);
+      }
+    });
+
+  });
+
+  doc.save(`Syllabus_All_Classes.pdf`);
+
+}
+
+function buildTermsHtml(terms) {
+
+  terms = terms || {};
+  let html = "";
+  let anyData = false;
+
+  SYLLABUS_TERMS.forEach((term) => {
+
+    const rows = terms[term.key] || [];
+
+    html += `<div class="term-block"><h4><i class="fas ${term.icon}"></i> ${term.label}</h4>`;
+
+    if (rows.length === 0) {
+      html += `<div class="empty-note">No syllabus added yet for ${term.label}.</div>`;
+    } else {
+      anyData = true;
+      rows.forEach((row) => {
+        const range = (row.chapterFrom || row.chapterTo)
+          ? ` (Chapter ${escapeHtml(row.chapterFrom || "-")} to ${escapeHtml(row.chapterTo || "-")})`
+          : "";
+        const extraText = row.extra ? ` — ${escapeHtml(row.extra)}` : "";
+        html += `<div class="term-item"><strong>${escapeHtml(row.subject)}</strong>${range}${extraText}</div>`;
+      });
+    }
+
+    html += `</div>`;
+
+  });
+
+  return { html, anyData };
+
+}
+
+function buildClassAccordion(className, syllabus) {
+
+  const { html: termsHtml, anyData } = buildTermsHtml(syllabus ? syllabus.terms : null);
+
+  syllabusDataStore[className] = syllabus ? syllabus.terms : {};
+
+  const wrap = document.createElement("div");
+  wrap.className = "class-accordion";
+  wrap.dataset.className = className.toLowerCase();
+
+  wrap.innerHTML = `
+    <div class="class-accordion-head">
+      <h2><i class="fas fa-layer-group"></i> ${escapeHtml(getClassDisplayName(className))}</h2>
+      <div style="display:flex;align-items:center;gap:.7rem;">
+        <button type="button" class="syllabus-download-btn" data-class="${escapeHtml(className)}"
+          style="background:#fcf3e8;color:#f58a2e;border:1px solid rgba(245,138,46,.2);padding:.4rem .8rem;border-radius:60px;font-weight:600;font-size:.75rem;cursor:pointer;display:inline-flex;align-items:center;gap:.35rem;">
+          <i class="fas fa-file-pdf"></i> PDF
+        </button>
+        <i class="fas fa-chevron-down chev"></i>
+      </div>
+    </div>
+    <div class="class-accordion-body">
+      ${anyData ? "" : `<p class="empty-note" style="margin-bottom:.6rem;"><i class="fas fa-info-circle"></i> Is class ka abhi tak koi syllabus save nahi hua.</p>`}
+      ${termsHtml}
+    </div>
+  `;
+
+  wrap.querySelector(".class-accordion-head").addEventListener("click", function(e) {
+    if (e.target.closest(".syllabus-download-btn")) return;
+    wrap.classList.toggle("open");
+  });
+
+  wrap.querySelector(".syllabus-download-btn").addEventListener("click", function(e) {
+    e.stopPropagation();
+    generateSyllabusPdf(className, syllabusDataStore[className]);
+  });
+
+  return wrap;
+
+}
+
+async function loadAllSyllabus() {
+
+  const container = document.getElementById("syllabusContainer");
+
+  try {
+
+    const [classesRes, syllabusRes] = await Promise.all([
+      fetch(`${API_URL}/api/classes`),
+      fetch(`${API_URL}/api/syllabus`)
+    ]);
+
+    const classesData = await classesRes.json();
+    const syllabusData = await syllabusRes.json();
+
+    const classList = (classesData.success && classesData.classes) ? classesData.classes : [];
+    const syllabusList = (syllabusData.success && syllabusData.syllabus) ? syllabusData.syllabus : [];
+
+    const syllabusMap = {};
+    syllabusList.forEach((s) => {
+      syllabusMap[s.className] = s;
+    });
+
+    container.innerHTML = "";
+
+    if (classList.length === 0) {
+      container.innerHTML = `<div class="no-results"><i class="fas fa-info-circle" style="font-size:1.5rem;color:#f58a2e;"></i><p style="margin-top:.6rem;">No classes found.</p></div>`;
+      return;
+    }
+
+    classList.forEach((cls) => {
+      const accordion = buildClassAccordion(cls.name, syllabusMap[cls.name] || null);
+      container.appendChild(accordion);
+    });
+
+  } catch (error) {
+
+    console.error("Load all syllabus error:", error);
+    container.innerHTML = `<div class="no-results"><i class="fas fa-triangle-exclamation" style="font-size:1.5rem;color:#c0392b;"></i><p style="margin-top:.6rem;">Unable to load syllabus. Please try again.</p></div>`;
+
+  }
+
+}
+
+document.getElementById("searchInput").addEventListener("input", function() {
+
+  const term = this.value.trim().toLowerCase();
+  const cards = document.querySelectorAll(".class-accordion");
+
+  let visibleCount = 0;
+
+  cards.forEach((card) => {
+    const match = card.dataset.className.includes(term);
+    card.style.display = match ? "" : "none";
+    if (match) visibleCount++;
+  });
+
+});
+
+document.getElementById("downloadAllBtn").addEventListener("click", generateAllSyllabusPdf);
+
+document.addEventListener("DOMContentLoaded", loadAllSyllabus);
+
+</script>
+
+</body>
+</html>

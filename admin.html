@@ -2,6 +2,14 @@
 <html lang="en">
 
 <head>
+  <script>
+    // AUTH GUARD — direct URL se andar aane se roko
+    // agar index.html se admin login karke nahi aaya, wapas bhejo
+    if (sessionStorage.getItem("isAdminLoggedIn") !== "true") {
+      window.location.replace("index.html");
+    }
+  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -251,6 +259,37 @@
       color: #f58a2e;
       margin-right: .6rem;
     }
+
+
+    .class-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: .5rem;
+  margin-top: .6rem;
+  flex-wrap: wrap;
+}
+
+.class-actions .view-btn {
+  margin-top: 0;
+}
+
+.edit-class-btn {
+  padding: .3rem 1rem;
+  border: none;
+  border-radius: 30px;
+  background: #fff3df;
+  color: #d97d22;
+  font-weight: 600;
+  font-size: .7rem;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.edit-class-btn:hover {
+  background: #f58a2e;
+  color: white;
+}
 
     .page-header .sub {
       color: #7f6a4b;
@@ -632,7 +671,7 @@
             Download PDF
         </button>
 
-      <a href="index.html" class="logout-btn">
+      <a href="index.html" class="logout-btn" onclick="sessionStorage.removeItem('isAdminLoggedIn');">
         <i class="fas fa-arrow-right-from-bracket"></i>
         Logout
       </a>
@@ -720,6 +759,14 @@
         <a href="attendance.html">
           <i class="fas fa-calendar-days"></i>
           Attendance
+        </a>
+        <a href="teacher-attendance.html">
+          <i class="fas fa-calendar-days"></i>
+          Teacher Attendance
+        </a>
+        <a href="view-syllabus.html">
+          <i class="fas fa-calendar-days"></i>
+          View Syllabus
         </a>
 
         <a href="result.html">
@@ -1097,6 +1144,91 @@
   </div>
 
 
+  <!-- EDIT CLASS MODAL -->
+
+<div class="modal-overlay" id="editClassModal">
+
+  <div class="modal">
+
+    <div class="modal-header">
+
+      <h3>
+        <i class="fas fa-pen" style="color:#f58a2e;"></i>
+        Edit Class
+      </h3>
+
+      <button
+        type="button"
+        class="close-modal"
+        onclick="closeEditClassModal()">
+
+        <i class="fas fa-times"></i>
+
+      </button>
+
+    </div>
+
+
+    <form id="editClassForm">
+
+      <input
+        type="hidden"
+        id="editClassId">
+
+
+      <div class="form-group">
+
+        <label>
+          Class Name
+        </label>
+
+        <input
+          type="text"
+          id="editClassNameInput"
+          placeholder="Enter class name"
+          maxlength="100"
+          required>
+
+      </div>
+
+
+      <div
+        class="modal-message"
+        id="editClassMessage">
+      </div>
+
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          class="cancel-btn"
+          onclick="closeEditClassModal()">
+
+          Cancel
+
+        </button>
+
+
+        <button
+          type="submit"
+          class="save-btn"
+          id="editClassSubmit">
+
+          <i class="fas fa-save"></i>
+          Save Changes
+
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
   <script>
 
     const API_URL =
@@ -1116,6 +1248,198 @@
         }
       );
 
+
+
+
+      /* ============================================================
+   EDIT CLASS
+   ============================================================ */
+
+function openEditClassModal(classData) {
+
+  document.getElementById("editClassId").value =
+    classData.id;
+
+  document.getElementById("editClassNameInput").value =
+    classData.name;
+
+  document.getElementById("editClassMessage").textContent =
+    "";
+
+  document
+    .getElementById("editClassModal")
+    .classList.add("show");
+
+  document
+    .getElementById("editClassNameInput")
+    .focus();
+}
+
+
+function closeEditClassModal() {
+
+  document
+    .getElementById("editClassModal")
+    .classList.remove("show");
+
+  document
+    .getElementById("editClassForm")
+    .reset();
+
+  document
+    .getElementById("editClassMessage")
+    .textContent = "";
+}
+
+
+/* ============================================================
+   SUBMIT EDIT
+   ============================================================ */
+
+document
+  .getElementById("editClassForm")
+  .addEventListener(
+    "submit",
+    async function (e) {
+
+      e.preventDefault();
+
+
+      const id =
+        document.getElementById("editClassId").value;
+
+      const input =
+        document.getElementById("editClassNameInput");
+
+      const message =
+        document.getElementById("editClassMessage");
+
+      const button =
+        document.getElementById("editClassSubmit");
+
+
+      const name =
+        input.value.trim();
+
+
+      if (!id) {
+
+        message.textContent =
+          "Class ID is missing.";
+
+        message.style.color =
+          "#d9534f";
+
+        return;
+      }
+
+
+      if (!name) {
+
+        message.textContent =
+          "Please enter class name.";
+
+        message.style.color =
+          "#d9534f";
+
+        return;
+      }
+
+
+      button.disabled = true;
+
+      button.innerHTML =
+        `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+
+
+      try {
+
+        const response =
+          await fetch(
+            `${API_URL}/api/classes/${encodeURIComponent(id)}`,
+            {
+              method: "PUT",
+
+              headers: {
+                "Content-Type": "application/json"
+              },
+
+              body: JSON.stringify({
+                name: name
+              })
+            }
+          );
+
+
+        const data =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            data.message ||
+            "Unable to update class"
+          );
+
+        }
+
+
+        closeEditClassModal();
+
+
+        await loadClasses();
+
+
+        alert(
+          `Class renamed to "${name}" successfully.`
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Edit class error:",
+          error
+        );
+
+
+        message.textContent =
+          error.message;
+
+        message.style.color =
+          "#d9534f";
+
+
+      } finally {
+
+        button.disabled = false;
+
+        button.innerHTML =
+          `<i class="fas fa-save"></i> Save Changes`;
+
+      }
+
+    }
+  );
+
+
+/* ============================================================
+   EDIT MODAL OUTSIDE CLICK
+   ============================================================ */
+
+document
+  .getElementById("editClassModal")
+  .addEventListener(
+    "click",
+    function (e) {
+
+      if (e.target === this) {
+        closeEditClassModal();
+      }
+
+    }
+  );
 
     /* DROPDOWN */
 
@@ -1367,14 +1691,31 @@
 
   </div>
 
-  <a
-    href="class.html?class=${encodedName}"
+  <div class="class-actions">
+
+  <a 
+    href="class.html?class=${encodedName}" 
     class="view-btn">
 
     <i class="fas fa-eye"></i>
     View Class
 
   </a>
+
+  <button
+    type="button"
+    class="edit-class-btn"
+    onclick='openEditClassModal(${JSON.stringify({
+      id: cls._id,
+      name: className
+    })})'>
+
+    <i class="fas fa-pen"></i>
+    Edit
+
+  </button>
+
+</div>
 `;
 
 

@@ -1,550 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sunshine · Attendance Report</title>
-    <!-- Font Awesome 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-        }
-
-        body {
-            background: #f7f3ed;
-            min-height: 100vh;
-            padding: 1.5rem;
-        }
-
-        .container {
-            max-width: 1360px;
-            margin: 0 auto;
-        }
-
-        /* header */
-        .page-header {
-            background: white;
-            border-radius: 32px;
-            padding: 1.2rem 2rem;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
-            border: 1px solid rgba(245, 138, 46, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.8rem;
-        }
-
-        .page-header h1 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #2d1f0c;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .page-header h1 i {
-            color: #f58a2e;
-            background: #fcf3e8;
-            padding: 0.3rem 0.6rem;
-            border-radius: 16px;
-            font-size: 1.2rem;
-        }
-
-        .page-header .badge {
-            background: #fcf3e8;
-            color: #7f6a4b;
-            padding: 0.3rem 1.2rem;
-            border-radius: 60px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            border: 1px solid rgba(245, 138, 46, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .page-header .badge i {
-            color: #f58a2e;
-        }
-
-        /* layout */
-        .report-layout {
-            display: grid;
-            grid-template-columns: 220px 1fr;
-            gap: 1.8rem;
-            align-items: start;
-        }
-
-        /* sidebar */
-        .sidebar {
-            background: white;
-            border-radius: 28px;
-            padding: 1.5rem 1rem;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
-            border: 1px solid rgba(245, 138, 46, 0.06);
-            position: sticky;
-            top: 1.5rem;
-        }
-
-        .sidebar-title {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #b8a58b;
-            font-weight: 700;
-            margin-bottom: 1.2rem;
-            padding-left: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .sidebar-title i {
-            color: #f58a2e;
-        }
-
-        .sidebar-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 0.2rem;
-        }
-
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            padding: 0.5rem 0.9rem;
-            border-radius: 14px;
-            color: #4d3e2b;
-            font-weight: 500;
-            font-size: 0.82rem;
-            text-decoration: none;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-            cursor: pointer;
-        }
-
-        .sidebar-nav a i {
-            width: 1.3rem;
-            color: #b8a58b;
-            font-size: 0.85rem;
-            transition: color 0.2s;
-        }
-
-        .sidebar-nav a:hover {
-            background: #fcf3e8;
-            border-color: #f9dbb8;
-            color: #f58a2e;
-        }
-
-        .sidebar-nav a:hover i {
-            color: #f58a2e;
-        }
-
-        .sidebar-nav a.active {
-            background: #fcf3e8;
-            border-color: #f9b042;
-            color: #d97d22;
-            font-weight: 600;
-        }
-
-        .sidebar-nav a.active i {
-            color: #f58a2e;
-        }
-
-        .sidebar-divider {
-            height: 1px;
-            background: linear-gradient(to right, #f0e2d2, transparent);
-            margin: 0.8rem 0.5rem;
-        }
-
-        /* main content */
-        .main-content {
-            background: white;
-            border-radius: 28px;
-            padding: 2rem 2.2rem;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
-            border: 1px solid rgba(245, 138, 46, 0.06);
-        }
-
-        /* filters */
-        .filters-section {
-            background: #fcf9f4;
-            border-radius: 20px;
-            padding: 1.2rem 1.5rem;
-            margin-bottom: 1.8rem;
-            border: 1px solid rgba(245, 138, 46, 0.06);
-        }
-
-        .filters-section .filter-title {
-            font-weight: 600;
-            color: #3d2e1b;
-            margin-bottom: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .filters-section .filter-title i {
-            color: #f58a2e;
-        }
-
-        .filter-row {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .filter-group label {
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: #3d2e1b;
-        }
-
-        .filter-group input,
-        .filter-group select {
-            padding: 0.5rem 0.9rem;
-            border: 1.5px solid #f0e2d2;
-            border-radius: 14px;
-            font-size: 0.85rem;
-            background: white;
-            outline: none;
-            color: #2d1f0c;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .filter-group input:focus,
-        .filter-group select:focus {
-            border-color: #f58a2e;
-            box-shadow: 0 0 0 3px rgba(245, 138, 46, 0.06);
-        }
-
-        .filter-group input {
-            width: 160px;
-        }
-
-        .btn-fetch {
-            padding: 0.5rem 1.8rem;
-            border: none;
-            border-radius: 60px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: linear-gradient(135deg, #f58a2e, #f9b042);
-            color: white;
-            box-shadow: 0 4px 12px rgba(245, 138, 46, 0.2);
-        }
-
-        .btn-fetch:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 20px rgba(245, 138, 46, 0.3);
-        }
-
-        .btn-fetch:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* summary cards */
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.8rem;
-        }
-
-        .summary-card {
-            background: #fcf9f4;
-            border-radius: 20px;
-            padding: 1rem 1.2rem;
-            border: 1px solid rgba(245, 138, 46, 0.04);
-            text-align: center;
-            transition: all 0.2s;
-        }
-
-        .summary-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(245, 138, 46, 0.04);
-        }
-
-        .summary-card .number {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #2d1f0c;
-            line-height: 1.2;
-        }
-
-        .summary-card .label {
-            font-size: 0.7rem;
-            color: #7f6a4b;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            margin-top: 0.2rem;
-        }
-
-        .summary-card .icon {
-            font-size: 1.4rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .summary-card.primary .icon { color: #f58a2e; }
-        .summary-card.success .icon { color: #2b7a3a; }
-        .summary-card.danger .icon { color: #b53b2e; }
-        .summary-card.info .icon { color: #1565c0; }
-
-        .summary-card .number.green { color: #2b7a3a; }
-        .summary-card .number.red { color: #b53b2e; }
-        .summary-card .number.orange { color: #e67e22; }
-
-        /* report meta */
-        .report-meta {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            padding: 0.5rem 0 1rem 0;
-            border-bottom: 1px solid #f0e2d2;
-            margin-bottom: 1.2rem;
-        }
-
-        .report-meta .meta-item {
-            font-size: 0.85rem;
-            color: #4d3e2b;
-        }
-
-        .report-meta .meta-item strong {
-            color: #2d1f0c;
-        }
-
-        .report-meta .meta-item i {
-            color: #f58a2e;
-            margin-right: 0.3rem;
-        }
-
-        /* student list */
-        .student-table-wrap {
-            overflow-x: auto;
-        }
-
-        .student-table {
-            width: 100%;
-            border-collapse: collapse;
-            border-radius: 16px;
-            overflow: hidden;
-            font-size: 0.88rem;
-        }
-
-        .student-table th {
-            background: #f0e2d2;
-            color: #3d2e1b;
-            font-weight: 700;
-            padding: 0.6rem 1rem;
-            text-align: left;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .student-table td {
-            padding: 0.5rem 1rem;
-            border-bottom: 1px solid #f0e2d2;
-        }
-
-        .student-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .student-table tr:hover td {
-            background: #fcf9f4;
-        }
-
-        .status-badge {
-            padding: 0.15rem 0.8rem;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            display: inline-block;
-        }
-
-        .status-badge.present {
-            background: #e8f5e9;
-            color: #2b7a3a;
-        }
-
-        .status-badge.absent {
-            background: #fce4e0;
-            color: #b53b2e;
-        }
-
-        .status-badge.unknown {
-            background: #f0e2d2;
-            color: #7f6a4b;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 2.5rem 1rem;
-            color: #b09a7e;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            color: #f0e2d2;
-            margin-bottom: 0.5rem;
-        }
-
-        .empty-state h3 {
-            color: #2d1f0c;
-            font-size: 1.1rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .loading-state {
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .loading-state .spinner {
-            font-size: 2rem;
-            color: #f58a2e;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-state p {
-            color: #7f6a4b;
-            margin-top: 0.3rem;
-        }
-
-        /* footer */
-        .footer-note {
-            margin-top: 2rem;
-            border-top: 1px solid #f0e2d2;
-            padding-top: 1rem;
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            color: #b09a7e;
-            font-size: 0.75rem;
-        }
-
-        .footer-note i {
-            color: #f58a2e;
-        }
-
-        /* responsive */
-        @media (max-width: 820px) {
-            .report-layout {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                position: static;
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                gap: 0.5rem;
-                padding: 1rem 1.2rem;
-            }
-            .sidebar-title {
-                margin-bottom: 0;
-                width: 100%;
-            }
-            .sidebar-nav {
-                flex-direction: row;
-                flex-wrap: wrap;
-                gap: 0.2rem;
-            }
-            .sidebar-nav a {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.75rem;
-            }
-            .sidebar-nav a i {
-                width: 1rem;
-                font-size: 0.75rem;
-            }
-            .main-content {
-                padding: 1.2rem 1.2rem;
-            }
-            .page-header h1 {
-                font-size: 1.3rem;
-            }
-            .filter-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .filter-group {
-                flex-wrap: wrap;
-            }
-            .filter-group input {
-                width: 100%;
-            }
-            .filter-group select {
-                flex: 1;
-            }
-            .summary-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .student-table {
-                font-size: 0.78rem;
-            }
-            .student-table th,
-            .student-table td {
-                padding: 0.3rem 0.6rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .summary-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .report-meta {
-                flex-direction: column;
-                gap: 0.2rem;
-            }
-            .filters-section {
-                padding: 1rem;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sunshine Junior High School · Attendance Report</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Roboto,system-ui,sans-serif}
+body{background:#f7f3ed;min-height:100vh;padding:1.5rem}
+.container{max-width:1360px;margin:0 auto}
+
+/* header */
+.page-header{background:white;border-radius:32px;padding:1rem 2rem;box-shadow:0 8px 30px rgba(0,0,0,.02);border:1px solid rgba(245,138,46,.06);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.8rem}
+.school-brand{display:flex;align-items:center;gap:.9rem}
+.school-brand img{height:52px;width:auto;object-fit:contain}
+.school-name{font-size:.8rem;font-weight:700;color:#7f6a4b;line-height:1.2;margin-top:.15rem}
+.page-header h1{font-size:1.6rem;font-weight:700;color:#2d1f0c;display:flex;align-items:center;gap:.6rem}
+.page-header h1 i{color:#f58a2e;background:#fcf3e8;padding:.3rem .6rem;border-radius:16px;font-size:1.2rem}
+.page-header .badge{background:#fcf3e8;color:#7f6a4b;padding:.3rem 1.2rem;border-radius:60px;font-weight:600;font-size:.8rem;border:1px solid rgba(245,138,46,.1);display:flex;align-items:center;gap:.4rem}
+.page-header .badge i{color:#f58a2e}
+
+/* layout */
+.report-layout{display:grid;grid-template-columns:220px 1fr;gap:1.8rem;align-items:start}
+
+/* sidebar */
+.sidebar{background:white;border-radius:28px;padding:1.5rem 1rem;box-shadow:0 8px 30px rgba(0,0,0,.02);border:1px solid rgba(245,138,46,.06);position:sticky;top:1.5rem}
+.sidebar-title{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:#b8a58b;font-weight:700;margin-bottom:1.2rem;padding-left:.5rem;display:flex;align-items:center;gap:.5rem}
+.sidebar-title i{color:#f58a2e}
+.sidebar-nav{display:flex;flex-direction:column;gap:.2rem}
+.sidebar-nav a{display:flex;align-items:center;gap:.7rem;padding:.5rem .9rem;border-radius:14px;color:#4d3e2b;font-weight:500;font-size:.82rem;text-decoration:none;transition:all .2s;border:1px solid transparent;cursor:pointer}
+.sidebar-nav a i{width:1.3rem;color:#b8a58b;font-size:.85rem;transition:color .2s}
+.sidebar-nav a:hover{background:#fcf3e8;border-color:#f9dbb8;color:#f58a2e}
+.sidebar-nav a:hover i{color:#f58a2e}
+.sidebar-nav a.active{background:#fcf3e8;border-color:#f9b042;color:#d97d22;font-weight:600}
+.sidebar-nav a.active i{color:#f58a2e}
+.sidebar-divider{height:1px;background:linear-gradient(to right,#f0e2d2,transparent);margin:.8rem .5rem}
+
+/* main */
+.main-content{background:white;border-radius:28px;padding:2rem 2.2rem;box-shadow:0 8px 30px rgba(0,0,0,.02);border:1px solid rgba(245,138,46,.06)}
+
+/* filters */
+.filters-section{background:#fcf9f4;border-radius:20px;padding:1.2rem 1.5rem;margin-bottom:1.8rem;border:1px solid rgba(245,138,46,.06)}
+.filters-section .filter-title{font-weight:600;color:#3d2e1b;margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem;font-size:.9rem}
+.filters-section .filter-title i{color:#f58a2e}
+.filter-row{display:flex;flex-wrap:wrap;align-items:center;gap:1rem}
+.filter-group{display:flex;align-items:center;gap:.5rem}
+.filter-group label{font-weight:600;font-size:.8rem;color:#3d2e1b}
+.filter-group input,.filter-group select{padding:.5rem .9rem;border:1.5px solid #f0e2d2;border-radius:14px;font-size:.85rem;background:white;outline:none;color:#2d1f0c;font-weight:500;transition:all .2s}
+.filter-group input:focus,.filter-group select:focus{border-color:#f58a2e;box-shadow:0 0 0 3px rgba(245,138,46,.06)}
+.filter-group input{width:160px}
+.btn-fetch{padding:.5rem 1.8rem;border:none;border-radius:60px;font-weight:700;font-size:.85rem;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,#f58a2e,#f9b042);color:white;box-shadow:0 4px 12px rgba(245,138,46,.2)}
+.btn-fetch:hover{transform:scale(1.02);box-shadow:0 6px 20px rgba(245,138,46,.3)}
+.btn-fetch:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+
+/* summary cards */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.8rem}
+.summary-card{background:#fcf9f4;border-radius:20px;padding:1rem 1.2rem;border:1px solid rgba(245,138,46,.04);text-align:center;transition:all .2s}
+.summary-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(245,138,46,.04)}
+.summary-card .number{font-size:1.8rem;font-weight:800;color:#2d1f0c;line-height:1.2}
+.summary-card .label{font-size:.7rem;color:#7f6a4b;font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-top:.2rem}
+.summary-card .icon{font-size:1.4rem;margin-bottom:.2rem}
+.summary-card.primary .icon{color:#f58a2e}
+.summary-card.success .icon{color:#2b7a3a}
+.summary-card.danger .icon{color:#b53b2e}
+.summary-card.info .icon{color:#1565c0}
+.summary-card .number.green{color:#2b7a3a}
+.summary-card .number.red{color:#b53b2e}
+.summary-card .number.orange{color:#e67e22}
+
+/* report meta */
+.report-meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;padding:.5rem 0 1rem 0;border-bottom:1px solid #f0e2d2;margin-bottom:1.2rem}
+.report-meta .meta-item{font-size:.85rem;color:#4d3e2b}
+.report-meta .meta-item strong{color:#2d1f0c}
+.report-meta .meta-item i{color:#f58a2e;margin-right:.3rem}
+
+/* student table */
+.student-table-wrap{overflow-x:auto}
+.student-table{width:100%;border-collapse:collapse;border-radius:16px;overflow:hidden;font-size:.88rem}
+.student-table th{background:#f0e2d2;color:#3d2e1b;font-weight:700;padding:.6rem 1rem;text-align:left;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px}
+.student-table td{padding:.5rem 1rem;border-bottom:1px solid #f0e2d2}
+.student-table tr:last-child td{border-bottom:none}
+.student-table tr:hover td{background:#fcf9f4}
+.status-badge{padding:.15rem .8rem;border-radius:30px;font-size:.7rem;font-weight:700;display:inline-block}
+.status-badge.present{background:#e8f5e9;color:#2b7a3a}
+.status-badge.absent{background:#fce4e0;color:#b53b2e}
+.status-badge.unknown{background:#f0e2d2;color:#7f6a4b}
+.status-badge.holiday{background:#e3f0fd;color:#1565c0}
+
+.empty-state{text-align:center;padding:2.5rem 1rem;color:#b09a7e}
+.empty-state i{font-size:3rem;color:#f0e2d2;margin-bottom:.5rem}
+.empty-state h3{color:#2d1f0c;font-size:1.1rem;margin-bottom:.2rem}
+.loading-state{text-align:center;padding:2rem}
+.loading-state .spinner{font-size:2rem;color:#f58a2e;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-state p{color:#7f6a4b;margin-top:.3rem}
+
+/* footer */
+.footer-note{margin-top:2rem;border-top:1px solid #f0e2d2;padding-top:1rem;display:flex;justify-content:space-between;flex-wrap:wrap;color:#b09a7e;font-size:.75rem}
+.footer-note i{color:#f58a2e}
+
+/* holiday */
+.holiday-banner{display:flex;align-items:center;gap:.8rem;background:#e8f1fc;border:1.5px solid #9dc1ef;color:#1b4f8f;border-radius:18px;padding:.8rem 1.2rem;margin-bottom:1rem;font-size:.88rem}
+.holiday-banner i{font-size:1.5rem;color:#1565c0}
+.holiday-banner small{color:#5d6f86}
+
+/* parents + monthly button */
+.student-table td.parent-cell{color:#4d3e2b;font-size:.84rem}
+.btn-month{border:1.5px solid #f9dbb8;background:#fcf3e8;color:#d97d22;border-radius:60px;padding:.25rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap;transition:all .2s}
+.btn-month:hover{background:#f58a2e;border-color:#f58a2e;color:white}
+
+/* monthly modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(45,31,12,.45);display:none;align-items:flex-start;justify-content:center;padding:1.5rem 1rem;overflow-y:auto;z-index:1000}
+.modal-overlay.open{display:flex}
+.modal-card{background:white;border-radius:28px;width:100%;max-width:780px;padding:1.6rem 1.8rem;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:1rem}
+.modal-brand{display:flex;align-items:center;gap:.8rem}
+.modal-brand img{height:44px;width:auto;object-fit:contain}
+.modal-head h3{font-size:1.25rem;color:#2d1f0c}
+.modal-head p{font-size:.8rem;color:#7f6a4b;margin-top:.25rem;line-height:1.5}
+.modal-close{border:none;background:#fcf3e8;color:#7f6a4b;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;flex-shrink:0}
+.modal-close:hover{background:#f58a2e;color:white}
+.modal-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.8rem;background:#fcf9f4;border-radius:18px;padding:.8rem 1.1rem;margin-bottom:1rem}
+.btn-pdf{background:linear-gradient(135deg,#c0392b,#e74c3c);box-shadow:0 4px 12px rgba(192,57,43,.22)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-dow{text-align:center;font-size:.7rem;font-weight:700;color:#b8a58b;padding-bottom:2px}
+.cal-cell{border-radius:12px;min-height:58px;padding:.3rem .4rem;display:flex;flex-direction:column;justify-content:space-between;background:#f7f3ed;color:#7f6a4b;border:1px solid transparent}
+.cal-cell.blank{background:transparent}
+.cal-cell .d{font-size:.72rem;font-weight:700}
+.cal-cell .s{font-size:.68rem;font-weight:800;text-align:right}
+.cal-cell.present{background:#e8f5e9;color:#2b7a3a;border-color:#c6e6c9}
+.cal-cell.absent{background:#fce4e0;color:#b53b2e;border-color:#f3c3bc}
+.cal-cell.holiday{background:#e3f0fd;color:#1565c0;border-color:#b9d6f5}
+.cal-cell.off{background:#f0ebe3;color:#b09a7e}
+.cal-legend{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem;font-size:.75rem;color:#4d3e2b}
+.cal-legend span i{margin-right:.3rem}
+.holiday-list{margin-top:.9rem;font-size:.8rem;color:#1b4f8f;background:#e8f1fc;border-radius:14px;padding:.6rem 1rem;line-height:1.7}
+
+/* responsive */
+@media (max-width:820px){
+.report-layout{grid-template-columns:1fr}
+.sidebar{position:static;display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;padding:1rem 1.2rem}
+.sidebar-title{margin-bottom:0;width:100%}
+.sidebar-nav{flex-direction:row;flex-wrap:wrap;gap:.2rem}
+.sidebar-nav a{padding:.4rem .8rem;font-size:.75rem}
+.sidebar-nav a i{width:1rem;font-size:.75rem}
+.main-content{padding:1.2rem}
+.page-header h1{font-size:1.3rem}
+.filter-row{flex-direction:column;align-items:stretch}
+.filter-group{flex-wrap:wrap}
+.filter-group input{width:100%}
+.filter-group select{flex:1}
+.summary-grid{grid-template-columns:repeat(2,1fr)}
+.student-table{font-size:.78rem}
+.student-table th,.student-table td{padding:.3rem .6rem}
+}
+@media (max-width:560px){
+.modal-card{padding:1.1rem 1rem}
+.cal-cell{min-height:46px;padding:.2rem .25rem}
+}
+@media (max-width:480px){
+.summary-grid{grid-template-columns:1fr 1fr}
+.report-meta{flex-direction:column;gap:.2rem}
+.filters-section{padding:1rem}
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body>
-
 <div class="container">
 
     <!-- HEADER -->
     <div class="page-header">
-        <h1><i class="fas fa-chart-bar"></i> Attendance Report</h1>
-        <span class="badge"><i class="fas fa-school"></i> Sunshine · analytics</span>
+        <div class="school-brand">
+            <img src="images/logo.png" alt="Sunshine Junior High School logo" onerror="this.style.display='none'">
+            <div>
+                <h1><i class="fas fa-chart-bar"></i> Attendance Report</h1>
+                <div class="school-name">Sunshine Junior High School</div>
+            </div>
+        </div>
+        <span class="badge"><i class="fas fa-school"></i> Sunshine Junior High School</span>
     </div>
 
-    <!-- LAYOUT -->
     <div class="report-layout">
 
         <!-- SIDEBAR -->
@@ -556,15 +194,13 @@
                 <a href="attendance.html"><i class="fas fa-clipboard-check"></i> Mark Attendance</a>
                 <a href="attendance-fetch.html" class="active"><i class="fas fa-chart-bar"></i> Reports</a>
                 <div class="sidebar-divider"></div>
-                
                 <a href="#"><i class="fas fa-gear"></i> Settings</a>
             </nav>
         </aside>
 
-        <!-- MAIN CONTENT -->
+        <!-- MAIN -->
         <main class="main-content">
 
-            <!-- FILTERS -->
             <div class="filters-section">
                 <div class="filter-title"><i class="fas fa-sliders-h"></i> Filters</div>
                 <div class="filter-row">
@@ -574,30 +210,12 @@
                     </div>
                     <div class="filter-group">
                         <label><i class="fas fa-layer-group"></i> Class</label>
-                        <select id="classSelect">
-                            <option value="">Select Class</option>
-                            <option value="Nursery">Nursery</option>
-                            <option value="LKG">LKG</option>
-                            <option value="UKG">UKG</option>
-                            <option value="1">Class 1</option>
-                            <option value="2">Class 2</option>
-                            <option value="3">Class 3</option>
-                            <option value="4">Class 4</option>
-                            <option value="5">Class 5</option>
-                            <option value="6">Class 6</option>
-                            <option value="7">Class 7</option>
-                            <option value="8">Class 8</option>
-                            <option value="9">Class 9</option>
-                            <option value="10">Class 10</option>
-                        </select>
+                        <select id="classSelect"><option value="">Loading classes...</option></select>
                     </div>
-                    <button class="btn-fetch" id="fetchAttendance">
-                        <i class="fas fa-search"></i> Fetch Report
-                    </button>
+                    <button class="btn-fetch" id="fetchAttendance"><i class="fas fa-search"></i> Fetch Report</button>
                 </div>
             </div>
 
-            <!-- SUMMARY CARDS -->
             <div class="summary-grid" id="summaryGrid">
                 <div class="summary-card primary">
                     <div class="icon"><i class="fas fa-users"></i></div>
@@ -621,14 +239,12 @@
                 </div>
             </div>
 
-            <!-- REPORT META -->
             <div class="report-meta" id="reportMeta">
                 <span class="meta-item"><i class="fas fa-chalkboard"></i> Class: <strong id="summaryClass">-</strong></span>
                 <span class="meta-item"><i class="fas fa-calendar-day"></i> Date: <strong id="summaryDate">-</strong></span>
                 <span class="meta-item"><i class="fas fa-clock"></i> Generated: <strong id="generatedTime">-</strong></span>
             </div>
 
-            <!-- STUDENT ATTENDANCE TABLE -->
             <h2 style="font-size:1.05rem;font-weight:700;color:#2d1f0c;margin-bottom:0.8rem;display:flex;align-items:center;gap:0.5rem;">
                 <i class="fas fa-list" style="color:#f58a2e;"></i> Student Attendance
             </h2>
@@ -642,19 +258,49 @@
             </div>
 
         </main>
-
     </div>
 
     <!-- FOOTER -->
     <div class="footer-note">
-        <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
+        <span><i class="fas fa-school"></i> Sunshine Junior High School · est. 2006</span>
         <span><i class="fas fa-lock"></i> secure · attendance analytics</span>
     </div>
 
 </div>
 
+<!-- MONTHLY ATTENDANCE MODAL -->
+<div class="modal-overlay" id="monthModal">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="mmName">
+        <div class="modal-head">
+            <div class="modal-brand">
+                <img src="images/logo.png" alt="Sunshine Junior High School logo" onerror="this.style.display='none'">
+                <div>
+                    <h3 id="mmName">Student</h3>
+                    <p id="mmSub"></p>
+                </div>
+            </div>
+            <button class="modal-close" id="mmClose" aria-label="Close"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="modal-toolbar">
+            <div class="filter-group">
+                <label><i class="fas fa-calendar-alt"></i> Month</label>
+                <input type="month" id="mmMonth">
+            </div>
+            <button class="btn-fetch btn-pdf" id="mmPdf" disabled>
+                <i class="fas fa-file-pdf"></i> Download PDF
+            </button>
+        </div>
+
+        <div class="summary-grid" id="mmSummary"></div>
+        <div id="mmBody"></div>
+    </div>
+</div>
+
 <script>
-    const API_URL = "https://sunshine-swp6.onrender.com";
+    const API_URL = "https://sunshine-swp6.onrender.com"; // Change this to your backend API URL
+    const SCHOOL_NAME = "Sunshine Junior High School";
+    const LOGO_PATH = "images/logo.png";
 
     const attendanceDate = document.getElementById("attendanceDate");
     const classSelect = document.getElementById("classSelect");
@@ -673,12 +319,77 @@
     attendanceDate.value = today;
 
     // ==========================================
+    // LOAD CLASSES FROM BACKEND
+    // ==========================================
+
+    // "1", "10" -> "Class 1", "Class 10"; other names are shown as is
+    function getClassDisplayName(className) {
+        return /^\d+$/.test(String(className).trim()) ? `Class ${className}` : className;
+    }
+
+    // Non-numeric first (Nursery, LKG, UKG, then A-Z), numeric after
+    function sortClassNames(a, b) {
+        const preferred = ["nursery", "lkg", "ukg"];
+        const aNum = /^\d+$/.test(a), bNum = /^\d+$/.test(b);
+
+        if (aNum && bNum) return Number(a) - Number(b);
+        if (aNum) return 1;
+        if (bNum) return -1;
+
+        const ai = preferred.indexOf(a.toLowerCase());
+        const bi = preferred.indexOf(b.toLowerCase());
+
+        if (ai !== -1 && bi !== -1) return ai - bi;
+        if (ai !== -1) return -1;
+        if (bi !== -1) return 1;
+
+        return a.localeCompare(b, undefined, { numeric: true });
+    }
+
+    async function loadClasses() {
+        try {
+            const response = await fetch(`${API_URL}/api/classes`);
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Unable to load classes.");
+            }
+
+            const names = (result.classes || [])
+                .map(c => String(c.name || "").trim())
+                .filter(Boolean)
+                .sort(sortClassNames);
+
+            classSelect.innerHTML = "";
+
+            if (names.length === 0) {
+                classSelect.innerHTML = '<option value="">No classes found</option>';
+                return;
+            }
+
+            classSelect.innerHTML = '<option value="">Select Class</option>';
+
+            names.forEach(name => {
+                const option = document.createElement("option");
+                option.value = name;
+                option.textContent = getClassDisplayName(name);
+                classSelect.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error("Load classes error:", error);
+            classSelect.innerHTML = '<option value="">Unable to load classes</option>';
+        }
+    }
+
+    loadClasses();
+
+    // ==========================================
     // FETCH ATTENDANCE
     // ==========================================
 
     fetchButton.addEventListener("click", fetchAttendance);
 
-    // Also allow Enter key on inputs
     document.addEventListener("keydown", (e) => {
         if (e.key === "Enter" && (e.target === attendanceDate || e.target === classSelect)) {
             fetchAttendance();
@@ -689,15 +400,8 @@
         const date = attendanceDate.value;
         const className = classSelect.value;
 
-        if (!date) {
-            alert("Please select a date.");
-            return;
-        }
-
-        if (!className) {
-            alert("Please select a class.");
-            return;
-        }
+        if (!date) { alert("Please select a date."); return; }
+        if (!className) { alert("Please select a class."); return; }
 
         fetchButton.disabled = true;
         fetchButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
@@ -710,11 +414,28 @@
         `;
 
         try {
-            const response = await fetch(
-                `${API_URL}/api/attendance/${encodeURIComponent(className)}/${date}`
-            );
+            // Attendance + class students (students list is needed for father / mother names)
+            const [response, studentsResponse] = await Promise.all([
+                fetch(`${API_URL}/api/attendance/${encodeURIComponent(className)}/${date}`),
+                fetch(`${API_URL}/api/students/class/${encodeURIComponent(className)}`).catch(() => null)
+            ]);
 
             const result = await response.json();
+            const parentMap = {};
+
+            try {
+                if (studentsResponse && studentsResponse.ok) {
+                    const studentsResult = await studentsResponse.json();
+                    (studentsResult.students || []).forEach(s => {
+                        parentMap[String(s._id)] = {
+                            father: s.fatherName || (s.father && s.father.name) || "",
+                            mother: s.motherName || (s.mother && s.mother.name) || ""
+                        };
+                    });
+                }
+            } catch (e) {
+                console.warn("Could not load parent names:", e);
+            }
 
             if (!response.ok) {
                 summaryClass.textContent = "-";
@@ -729,7 +450,7 @@
                     <div class="empty-state">
                         <i class="fas fa-info-circle"></i>
                         <h3>No Records Found</h3>
-                        <p>${result.message || "Attendance not found for this date and class."}</p>
+                        <p>${esc(result.message || "Attendance not found for this date and class.")}</p>
                     </div>
                 `;
                 fetchButton.disabled = false;
@@ -740,32 +461,26 @@
             const attendance = result.attendance;
             const students = attendance.students || [];
 
-            // ==========================================
-            // CALCULATE COUNTS
-            // ==========================================
-
+            // COUNTS
             const total = students.length;
             const present = students.filter(s => s.status === "Present").length;
             const absent = students.filter(s => s.status === "Absent").length;
-            const percentage = total > 0 ? ((present / total) * 100).toFixed(2) : 0;
+            const holidayCount = students.filter(s => s.status === "Holiday").length;
+            const isHolidayDay = !!attendance.isHoliday || (total > 0 && holidayCount === total);
+            const counted = present + absent;
+            const percentage = counted > 0 ? ((present / counted) * 100).toFixed(2) : 0;
+            reportRows = [];
 
-            const displayName = ["Nursery", "LKG", "UKG"].includes(className) ? className : `Class ${className}`;
+            const displayName = getClassDisplayName(className);
 
-            // ==========================================
-            // UPDATE SUMMARY
-            // ==========================================
-
+            // SUMMARY
             summaryClass.textContent = displayName;
             summaryDate.textContent = date;
             generatedTime.textContent = new Date().toLocaleTimeString();
             totalStudents.textContent = total;
             presentStudents.textContent = present;
             absentStudents.textContent = absent;
-            attendancePercentage.textContent = `${percentage}%`;
-
-            // ==========================================
-            // NO STUDENTS
-            // ==========================================
+            attendancePercentage.textContent = isHolidayDay ? "Holiday" : `${percentage}%`;
 
             if (total === 0) {
                 attendanceContainer.innerHTML = `
@@ -780,10 +495,7 @@
                 return;
             }
 
-            // ==========================================
-            // BUILD STUDENT TABLE
-            // ==========================================
-
+            // TABLE
             let tableHtml = `
                 <div class="student-table-wrap">
                     <table class="student-table">
@@ -792,7 +504,10 @@
                                 <th>#</th>
                                 <th>Student Name</th>
                                 <th>Roll No</th>
+                                <th>Father's Name</th>
+                                <th>Mother's Name</th>
                                 <th>Status</th>
+                                <th>Monthly</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -801,12 +516,26 @@
             students.forEach((student, index) => {
                 const statusClass = (student.status || "Unknown").toLowerCase();
                 const statusDisplay = student.status || "Unknown";
+                const parents = parentMap[String(student.studentId)] || {};
+
+                reportRows[index] = {
+                    studentMongoId: String(student.studentId),
+                    name: student.studentName || "-",
+                    roll: student.rollNumber || "",
+                    father: parents.father || "",
+                    mother: parents.mother || "",
+                    className: displayName
+                };
+
                 tableHtml += `
                     <tr>
                         <td>${index + 1}</td>
-                        <td><strong>${student.studentName || "-"}</strong></td>
-                        <td>${student.rollNumber || "-"}</td>
-                        <td><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
+                        <td><strong>${esc(student.studentName) || "-"}</strong></td>
+                        <td>${esc(student.rollNumber) || "-"}</td>
+                        <td class="parent-cell">${esc(parents.father) || "-"}</td>
+                        <td class="parent-cell">${esc(parents.mother) || "-"}</td>
+                        <td><span class="status-badge ${statusClass}">${esc(statusDisplay)}</span></td>
+                        <td><button type="button" class="btn-month" data-idx="${index}"><i class="fas fa-calendar-alt"></i> View Month</button></td>
                     </tr>
                 `;
             });
@@ -815,10 +544,6 @@
                         </tbody>
                     </table>
                 </div>
-            `;
-
-            // Add summary footer
-            tableHtml += `
                 <div style="margin-top:1rem;padding:0.5rem 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;font-size:0.85rem;color:#4d3e2b;border-top:1px solid #f0e2d2;">
                     <span><i class="fas fa-check-circle" style="color:#2b7a3a;"></i> Present: <strong>${present}</strong></span>
                     <span><i class="fas fa-times-circle" style="color:#b53b2e;"></i> Absent: <strong>${absent}</strong></span>
@@ -826,7 +551,7 @@
                 </div>
             `;
 
-            attendanceContainer.innerHTML = tableHtml;
+            attendanceContainer.innerHTML = buildHolidayBanner(attendance) + tableHtml;
 
         } catch (error) {
             console.error("Fetch attendance error:", error);
@@ -843,18 +568,524 @@
         fetchButton.innerHTML = '<i class="fas fa-search"></i> Fetch Report';
     }
 
-    // Auto-fetch on load if date and class are set
-    document.addEventListener('DOMContentLoaded', () => {
-        // Optionally auto-fetch with first class
-        // Uncomment below to auto-load on page load
-        // const firstOption = classSelect.querySelector('option[value!=""]');
-        // if (firstOption) {
-        //     classSelect.value = firstOption.value;
-        //     fetchAttendance();
-        // }
+    // ==========================================
+    // HELPERS
+    // ==========================================
+
+    function esc(value) {
+        return String(value == null ? "" : value).replace(/[&<>"']/g, c => ({
+            "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        }[c]));
+    }
+
+    function buildHolidayBanner(attendance) {
+        if (!attendance || !attendance.isHoliday) return "";
+
+        const reason = attendance.holidayReason || "Holiday";
+        const name = attendance.holidayName ? ` - ${esc(attendance.holidayName)}` : "";
+
+        return `
+            <div class="holiday-banner">
+                <i class="fas fa-umbrella-beach"></i>
+                <div>
+                    <strong>Holiday</strong> &middot; ${esc(reason)}${name}<br>
+                    <small>All students are marked as Holiday for this date.</small>
+                </div>
+            </div>
+        `;
+    }
+
+    // ==========================================
+    // STUDENT MONTHLY ATTENDANCE (VIEW + PDF)
+    // ==========================================
+
+    const MONTH_NAMES = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"];
+    const DAY_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const DAY_LONG = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    let reportRows = [];
+    let monthState = null;
+    let monthRequestId = 0;
+
+    const monthModal = document.getElementById("monthModal");
+    const mmName = document.getElementById("mmName");
+    const mmSub = document.getElementById("mmSub");
+    const mmMonth = document.getElementById("mmMonth");
+    const mmSummary = document.getElementById("mmSummary");
+    const mmBody = document.getElementById("mmBody");
+    const mmPdf = document.getElementById("mmPdf");
+
+    attendanceContainer.addEventListener("click", (e) => {
+        const btn = e.target.closest(".btn-month");
+        if (!btn) return;
+        openMonthly(Number(btn.dataset.idx));
     });
+
+    document.getElementById("mmClose").addEventListener("click", closeMonthly);
+
+    monthModal.addEventListener("click", (e) => {
+        if (e.target === monthModal) closeMonthly();
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && monthModal.classList.contains("open")) closeMonthly();
+    });
+
+    mmMonth.addEventListener("change", loadMonth);
+    mmPdf.addEventListener("click", downloadMonthPdf);
+
+    function openMonthly(index) {
+        const row = reportRows[index];
+        if (!row) return;
+
+        monthState = { row, month: "", days: {}, ready: false };
+
+        mmName.textContent = row.name;
+        mmSub.innerHTML =
+            `${esc(row.className)} &middot; Roll No: ${esc(row.roll || "-")}<br>` +
+            `Father: ${esc(row.father || "-")} &nbsp;|&nbsp; Mother: ${esc(row.mother || "-")}`;
+
+        mmMonth.value = (attendanceDate.value || today).slice(0, 7);
+
+        monthModal.classList.add("open");
+        document.body.style.overflow = "hidden";
+
+        loadMonth();
+    }
+
+    function closeMonthly() {
+        monthModal.classList.remove("open");
+        document.body.style.overflow = "";
+        monthRequestId++;
+    }
+
+    async function loadMonth() {
+        if (!monthState || !mmMonth.value) return;
+
+        const requestId = ++monthRequestId;
+        const month = mmMonth.value;
+
+        monthState.ready = false;
+        mmPdf.disabled = true;
+        mmSummary.innerHTML = "";
+        mmBody.innerHTML = `
+            <div class="loading-state">
+                <div class="spinner"><i class="fas fa-circle-notch"></i></div>
+                <p>Loading monthly attendance...</p>
+            </div>
+        `;
+
+        try {
+            const response = await fetch(
+                `${API_URL}/api/attendance/student-month/${encodeURIComponent(monthState.row.studentMongoId)}/${month}`
+            );
+            const result = await response.json();
+
+            if (requestId !== monthRequestId) return; // a newer request replaced this one
+
+            if (!response.ok) {
+                throw new Error(result.message || "Unable to load monthly attendance.");
+            }
+
+            monthState.month = month;
+            monthState.days = {};
+            (result.days || []).forEach(d => { monthState.days[d.date] = d; });
+            monthState.ready = true;
+
+            renderMonth();
+
+        } catch (error) {
+            if (requestId !== monthRequestId) return;
+            console.error("Monthly attendance error:", error);
+            mmBody.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-wifi"></i>
+                    <h3>Could not load</h3>
+                    <p>${esc(error.message || "Please try again.")}</p>
+                </div>
+            `;
+        }
+    }
+
+    function pad2(n) {
+        return String(n).padStart(2, "0");
+    }
+
+    // One entry per calendar day of the selected month
+    function buildMonthData() {
+        const [year, month] = monthState.month.split("-").map(Number);
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        const now = new Date();
+        const todayKey = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+
+        const cells = [];
+        const counts = { present: 0, absent: 0, holiday: 0 };
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const key = `${year}-${pad2(month)}-${pad2(day)}`;
+            const weekday = new Date(year, month - 1, day).getDay();
+            const entry = monthState.days[key];
+
+            let status, cls, short, remark = "";
+
+            if (entry && (entry.status === "Holiday" || entry.isHoliday)) {
+                status = "Holiday"; cls = "holiday"; short = "H";
+                remark = [entry.holidayReason, entry.holidayName].filter(Boolean).join(" - ");
+                counts.holiday++;
+            } else if (entry && entry.status === "Present") {
+                status = "Present"; cls = "present"; short = "P";
+                counts.present++;
+            } else if (entry && entry.status === "Absent") {
+                status = "Absent"; cls = "absent"; short = "A";
+                counts.absent++;
+            } else if (key > todayKey) {
+                status = "Upcoming"; cls = "none"; short = "";
+            } else if (weekday === 0) {
+                status = "Sunday"; cls = "off"; short = "S";
+            } else {
+                status = "Not Marked"; cls = "none"; short = "-";
+            }
+
+            cells.push({ day, key, weekday, status, cls, short, remark });
+        }
+
+        const working = counts.present + counts.absent;
+        const percentage = working > 0 ? ((counts.present / working) * 100).toFixed(2) : "0.00";
+
+        return { year, month, cells, counts, working, percentage };
+    }
+
+    function renderMonth() {
+        const data = buildMonthData();
+        const { cells, counts, working, percentage } = data;
+
+        mmSummary.innerHTML = `
+            <div class="summary-card success">
+                <div class="icon"><i class="fas fa-check-circle"></i></div>
+                <div class="number green">${counts.present}</div>
+                <div class="label">Present</div>
+            </div>
+            <div class="summary-card danger">
+                <div class="icon"><i class="fas fa-times-circle"></i></div>
+                <div class="number red">${counts.absent}</div>
+                <div class="label">Absent</div>
+            </div>
+            <div class="summary-card info">
+                <div class="icon"><i class="fas fa-umbrella-beach"></i></div>
+                <div class="number" style="color:#1565c0;">${counts.holiday}</div>
+                <div class="label">Holidays</div>
+            </div>
+            <div class="summary-card primary">
+                <div class="icon"><i class="fas fa-calendar-check"></i></div>
+                <div class="number">${working}</div>
+                <div class="label">Working Days</div>
+            </div>
+            <div class="summary-card primary">
+                <div class="icon"><i class="fas fa-percent"></i></div>
+                <div class="number orange">${percentage}%</div>
+                <div class="label">Attendance %</div>
+            </div>
+        `;
+
+        let html = `<div class="cal-grid">`;
+        DAY_SHORT.forEach(d => { html += `<div class="cal-dow">${d}</div>`; });
+
+        for (let i = 0; i < cells[0].weekday; i++) {
+            html += `<div class="cal-cell blank"></div>`;
+        }
+
+        cells.forEach(c => {
+            const title = c.remark ? `${c.status}: ${c.remark}` : c.status;
+            html += `
+                <div class="cal-cell ${c.cls}" title="${esc(title)}">
+                    <span class="d">${c.day}</span>
+                    <span class="s">${c.short}</span>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+
+        html += `
+            <div class="cal-legend">
+                <span><i class="fas fa-square" style="color:#2b7a3a;"></i>P = Present</span>
+                <span><i class="fas fa-square" style="color:#b53b2e;"></i>A = Absent</span>
+                <span><i class="fas fa-square" style="color:#1565c0;"></i>H = Holiday</span>
+                <span><i class="fas fa-square" style="color:#b09a7e;"></i>S = Sunday (not marked)</span>
+                <span><i class="fas fa-square" style="color:#d8cbb8;"></i>- = Not marked</span>
+            </div>
+        `;
+
+        const holidays = cells.filter(c => c.status === "Holiday");
+        if (holidays.length) {
+            html += `<div class="holiday-list"><strong>Holidays this month</strong><br>` +
+                holidays.map(c =>
+                    `${c.day} ${MONTH_NAMES[data.month - 1].slice(0, 3)} (${DAY_SHORT[c.weekday]})${c.remark ? " - " + esc(c.remark) : ""}`
+                ).join("<br>") + `</div>`;
+        }
+
+        mmBody.innerHTML = html;
+        mmPdf.disabled = false;
+    }
+
+    // ==========================================
+    // DOWNLOAD PDF (complete month on ONE page)
+    // ==========================================
+
+    // Loads the school logo for the PDF; if it can't load, the PDF is still created without it
+    function loadLogo() {
+        return new Promise(resolve => {
+            const img = new Image();
+            img.onload = () => {
+                try {
+                    const c = document.createElement("canvas");
+                    c.width = img.naturalWidth;
+                    c.height = img.naturalHeight;
+                    c.getContext("2d").drawImage(img, 0, 0);
+                    resolve({ data: c.toDataURL("image/png"), w: img.naturalWidth, h: img.naturalHeight });
+                } catch (e) {
+                    resolve(null);
+                }
+            };
+            img.onerror = () => resolve(null);
+            img.src = LOGO_PATH;
+        });
+    }
+
+    async function downloadMonthPdf() {
+        if (!monthState || !monthState.ready) return;
+
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+            alert("PDF library could not be loaded. Please check your internet connection and refresh the page.");
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const data = buildMonthData();
+        const row = monthState.row;
+        const monthLabel = `${MONTH_NAMES[data.month - 1]} ${data.year}`;
+        const logo = await loadLogo();
+
+        const doc = new jsPDF({ unit: "mm", format: "a4" });
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+
+        // ----- header (same design as the Result PDF) -----
+        const marginLeft = 10;
+        const marginRight = 10;
+        const contentWidth = pageWidth - marginLeft - marginRight;
+
+        function drawHeader() {
+            const headerTop = 4;
+            const logoSize = 28;
+            const logoX = marginLeft;
+            const logoY = headerTop;
+
+            // LOGO (left side)
+            if (logo) {
+                doc.addImage(logo.data, "PNG", logoX, logoY, logoSize, logoSize);
+            }
+
+            // TITLE AREA (right of logo, centered in remaining space)
+            const titleAreaX = logoX + logoSize + 3;
+            const titleAreaWidth = (pageWidth - marginRight) - titleAreaX;
+            const titleCenterX = titleAreaX + titleAreaWidth / 2;
+
+            let textY = headerTop + 12;
+
+            // SCHOOL NAME - big, dark red fill + black outline
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(27);
+            doc.setTextColor(178, 24, 24);
+            doc.setDrawColor(0, 0, 0);
+            doc.setLineWidth(0.35);
+            doc.text("SUN SHINE JUNIOR HIGH SCHOOL", titleCenterX, textY, {
+                align: "center",
+                renderingMode: "fillThenStroke"
+            });
+
+            // DECORATIVE DIVIDER
+            textY += 3.5;
+            const dividerHalfWidth = 30;
+            doc.setDrawColor(178, 24, 24);
+            doc.setLineWidth(0.35);
+            doc.line(titleCenterX - dividerHalfWidth, textY, titleCenterX - 5, textY);
+            doc.line(titleCenterX + 5, textY, titleCenterX + dividerHalfWidth, textY);
+
+            const dSize = 1.6;
+            doc.setFillColor(178, 24, 24);
+            doc.triangle(titleCenterX - dSize, textY, titleCenterX, textY - dSize, titleCenterX + dSize, textY, "F");
+            doc.triangle(titleCenterX - dSize, textY, titleCenterX, textY + dSize, titleCenterX + dSize, textY, "F");
+
+            textY += 6;
+
+            // ICON HELPERS
+            function drawPinIcon(cx, cy) {
+                doc.setFillColor(178, 24, 24);
+                doc.circle(cx, cy - 0.6, 1.6, "F");
+                doc.triangle(cx - 1.1, cy, cx + 1.1, cy, cx, cy + 2.2, "F");
+                doc.setFillColor(255, 255, 255);
+                doc.circle(cx, cy - 0.6, 0.6, "F");
+            }
+            function drawPhoneIcon(cx, cy) {
+                doc.setFillColor(178, 24, 24);
+                doc.circle(cx - 0.9, cy - 0.9, 1.4, "F");
+                doc.circle(cx + 0.9, cy + 0.9, 1.4, "F");
+                doc.setDrawColor(178, 24, 24);
+                doc.setLineWidth(1.1);
+                doc.line(cx - 0.6, cy - 0.6, cx + 0.6, cy + 0.6);
+            }
+            function drawGlobeIcon(cx, cy) {
+                doc.setDrawColor(30, 60, 150);
+                doc.setLineWidth(0.35);
+                doc.circle(cx, cy, 1.8, "S");
+                doc.ellipse(cx, cy, 0.8, 1.8, "S");
+                doc.line(cx - 1.8, cy, cx + 1.8, cy);
+            }
+
+            // ADDRESS LINE (centered)
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.setTextColor(20, 20, 20);
+
+            const addressText = "20 Futa Road, Mohalla Garhi Nai Aabadi Pilkhuwa Hapur, U.P - 245304";
+            const addrTextWidth = doc.getTextWidth(addressText);
+            const addrIconX = titleCenterX - addrTextWidth / 2 - 4;
+            drawPinIcon(addrIconX, textY - 1);
+            doc.text(addressText, titleCenterX + 2, textY, { align: "center" });
+
+            textY += 5.5;
+
+            // PHONE + WEBSITE LINE (centered, side by side)
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(8.5);
+
+            const phoneText = "Mobile :- +91 87917-64372 | 92596-95556";
+            const websiteText = "sunshinejuniorhighschool.com";
+            const gap = 8;
+            const phoneWidth = doc.getTextWidth(phoneText);
+            const websiteWidth = doc.getTextWidth(websiteText);
+            const totalLineWidth = phoneWidth + gap + websiteWidth + 10;
+            let lineX = titleCenterX - totalLineWidth / 2;
+
+            drawPhoneIcon(lineX, textY - 1);
+            doc.setTextColor(20, 20, 20);
+            doc.text(phoneText, lineX + 4, textY);
+            lineX += 4 + phoneWidth + 4;
+
+            doc.setDrawColor(150, 150, 150);
+            doc.setLineWidth(0.3);
+            doc.line(lineX, textY - 2.5, lineX, textY + 0.8);
+            lineX += gap - 4;
+
+            drawGlobeIcon(lineX, textY - 1);
+            doc.setTextColor(30, 60, 150);
+            doc.text(websiteText, lineX + 4, textY);
+
+            // BOTTOM BORDER (red line + black bar)
+            textY += 4.5;
+            doc.setDrawColor(178, 24, 24);
+            doc.setLineWidth(0.6);
+            doc.line(marginLeft, textY, pageWidth - marginRight, textY);
+
+            textY += 2;
+            doc.setFillColor(20, 20, 20);
+            doc.rect(marginLeft, textY, contentWidth, 2.5, "F");
+
+            return textY + 2.5 + 4;
+        }
+
+        const headerBottom = drawHeader();
+
+        // ----- report title (below header) -----
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11.5);
+        doc.setTextColor(45, 31, 12);
+        doc.text(`Student Attendance Report - ${monthLabel}`, pageWidth / 2, headerBottom + 2, { align: "center" });
+
+        const detailsY = headerBottom + 9;
+
+        // ----- student details (2 columns to save space) -----
+        doc.setFontSize(9.5);
+        doc.setTextColor(45, 31, 12);
+
+        const leftCol = [["Student Name", row.name], ["Class", row.className], ["Roll No", row.roll || "-"]];
+        const rightCol = [["Father's Name", row.father || "-"], ["Mother's Name", row.mother || "-"]];
+
+        const drawDetails = (items, x, valueX) => {
+            let y = detailsY;
+            items.forEach(([label, value]) => {
+                doc.setFont("helvetica", "bold");
+                doc.text(`${label}:`, x, y);
+                doc.setFont("helvetica", "normal");
+                doc.text(String(value), valueX, y);
+                y += 5.5;
+            });
+        };
+        drawDetails(leftCol, 14, 40);
+        drawDetails(rightCol, pageWidth / 2 + 2, pageWidth / 2 + 30);
+
+        // ----- summary box -----
+        const boxY = detailsY + 18;
+        doc.setFillColor(252, 243, 232);
+        doc.roundedRect(14, boxY, pageWidth - 28, 10, 2, 2, "F");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.text(
+            `Present: ${data.counts.present}     Absent: ${data.counts.absent}     Holidays: ${data.counts.holiday}     Working Days: ${data.working}     Attendance: ${data.percentage}%`,
+            pageWidth / 2, boxY + 6.3, { align: "center" }
+        );
+
+        // ----- day by day table (fits 28-31 days on a single page) -----
+        const body = data.cells.map(c => [
+            `${pad2(c.day)}-${pad2(data.month)}-${data.year}`,
+            DAY_LONG[c.weekday],
+            c.status,
+            c.remark
+        ]);
+
+        doc.autoTable({
+            startY: boxY + 14,
+            head: [["Date", "Day", "Status", "Remarks"]],
+            body,
+            theme: "grid",
+            pageBreak: "avoid",
+            rowPageBreak: "avoid",
+            styles: { font: "helvetica", fontSize: 8, cellPadding: 1.1, lineColor: [226, 212, 194], minCellHeight: 0 },
+            headStyles: { fillColor: [245, 138, 46], textColor: 255, fontStyle: "bold" },
+            columnStyles: { 0: { cellWidth: 30 }, 1: { cellWidth: 32 }, 2: { cellWidth: 30 } },
+            margin: { left: 14, right: 14, bottom: 12 },
+            didParseCell: (hook) => {
+                if (hook.section !== "body") return;
+
+                const status = hook.row.raw[2];
+
+                if (hook.column.index === 2) {
+                    hook.cell.styles.fontStyle = "bold";
+                    if (status === "Present") hook.cell.styles.textColor = [43, 122, 58];
+                    else if (status === "Absent") hook.cell.styles.textColor = [181, 59, 46];
+                    else if (status === "Holiday") hook.cell.styles.textColor = [21, 101, 192];
+                    else hook.cell.styles.textColor = [150, 135, 115];
+                }
+
+                if (status === "Absent") hook.cell.styles.fillColor = [253, 241, 238];
+                else if (status === "Holiday") hook.cell.styles.fillColor = [236, 244, 253];
+            }
+        });
+
+        // ----- footer -----
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(150, 135, 115);
+        doc.text(`Generated on ${new Date().toLocaleDateString("en-IN")}`, 14, pageHeight - 7);
+        doc.text(SCHOOL_NAME, pageWidth - 14, pageHeight - 7, { align: "right" });
+
+        const safeName = row.name.replace(/[^a-z0-9]+/gi, "_").replace(/^_+|_+$/g, "") || "Student";
+        doc.save(`Attendance_${safeName}_${MONTH_NAMES[data.month - 1]}_${data.year}.pdf`);
+    }
 </script>
 
 </body>
-
 </html>

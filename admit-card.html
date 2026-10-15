@@ -179,7 +179,7 @@
 
         .subject-row {
             display: grid;
-            grid-template-columns: 1fr 1fr 150px 50px;
+            grid-template-columns: 1.3fr 1fr 110px 125px 125px 50px;
             gap: 0.8rem;
             margin-bottom: 0.8rem;
             align-items: center;
@@ -242,6 +242,37 @@
         .subject-row .day-input:focus {
             border-color: #f0e2d2;
             box-shadow: none;
+        }
+
+        .subject-row .time-input {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+        }
+
+        .subject-row .time-field {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .subject-row .time-field label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: #8a7558;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            padding-left: 4px;
+        }
+
+        .subject-row .time-field label small {
+            font-weight: 500;
+            text-transform: none;
+            color: #b8a58b;
+        }
+
+        .subject-row .time-input.invalid {
+            border-color: #b53b2e;
+            box-shadow: 0 0 0 4px rgba(181, 59, 46, 0.06);
         }
 
         .btn-remove {
@@ -331,6 +362,156 @@
             margin-bottom: 0.5rem;
         }
 
+        /* ===== LIVE PREVIEW ===== */
+        .preview-box {
+            margin-top: 1.8rem;
+        }
+
+        .preview-hint {
+            font-size: 0.8rem;
+            color: #b09a7e;
+            margin: -0.8rem 0 1rem;
+        }
+
+        .admit-preview {
+            border: 2px solid #1a2a3a;
+            border-radius: 14px;
+            padding: 1.5rem;
+            background: white;
+            cursor: pointer;
+            position: relative;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        .admit-preview:hover {
+            box-shadow: 0 6px 22px rgba(245, 138, 46, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .admit-preview .edit-hint {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: rgba(255,255,255,0.95);
+            color: #b5651d;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .admit-preview .header-band {
+            background: linear-gradient(135deg, #1a2a3a, #2d4a6a);
+            color: white;
+            padding: 0.8rem;
+            text-align: center;
+            border-radius: 8px;
+            margin: -1.5rem -1.5rem 1rem -1.5rem;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .admit-preview .header-band h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+
+        .admit-preview .header-band p {
+            margin: 4px 0 0;
+            font-size: 0.8rem;
+            opacity: 0.85;
+        }
+
+        .admit-preview .student-note {
+            background: #fcfaf7;
+            border-radius: 8px;
+            padding: 0.7rem 1rem;
+            font-size: 0.8rem;
+            color: #7f6a4b;
+            margin-bottom: 0.8rem;
+        }
+
+        .admit-preview .student-note strong {
+            color: #7f6a4b;
+        }
+
+        .admit-preview table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .admit-preview table th {
+            background: #f58a2e;
+            color: white;
+            padding: 0.55rem 0.7rem;
+            text-align: left;
+            border: 1px solid #f0e2d2;
+        }
+
+        .admit-preview table td {
+            padding: 0.55rem 0.7rem;
+            border: 1px solid #e8d9c5;
+            font-weight: 700;
+            color: #000;
+        }
+
+        /* Holiday row: one full-width themed line */
+        .admit-preview table td.holiday-cell {
+            background: #fff4e6;
+            border: 1px solid #f9b042;
+            text-align: center;
+            padding: 0.7rem 0.9rem;
+            color: #b5651d;
+            letter-spacing: 0.4px;
+        }
+
+        .admit-preview .holiday-date {
+            color: #2d1f0c;
+            font-weight: 700;
+        }
+
+        .admit-preview .holiday-sep {
+            margin: 0 0.7rem;
+            color: #f9b042;
+            font-weight: 700;
+        }
+
+        .admit-preview .holiday-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            background: linear-gradient(135deg, #f58a2e, #f9b042);
+            color: white;
+            padding: 0.2rem 0.9rem;
+            border-radius: 30px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            font-size: 0.82em;
+        }
+
+        .subject-row.is-holiday {
+            background: #fff4e6;
+            border-color: #f9b042;
+        }
+
+        .subject-row.is-holiday .time-input {
+            background: #f7efe3;
+            cursor: not-allowed;
+        }
+
+        .admit-preview .footer-text {
+            text-align: center;
+            color: #b09a7e;
+            font-size: 0.7rem;
+            margin-top: 0.8rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #f0e2d2;
+        }
+
         /* Footer */
         .footer-note {
             margin-top: 2rem;
@@ -360,13 +541,19 @@
                 gap: 0.2rem;
             }
             .subject-row {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
                 gap: 0.5rem;
                 padding: 0.8rem;
+            }
+            .subject-row .subject-input {
+                grid-column: 1 / -1;
             }
             .btn-remove {
                 width: 100%;
                 height: 44px;
+            }
+            .admit-preview table {
+                font-size: 0.75rem;
             }
         }
 
@@ -400,9 +587,9 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <div class="main-box">
+    <div class="main-box" id="editBox">
 
-        <h2><i class="fas fa-pen-to-square"></i> Create Admit Card</h2>
+        <h2><i class="fas fa-pen-to-square"></i> <span id="formTitle">Create Admit Card</span></h2>
 
         <!-- Info Card -->
         <div class="info-card">
@@ -434,6 +621,13 @@
 
     </div>
 
+    <!-- LIVE PREVIEW -->
+    <div class="main-box preview-box">
+        <h2><i class="fas fa-eye"></i> Admit Card Preview</h2>
+        <p class="preview-hint">Preview updates as you type. Click the card to edit.</p>
+        <div id="admitPreview"></div>
+    </div>
+
     <!-- FOOTER -->
     <div class="footer-note">
         <span><i class="fas fa-school"></i> Sunshine School · est. 2006</span>
@@ -444,7 +638,7 @@
 
 
 <script>
-    const API_URL = "https://sunshine-swp6.onrender.com";
+    const API_URL = "https://sunshine-swp6.onrender.com"; // Replace with your actual API base URL
 
     const params = new URLSearchParams(window.location.search);
 
@@ -501,11 +695,56 @@
         return date;
     }
 
+    // Date -> "YYYY-MM-DD" using LOCAL time.
+    // (toISOString() converts to UTC and shifts the date back by one day
+    //  in timezones ahead of UTC such as India.)
+    function toLocalISODate(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, "0");
+        const d = String(date.getDate()).padStart(2, "0");
+        return `${y}-${m}-${d}`;
+    }
+
+    // "YYYY-MM-DD" (saved format) -> "DD/MM/YYYY" (input format)
+    function isoToDDMMYYYY(iso) {
+        const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || ""));
+        return m ? `${m[3]}/${m[2]}/${m[1]}` : "";
+    }
+
     /* =========================
-       ADD SUBJECT
+       HOLIDAY HELPERS
+       If the subject name contains "holiday", the row is treated as a
+       holiday: time is not needed and the admit card shows one
+       full-width "HOLIDAY" line instead of a normal subject row.
     ========================= */
 
-    function addSubject() {
+    function isHolidaySubject(name) {
+        return /holiday/i.test(String(name || ""));
+    }
+
+    function applyHolidayState(row) {
+        const holiday = isHolidaySubject(row.querySelector(".subject-input").value);
+        const startInput = row.querySelector(".start-time-input");
+        const endInput = row.querySelector(".end-time-input");
+
+        row.classList.toggle("is-holiday", holiday);
+        startInput.disabled = holiday;
+        endInput.disabled = holiday;
+
+        if (holiday) {
+            startInput.value = "";
+            endInput.value = "";
+            startInput.classList.remove("invalid");
+            endInput.classList.remove("invalid");
+        }
+    }
+
+    /* =========================
+       ADD SUBJECT
+       (optional `data` is used to pre-fill a saved subject)
+    ========================= */
+
+    function addSubject(data) {
         const container = document.getElementById("subjectsContainer");
 
         const row = document.createElement("div");
@@ -535,6 +774,26 @@
                 readonly
             >
 
+            <div class="time-field">
+                <label>Start Time <small>(optional)</small></label>
+                <input
+                    type="time"
+                    class="time-input start-time-input"
+                    title="Exam start time (optional)"
+                    autocomplete="off"
+                >
+            </div>
+
+            <div class="time-field">
+                <label>End Time <small>(optional)</small></label>
+                <input
+                    type="time"
+                    class="time-input end-time-input"
+                    title="Exam end time (optional)"
+                    autocomplete="off"
+                >
+            </div>
+
             <button
                 class="btn-remove"
                 onclick="this.parentElement.remove(); updateCount();"
@@ -545,6 +804,11 @@
 
         const dateInput = row.querySelector(".date-input");
         const dayInput = row.querySelector(".day-input");
+
+        // Holiday: disable/clear time fields automatically
+        row.querySelector(".subject-input").addEventListener("input", function () {
+            applyHolidayState(row);
+        });
 
         // Auto-format while typing (adds "/" automatically)
         dateInput.addEventListener("input", function (e) {
@@ -580,9 +844,19 @@
             }
         });
 
-        // Auto-focus the subject input
-        const subjectInput = row.querySelector(".subject-input");
-        setTimeout(() => subjectInput.focus(), 100);
+        // Pre-fill saved data (edit mode)
+        if (data) {
+            row.querySelector(".subject-input").value = data.subject || "";
+            dateInput.value = isoToDDMMYYYY(data.date);
+            dayInput.value = data.day || "";
+            row.querySelector(".start-time-input").value = data.startTime || "";
+            row.querySelector(".end-time-input").value = data.endTime || "";
+            applyHolidayState(row);
+        } else {
+            // Auto-focus the subject input
+            const subjectInput = row.querySelector(".subject-input");
+            setTimeout(() => subjectInput.focus(), 100);
+        }
 
         container.appendChild(row);
         updateCount();
@@ -595,13 +869,157 @@
     function updateCount() {
         const rows = document.querySelectorAll(".subject-row");
         document.getElementById("subjectCount").textContent = rows.length;
+        renderPreview();
     }
+
+    /* =========================
+       LIVE PREVIEW
+    ========================= */
+
+    function previewEscape(value) {
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // "14:30" -> "02:30 PM"
+    function previewTime12h(time) {
+        if (!time || !/^\d{2}:\d{2}$/.test(time)) return "";
+        let [h, m] = time.split(":").map(Number);
+        const ampm = h >= 12 ? "PM" : "AM";
+        h = h % 12 || 12;
+        return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")} ${ampm}`;
+    }
+
+    function renderPreview() {
+        const target = document.getElementById("admitPreview");
+        if (!target) return;
+
+        const rows = Array.from(document.querySelectorAll(".subject-row"))
+            .map(row => ({
+                subject: row.querySelector(".subject-input").value.trim(),
+                date: row.querySelector(".date-input").value.trim(),
+                day: row.querySelector(".day-input").value,
+                start: row.querySelector(".start-time-input").value,
+                end: row.querySelector(".end-time-input").value
+            }))
+            .filter(r => r.subject || r.date || r.start || r.end);
+
+        let body = "";
+
+        if (!rows.length) {
+            body = `<div class="empty-state"><i class="fas fa-file"></i><p>Add subjects to see the preview.</p></div>`;
+        } else {
+            body = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Exam Date</th>
+                            <th>Exam Day</th>
+                            <th>Exam Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(r => {
+                            // Holiday: one full-width themed line
+                            if (isHolidaySubject(r.subject)) {
+                                const dateText = [r.date, r.day ? `(${r.day})` : ""].filter(Boolean).join(" ");
+                                return `
+                                    <tr>
+                                        <td colspan="4" class="holiday-cell">
+                                            ${dateText ? `<span class="holiday-date">${previewEscape(dateText)}</span><span class="holiday-sep">—</span>` : ""}
+                                            <span class="holiday-tag"><i class="fas fa-umbrella-beach"></i> ${previewEscape(r.subject.toUpperCase())}</span>
+                                        </td>
+                                    </tr>
+                                `;
+                            }
+
+                            // Time is optional: show it only when both are filled
+                            const time = (r.start && r.end)
+                                ? `${previewTime12h(r.start)} - ${previewTime12h(r.end)}`
+                                : "";
+                            return `
+                                <tr>
+                                    <td>${previewEscape(r.subject)}</td>
+                                    <td>${previewEscape(r.date)}</td>
+                                    <td>${previewEscape(r.day)}</td>
+                                    <td>${previewEscape(time)}</td>
+                                </tr>
+                            `;
+                        }).join("")}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        target.innerHTML = `
+            <div class="admit-preview" onclick="goToEdit()" title="Click to edit">
+                <span class="edit-hint"><i class="fas fa-pen"></i> Click to edit</span>
+                <div class="header-band">
+                    <h3>ADMIT CARD</h3>
+                    <p>${previewEscape(exam)} | Class: ${previewEscape(className)}</p>
+                </div>
+                <div class="student-note">
+                    <strong>Student details</strong> (name, roll number, parents, etc.) are filled in automatically for every student.
+                </div>
+                ${body}
+                <div class="footer-text">This is a system generated admit card.</div>
+            </div>
+        `;
+    }
+
+    // Clicking the preview scrolls back to the form and focuses the first empty/first field
+    function goToEdit() {
+        const box = document.getElementById("editBox");
+        box.scrollIntoView({ behavior: "smooth", block: "start" });
+        const first = document.querySelector(".subject-row .subject-input");
+        if (first) setTimeout(() => first.focus(), 350);
+    }
+
+    // Keep preview in sync with every keystroke / time change
+    document.getElementById("subjectsContainer").addEventListener("input", renderPreview);
+    document.getElementById("subjectsContainer").addEventListener("change", renderPreview);
 
     /* =========================
        FIRST SUBJECT
     ========================= */
 
     addSubject();
+
+    /* =========================
+       LOAD SAVED ADMIT CARD (edit mode)
+       If an admit card was already saved for this exam + class,
+       fill the form with it so it can be previewed and edited.
+    ========================= */
+
+    async function loadExistingAdmitCard() {
+        if (!exam || !className) return;
+
+        try {
+            const response = await fetch(
+                `${API_URL}/api/admitcard?exam=${encodeURIComponent(exam)}&className=${encodeURIComponent(className)}`
+            );
+
+            if (!response.ok) return; // not created yet -> stay in create mode
+
+            const result = await response.json();
+            const saved = result && result.data && result.data.subjects;
+
+            if (!saved || !saved.length) return;
+
+            document.getElementById("subjectsContainer").innerHTML = "";
+            saved.forEach(s => addSubject(s));
+            document.getElementById("formTitle").textContent = "Edit Admit Card";
+        } catch (error) {
+            console.warn("Could not load saved admit card:", error);
+        }
+    }
+
+    loadExistingAdmitCard();
 
     /* =========================
        SAVE
@@ -613,34 +1031,79 @@
         const subjects = [];
         let hasInvalid = false;
 
+        let errorMessage = "";
+
         rows.forEach(row => {
             const subject = row.querySelector(".subject-input").value.trim();
             const dateRaw = row.querySelector(".date-input").value.trim();
             const day = row.querySelector(".day-input").value;
+            const startInput = row.querySelector(".start-time-input");
+            const endInput = row.querySelector(".end-time-input");
+            const startTime = startInput.value; // "HH:mm" (24-hour) or ""
+            const endTime = endInput.value;     // "HH:mm" (24-hour) or ""
 
-            if (!subject && !dateRaw) return; // empty row, skip
+            startInput.classList.remove("invalid");
+            endInput.classList.remove("invalid");
 
+            if (!subject && !dateRaw && !startTime && !endTime) return; // empty row, skip
+
+            const label = subject || "a subject";
             const parsed = parseDDMMYYYY(dateRaw);
 
-            if (subject && dateRaw && !parsed) {
+            if (!subject || !dateRaw || !parsed) {
                 hasInvalid = true;
                 row.querySelector(".date-input").classList.add("invalid");
+                if (!errorMessage) {
+                    errorMessage = `⚠️ Subject name and a valid date (DD/MM/YYYY) are required for ${label}.`;
+                }
                 return;
             }
 
-            if (subject && parsed) {
-                // Convert to ISO (YYYY-MM-DD) for the backend, same as before
-                const iso = parsed.toISOString().slice(0, 10);
+            // Holiday: no time needed, save with empty time
+            if (isHolidaySubject(subject)) {
                 subjects.push({
                     subject,
-                    date: iso,
-                    day
+                    date: toLocalISODate(parsed),
+                    day,
+                    startTime: "",
+                    endTime: ""
                 });
+                return;
             }
+
+            // Time is OPTIONAL: both empty is fine, both filled is fine.
+            // Only one of them filled is an error.
+            if ((startTime && !endTime) || (!startTime && endTime)) {
+                hasInvalid = true;
+                if (!startTime) startInput.classList.add("invalid");
+                if (!endTime) endInput.classList.add("invalid");
+                if (!errorMessage) {
+                    errorMessage = `⚠️ Fill both start and end time for ${label}, or leave both empty.`;
+                }
+                return;
+            }
+
+            if (startTime && endTime && endTime <= startTime) {
+                hasInvalid = true;
+                startInput.classList.add("invalid");
+                endInput.classList.add("invalid");
+                if (!errorMessage) {
+                    errorMessage = `⚠️ End time must be after start time for ${label}.`;
+                }
+                return;
+            }
+
+            subjects.push({
+                subject,
+                date: toLocalISODate(parsed),
+                day,
+                startTime, // e.g. "10:00" or ""
+                endTime    // e.g. "13:00" or ""
+            });
         });
 
         if (hasInvalid) {
-            alert("⚠️ Please enter a valid date in DD/MM/YYYY format.");
+            alert(errorMessage || "⚠️ Please check the highlighted fields.");
             return;
         }
 

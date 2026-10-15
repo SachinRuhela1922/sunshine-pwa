@@ -130,6 +130,218 @@
     }
 
 
+    /* ================= SYLLABUS MODAL ================= */
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(45,31,12,.45);
+      z-index: 999;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 1rem;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .syllabus-modal {
+      background: #f7f3ed;
+      border-radius: 28px;
+      max-width: 1100px;
+      width: 100%;
+      padding: 1.6rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+
+    .syllabus-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: .6rem;
+    }
+
+    .syllabus-modal-header h2 {
+      font-size: 1.3rem;
+      color: #2d1f0c;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .syllabus-modal-header h2 i {
+      color: #f58a2e;
+    }
+
+    .syllabus-close-btn {
+      background: #fcf3e8;
+      color: #f58a2e;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .term-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: 1rem;
+    }
+
+    .term-tab-btn {
+      background: white;
+      border: 1px solid rgba(245,138,46,.15);
+      color: #7f6a4b;
+      padding: .5rem 1rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: .8rem;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .term-tab-btn.active {
+      background: linear-gradient(135deg,#f58a2e,#f9b042);
+      color: white;
+      border-color: transparent;
+    }
+
+    .term-panel {
+      display: none;
+      background: white;
+      border-radius: 20px;
+      padding: 1.2rem;
+      border: 1px solid rgba(245,138,46,.06);
+    }
+
+    .term-panel.active {
+      display: block;
+    }
+
+    .syllabus-row {
+      display: grid;
+      grid-template-columns: 1.4fr .7fr .7fr 1.4fr auto;
+      gap: .6rem;
+      margin-bottom: .6rem;
+      align-items: center;
+    }
+
+    .syllabus-row input {
+      padding: .55rem .7rem;
+      border: 1px solid #f0e2d2;
+      border-radius: 10px;
+      font-size: .85rem;
+      width: 100%;
+    }
+
+    .syllabus-row input:focus {
+      outline: none;
+      border-color: #f58a2e;
+    }
+
+    .row-remove-btn {
+      background: #fdeaea;
+      color: #c0392b;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .add-row-btn {
+      background: #fcf3e8;
+      color: #f58a2e;
+      border: 1px dashed #f58a2e;
+      padding: .5rem 1rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: .8rem;
+      cursor: pointer;
+      margin-top: .3rem;
+    }
+
+    .syllabus-row-labels {
+      display: grid;
+      grid-template-columns: 1.4fr .7fr .7fr 1.4fr auto;
+      gap: .6rem;
+      margin-bottom: .4rem;
+      font-size: .72rem;
+      font-weight: 700;
+      color: #a68a5e;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+
+    .syllabus-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: .6rem;
+      margin-top: 1.2rem;
+    }
+
+    .syllabus-view-wrap {
+      margin-top: 1.5rem;
+    }
+
+    .syllabus-view-term {
+      background: white;
+      border-radius: 20px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(245,138,46,.06);
+    }
+
+    .syllabus-view-term h3 {
+      font-size: 1rem;
+      color: #2d1f0c;
+      margin-bottom: .6rem;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    .syllabus-view-term h3 i {
+      color: #f58a2e;
+    }
+
+    .syllabus-view-item {
+      padding: .6rem 0;
+      border-bottom: 1px dashed #f0e2d2;
+      font-size: .85rem;
+      color: #4a3c26;
+    }
+
+    .syllabus-view-item:last-child {
+      border-bottom: none;
+    }
+
+    .syllabus-view-item strong {
+      color: #2d1f0c;
+    }
+
+    .syllabus-empty-note {
+      color: #a68a5e;
+      font-size: .8rem;
+      padding: .3rem 0;
+    }
+
+    @media (max-width: 700px) {
+      .syllabus-row, .syllabus-row-labels {
+        grid-template-columns: 1fr;
+      }
+      .syllabus-row-labels { display: none; }
+    }
+
+
     /* SEARCH */
 
     .search-section {
@@ -478,6 +690,48 @@
         Refresh
 
       </button>
+
+
+      <button
+        class="btn-action btn-primary"
+        id="openSyllabusBtn">
+
+        <i class="fas fa-book-open"></i>
+
+        Syllabus
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= SYLLABUS MODAL ================= -->
+
+  <div class="modal-overlay" id="syllabusModalOverlay">
+
+    <div class="syllabus-modal">
+
+      <div class="syllabus-modal-header">
+        <h2><i class="fas fa-book-open"></i> Syllabus · <span id="syllabusClassLabel">Class</span></h2>
+        <button class="syllabus-close-btn" id="closeSyllabusBtn"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div class="term-tabs" id="termTabs"></div>
+
+      <div id="termPanels"></div>
+
+      <div class="syllabus-modal-footer">
+        <button class="btn-action btn-back" id="cancelSyllabusBtn">Cancel</button>
+        <button class="btn-action btn-success" id="saveSyllabusBtn">
+          <i class="fas fa-save"></i> Save Syllabus
+        </button>
+      </div>
+
+      <div class="syllabus-view-wrap" id="syllabusViewWrap">
+        <!-- Saved syllabus preview render hoga yaha -->
+      </div>
 
     </div>
 
@@ -1551,6 +1805,303 @@ document.addEventListener(
   "DOMContentLoaded",
   loadClassStudents
 );
+
+
+/* =====================================================
+   SYLLABUS (Create + View for this class)
+   Fixed terms: Unit 1, Unit 2, Half Yearly, Unit 3, Unit 4, Annual
+===================================================== */
+
+const SYLLABUS_TERMS = [
+  { key: "unit1",      label: "Unit 1",      icon: "fa-1" },
+  { key: "unit2",      label: "Unit 2",      icon: "fa-2" },
+  { key: "halfYearly",  label: "Half Yearly", icon: "fa-calendar-check" },
+  { key: "unit3",      label: "Unit 3",      icon: "fa-3" },
+  { key: "unit4",      label: "Unit 4",      icon: "fa-4" },
+  { key: "annual",     label: "Annual",      icon: "fa-trophy" }
+];
+
+let syllabusRowIdCounter = 0;
+let activeSyllabusTerm = "unit1";
+
+const syllabusModalOverlay = document.getElementById("syllabusModalOverlay");
+const openSyllabusBtn = document.getElementById("openSyllabusBtn");
+const closeSyllabusBtn = document.getElementById("closeSyllabusBtn");
+const cancelSyllabusBtn = document.getElementById("cancelSyllabusBtn");
+const saveSyllabusBtn = document.getElementById("saveSyllabusBtn");
+const termTabsEl = document.getElementById("termTabs");
+const termPanelsEl = document.getElementById("termPanels");
+const syllabusViewWrap = document.getElementById("syllabusViewWrap");
+const syllabusClassLabel = document.getElementById("syllabusClassLabel");
+
+function buildSyllabusRow(termKey, data) {
+
+  const row = data || { subject: "", chapterFrom: "", chapterTo: "", extra: "" };
+  syllabusRowIdCounter++;
+  const rowId = "srow_" + syllabusRowIdCounter;
+
+  const div = document.createElement("div");
+  div.className = "syllabus-row";
+  div.dataset.rowId = rowId;
+
+  div.innerHTML = `
+    <input type="text" class="s-subject" placeholder="Subject (e.g. Mathematics)" value="${escapeHtml(row.subject)}">
+    <input type="text" class="s-from" placeholder="Chapter from" value="${escapeHtml(row.chapterFrom)}">
+    <input type="text" class="s-to" placeholder="Chapter to" value="${escapeHtml(row.chapterTo)}">
+    <input type="text" class="s-extra" placeholder="Extra note (optional)" value="${escapeHtml(row.extra)}">
+    <button type="button" class="row-remove-btn" title="Remove row"><i class="fas fa-trash"></i></button>
+  `;
+
+  div.querySelector(".row-remove-btn").addEventListener("click", function() {
+    div.remove();
+  });
+
+  const panel = document.getElementById("panel_" + termKey);
+  const addBtn = panel.querySelector(".add-row-btn");
+  panel.querySelector(".syllabus-rows").appendChild(div);
+
+  return div;
+}
+
+function renderSyllabusTabsAndPanels() {
+
+  termTabsEl.innerHTML = "";
+  termPanelsEl.innerHTML = "";
+
+  SYLLABUS_TERMS.forEach((term, idx) => {
+
+    const tabBtn = document.createElement("button");
+    tabBtn.type = "button";
+    tabBtn.className = "term-tab-btn" + (idx === 0 ? " active" : "");
+    tabBtn.dataset.term = term.key;
+    tabBtn.innerHTML = `<i class="fas ${term.icon}"></i> ${term.label}`;
+    tabBtn.addEventListener("click", function() {
+      activeSyllabusTerm = term.key;
+      document.querySelectorAll(".term-tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".term-panel").forEach(p => p.classList.remove("active"));
+      tabBtn.classList.add("active");
+      document.getElementById("panel_" + term.key).classList.add("active");
+    });
+    termTabsEl.appendChild(tabBtn);
+
+    const panel = document.createElement("div");
+    panel.className = "term-panel" + (idx === 0 ? " active" : "");
+    panel.id = "panel_" + term.key;
+    panel.innerHTML = `
+      <div class="syllabus-row-labels">
+        <span>Subject</span><span>From</span><span>To</span><span>Extra note</span><span></span>
+      </div>
+      <div class="syllabus-rows"></div>
+      <button type="button" class="add-row-btn"><i class="fas fa-plus"></i> Add Subject Row</button>
+    `;
+    termPanelsEl.appendChild(panel);
+
+    panel.querySelector(".add-row-btn").addEventListener("click", function() {
+      buildSyllabusRow(term.key, null);
+    });
+
+  });
+
+}
+
+function fillSyllabusForm(terms) {
+
+  SYLLABUS_TERMS.forEach((term) => {
+
+    const panel = document.getElementById("panel_" + term.key);
+    panel.querySelector(".syllabus-rows").innerHTML = "";
+
+    const rows = (terms && terms[term.key] && terms[term.key].length) ? terms[term.key] : [null];
+
+    rows.forEach((row) => {
+      buildSyllabusRow(term.key, row);
+    });
+
+  });
+
+}
+
+function collectSyllabusFormData() {
+
+  const terms = {};
+
+  SYLLABUS_TERMS.forEach((term) => {
+
+    const panel = document.getElementById("panel_" + term.key);
+    const rowEls = panel.querySelectorAll(".syllabus-row");
+
+    const rows = [];
+
+    rowEls.forEach((rowEl) => {
+
+      const subject = rowEl.querySelector(".s-subject").value.trim();
+      const chapterFrom = rowEl.querySelector(".s-from").value.trim();
+      const chapterTo = rowEl.querySelector(".s-to").value.trim();
+      const extra = rowEl.querySelector(".s-extra").value.trim();
+
+      if (subject) {
+        rows.push({ subject, chapterFrom, chapterTo, extra });
+      }
+
+    });
+
+    terms[term.key] = rows;
+
+  });
+
+  return terms;
+
+}
+
+function renderSyllabusView(syllabus) {
+
+  syllabusViewWrap.innerHTML = `<div class="section-divider" style="border-top:1px dashed #e6d4bb;margin:1rem 0 1rem;"></div>
+    <h3 style="color:#2d1f0c;font-size:1rem;margin-bottom:.8rem;"><i class="fas fa-eye" style="color:#f58a2e;"></i> Saved Syllabus</h3>`;
+
+  const terms = (syllabus && syllabus.terms) ? syllabus.terms : {};
+
+  let anyData = false;
+
+  SYLLABUS_TERMS.forEach((term) => {
+
+    const rows = terms[term.key] || [];
+
+    const block = document.createElement("div");
+    block.className = "syllabus-view-term";
+
+    let inner = `<h3><i class="fas ${term.icon}"></i> ${term.label}</h3>`;
+
+    if (rows.length === 0) {
+      inner += `<div class="syllabus-empty-note">No syllabus added yet for ${term.label}.</div>`;
+    } else {
+      anyData = true;
+      rows.forEach((row) => {
+        const range = (row.chapterFrom || row.chapterTo)
+          ? ` (Chapter ${escapeHtml(row.chapterFrom || "-")} to ${escapeHtml(row.chapterTo || "-")})`
+          : "";
+        const extraText = row.extra ? ` — ${escapeHtml(row.extra)}` : "";
+        inner += `<div class="syllabus-view-item"><strong>${escapeHtml(row.subject)}</strong>${range}${extraText}</div>`;
+      });
+    }
+
+    block.innerHTML = inner;
+    syllabusViewWrap.appendChild(block);
+
+  });
+
+  if (!anyData) {
+    syllabusViewWrap.insertAdjacentHTML(
+      "beforeend",
+      `<p class="syllabus-empty-note"><i class="fas fa-info-circle"></i> Abhi tak is class ka koi syllabus save nahi hua.</p>`
+    );
+  }
+
+}
+
+async function loadSyllabusForClass() {
+
+  fillSyllabusForm(null);
+  syllabusViewWrap.innerHTML = `<p class="syllabus-empty-note"><i class="fas fa-circle-notch fa-spin"></i> Loading syllabus...</p>`;
+
+  try {
+
+    const response = await fetch(`${API_URL}/api/syllabus/${encodeURIComponent(className)}`);
+    const result = await response.json();
+
+    if (response.ok && result.success && result.syllabus) {
+      fillSyllabusForm(result.syllabus.terms);
+      renderSyllabusView(result.syllabus);
+    } else {
+      renderSyllabusView(null);
+    }
+
+  } catch (error) {
+
+    console.error("Load syllabus error:", error);
+    syllabusViewWrap.innerHTML = `<p class="syllabus-empty-note"><i class="fas fa-triangle-exclamation"></i> Syllabus load nahi ho paya.</p>`;
+
+  }
+
+}
+
+function openSyllabusModal() {
+
+  if (!className) {
+    alert("No class selected.");
+    return;
+  }
+
+  syllabusClassLabel.textContent = displayName;
+  syllabusModalOverlay.classList.add("open");
+  loadSyllabusForClass();
+
+}
+
+function closeSyllabusModal() {
+  syllabusModalOverlay.classList.remove("open");
+}
+
+if (openSyllabusBtn) {
+  renderSyllabusTabsAndPanels();
+  openSyllabusBtn.addEventListener("click", openSyllabusModal);
+}
+
+if (closeSyllabusBtn) {
+  closeSyllabusBtn.addEventListener("click", closeSyllabusModal);
+}
+
+if (cancelSyllabusBtn) {
+  cancelSyllabusBtn.addEventListener("click", closeSyllabusModal);
+}
+
+if (syllabusModalOverlay) {
+  syllabusModalOverlay.addEventListener("click", function(e) {
+    if (e.target === syllabusModalOverlay) {
+      closeSyllabusModal();
+    }
+  });
+}
+
+if (saveSyllabusBtn) {
+  saveSyllabusBtn.addEventListener("click", async function() {
+
+    const terms = collectSyllabusFormData();
+
+    const oldText = saveSyllabusBtn.innerHTML;
+    saveSyllabusBtn.disabled = true;
+    saveSyllabusBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+
+    try {
+
+      const response = await fetch(`${API_URL}/api/syllabus`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ className: className, terms: terms })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        renderSyllabusView(result.syllabus);
+        alert("Syllabus saved successfully.");
+      } else {
+        alert(result.message || "Unable to save syllabus.");
+      }
+
+    } catch (error) {
+
+      console.error("Save syllabus error:", error);
+      alert("Unable to save syllabus. Please try again.");
+
+    } finally {
+
+      saveSyllabusBtn.disabled = false;
+      saveSyllabusBtn.innerHTML = oldText;
+
+    }
+
+  });
+}
 
 </script>
 
