@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.vercel.sunshine_pwa_six.twa",
+        "sha256_cert_fingerprints": ["7F:B4:50:2E:62:5A:E5:72:97:EE:D3:52:C2:91:F7:5A:CE:87:3A:01:F4:82:49:16:6D:0C:D7:8E:57:9F:D2:F7"]
+      }
+    }]
