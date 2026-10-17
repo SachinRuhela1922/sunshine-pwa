@@ -633,7 +633,7 @@
 
     async function loadClasses() {
     try {
-        const response = await fetch("https://sunshine-swp6.onrender.com/api/classes");
+        const response = await fetch("https://sunshine-vtal.onrender.com/api/classes");
         const data = await response.json();
 
         const select = document.getElementById("classSelect");
@@ -887,7 +887,7 @@
         };
 
         try {
-            const response = await fetch("https://sunshine-swp6.onrender.com/api/students", {
+            const response = await fetch("https://sunshine-vtal.onrender.com/api/students", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(student)
