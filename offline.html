@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f58a2e">
+<title>Sunshine School · Offline</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Roboto,system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#f9f3e8,#fff4e6);padding:20px}
+  .card{max-width:440px;width:100%;background:rgba(255,255,255,.9);padding:40px;border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,.08);text-align:center}
+  img{width:80px;height:80px;border-radius:30px;margin-bottom:16px}
+  h1{color:#2d1f0c;font-size:1.4rem;margin-bottom:10px}
+  p{color:#6b5a43;line-height:1.5;margin-bottom:22px}
+  button{border:0;border-radius:14px;padding:12px 26px;font-size:1rem;color:#fff;cursor:pointer;background:linear-gradient(135deg,#f9b042,#f58a2e)}
+</style>
+</head>
+<body>
+  <div class="card">
+    <img src="icons/icon-192.png" alt="Sunshine School">
+    <h1>You're offline</h1>
+    <p>This page hasn't been saved for offline use yet, and school data needs an internet connection. Please reconnect and try again.</p>
+    <button onclick="location.reload()">Try again</button>
+  </div>
+</body>
+</html>
